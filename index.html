@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swipe.ardy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f4;
+      --bg-tertiary: #f0efee;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --border: rgba(0,0,0,0.1);
+      --border-hover: rgba(0,0,0,0.2);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --accent: #1a1a1a;
+      --accent-text: #ffffff;
+      --liked: #E24B4A;
+      --liked-bg: #FCEBEB;
+      --liked-border: #F09595;
+      --liked-text: #A32D2D;
+      --info-bg: #E6F1FB;
+      --info-text: #185FA5;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .app { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-name { font-size: 18px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.4px; }
+    .brand-name span { color: var(--text-tertiary); font-weight: 400; }
+    .count-badge { font-size: 11px; padding: 2px 9px; border-radius: 20px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-tertiary); }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* Search */
+    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 7px 12px; }
+    .search-box input { border: none; background: transparent; font-size: 13px; color: var(--text-primary); outline: none; width: 180px; font-family: inherit; }
+    .search-box input::placeholder { color: var(--text-tertiary); }
+    .search-box i { font-size: 15px; color: var(--text-tertiary); }
+
+    /* Buttons */
+    .btn-primary { display: flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: var(--radius-md); background: var(--accent); color: var(--accent-text); border: none; cursor: pointer; font-family: inherit; transition: opacity 0.15s; white-space: nowrap; }
+    .btn-primary:hover { opacity: 0.82; }
+    .btn-ghost { display: flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 13px; border-radius: var(--radius-md); background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .btn-ghost:hover { background: var(--bg-secondary); border-color: var(--border-hover); }
+    .btn-cancel { padding: 8px 16px; font-size: 13px; border-radius: var(--radius-md); border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .btn-cancel:hover { background: var(--bg-secondary); }
+    .btn-save { padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: var(--radius-md); border: none; background: var(--accent); color: var(--accent-text); cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+    .btn-save:hover { opacity: 0.82; }
+
+    /* Filter bar */
+    .filterbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-btn { display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12px; border-radius: var(--radius-md); background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .dropdown-btn.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+    .dropdown-btn:hover:not(.active) { border-color: var(--border-hover); }
+    .dropdown-menu { position: absolute; top: calc(100% + 6px); left: 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 6px; min-width: 170px; z-index: 100; display: none; box-shadow: var(--shadow); }
+    .dropdown-menu.open { display: block; }
+    .dropdown-item { padding: 8px 10px; font-size: 13px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background 0.1s; }
+    .dropdown-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .dropdown-item.selected { color: var(--text-primary); font-weight: 500; }
+    .liked-btn { display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12px; border-radius: var(--radius-md); background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .liked-btn.active { background: var(--liked-bg); color: var(--liked-text); border-color: var(--liked-border); }
+    .sort-select { padding: 7px 12px; font-size: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; font-family: inherit; outline: none; margin-left: auto; }
+    .divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+
+    /* Results */
+    .results-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+
+    /* Card */
+    .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; display: flex; flex-direction: column; }
+    .card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+    .card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .card-author { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .author-name { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .author-date { font-size: 11px; color: var(--text-tertiary); }
+    .platform-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: var(--info-bg); color: var(--info-text); white-space: nowrap; flex-shrink: 0; }
+    .card-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+    .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .card-placeholder { width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    .card-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
+    .card-tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
+    .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .card-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 4px; font-size: 16px; transition: color 0.15s; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+    .card-btn:hover { color: var(--text-primary); background: var(--bg-secondary); }
+    .card-btn.liked { color: var(--liked); }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-tertiary); }
+    .empty-state i { font-size: 36px; display: block; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; margin-bottom: 8px; }
+    .empty-state small { font-size: 12px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--accent-text); padding: 9px 20px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+
+    /* Overlay */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 1rem; backdrop-filter: blur(2px); }
+    .modal { background: var(--bg); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 1.5rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .modal-close { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 20px; padding: 2px; border-radius: 4px; display: flex; align-items: center; }
+    .modal-close:hover { background: var(--bg-secondary); }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+    .field { margin-bottom: 1rem; }
+    .field label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .field input, .field textarea, .field select { width: 100%; font-size: 13px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 12px; background: var(--bg-secondary); color: var(--text-primary); outline: none; transition: border-color 0.15s; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--border-hover); background: var(--bg); }
+    .field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+    /* Settings */
+    .settings-label { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 12px; display: block; }
+    .filter-group { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
+    .filter-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .rename-input { font-size: 13px; font-weight: 500; font-family: inherit; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; background: var(--bg); color: var(--text-primary); outline: none; width: 150px; }
+    .rename-input:focus { border-color: var(--border-hover); }
+    .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 16px; padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: all 0.15s; }
+    .icon-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+    .icon-btn.danger:hover { color: var(--liked); }
+    .filter-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .filter-option-pill { display: flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); }
+    .filter-option-pill button { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 13px; padding: 0; line-height: 1; display: flex; align-items: center; transition: color 0.15s; }
+    .filter-option-pill button:hover { color: var(--liked); }
+    .add-option-row { display: flex; gap: 6px; }
+    .add-option-row input { flex: 1; font-size: 12px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 10px; background: var(--bg); color: var(--text-primary); outline: none; }
+    .add-option-row input:focus { border-color: var(--border-hover); }
+    .add-option-row button { padding: 6px 12px; font-size: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .add-option-row button:hover { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+    .add-filter-row { display: flex; gap: 8px; margin-top: 6px; }
+    .add-filter-row input { flex: 1; font-size: 13px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 12px; background: var(--bg-secondary); color: var(--text-primary); outline: none; }
+    .add-filter-row input:focus { border-color: var(--border-hover); background: var(--bg); }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .app { padding: 16px 14px; }
+      .search-box input { width: 120px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <div style="display:flex;align-items:baseline;">
+        <span class="brand-name">Swipe<span>.</span>ardy</span>
+      </div>
+      <span class="count-badge" id="totalBadge">0 swipes</span>
+    </div>
+    <div class="header-right">
+      <div class="search-box">
+        <i class="ri-search-line"></i>
+        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="applyFilters()" />
+      </div>
+      <button class="btn-ghost" onclick="openSettings()">
+        <i class="ri-equalizer-line"></i> Manage filters
+      </button>
+      <button class="btn-primary" onclick="openAddModal()">
+        <i class="ri-add-line"></i> Add swipe
+      </button>
+    </div>
+  </div>
+
+  <div class="filterbar" id="filterBar"></div>
+  <div class="results-label" id="resultsLabel"></div>
+  <div class="grid" id="cardGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Add swipe modal -->
+<div class="overlay" id="addOverlay" style="display:none" onclick="handleOverlayClick(event,'addOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">Add new swipe</span>
+      <button class="modal-close" onclick="closeAddModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="field"><label>Author name *</label><input type="text" id="f-author" placeholder="e.g. Justin Welsh" /></div>
+    <div class="field"><label>Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
+    <div class="field"><label>Image URL (optional)</label><input type="text" id="f-image" placeholder="https://..." /></div>
+    <div class="field"><label>Platform</label>
+      <select id="f-platform">
+        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
+      </select>
+    </div>
+    <div id="dynamicFields"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="btn-save" onclick="saveSwipe()">Save swipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage filters modal -->
+<div class="overlay" id="settingsOverlay" style="display:none" onclick="handleOverlayClick(event,'settingsOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">Manage filters</span>
+      <button class="modal-close" onclick="closeSettings()"><i class="ri-close-line"></i></button>
+    </div>
+    <span class="settings-label">Filter categories</span>
+    <div id="filterGroupList"></div>
+    <div class="add-filter-row">
+      <input type="text" id="newFilterName" placeholder="New filter name (e.g. Tone, Goal, Niche...)" onkeydown="if(event.key==='Enter')addFilterGroup()" />
+      <button class="btn-save" onclick="addFilterGroup()">Add filter</button>
+    </div>
+    <div class="modal-actions" style="margin-top:1.5rem;">
+      <button class="btn-save" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const LS_SWIPES = 'swipeardy_swipes_v1';
+  const LS_FILTERS = 'swipeardy_filters_v1';
+
+  const AVATAR_COLORS = [
+    {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
+    {bg:'#FAECE7',color:'#993C1D'},{bg:'#FBEAF0',color:'#993556'},
+    {bg:'#EEEDFE',color:'#534AB7'},{bg:'#FAEEDA',color:'#854F0B'},
+  ];
+  const EMOJIS = {Design:'🎨',Copywriting:'✍️',Strategy:'♟️',Hooks:'🪝',Carousel:'📊',Personal:'💡',Storytelling:'📖',Branding:'🏷️'};
+
+  const DEFAULT_FILTERS = {
+    Category: ['Hooks','Copywriting','Design','Strategy','Carousel','Personal','Storytelling'],
+    Format:   ['Text only','Single image','Carousel','Video'],
+    Platform: ['LinkedIn','Twitter','Instagram'],
+  };
+
+  const DEFAULT_SWIPES = [
+    {id:1,author:'Ruben Hassid',date:'Jan 21, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Single image'},liked:false,text:'Stop embarrassing yourself with outdated tools. Here are the 8 tools I actually use in 2026 — completely changed how I work.',image:'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80'},
+    {id:2,author:'Lara Acosta',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Carousel'},liked:false,text:"You don't need algorithm hacks to grow on LinkedIn. I spent 90 days testing every growth hack. Here's what actually works.",image:'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=400&q=80'},
+    {id:3,author:'Josh Lowman',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Text only'},liked:true,text:'My intense desire to win makes me question everything. Did I choose the right path? So I build ideas that let me see in the dark.',image:''},
+    {id:4,author:'Justin Welsh',date:'Jan 15, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},liked:false,text:"I made $5M online with one simple system. No team. No investors. No office. Here's the exact framework I use every week.",image:''},
+    {id:5,author:'Katelyn Bourgoin',date:'Jan 14, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Single image'},liked:true,text:"Most copywriters focus on features. The best ones focus on the moment before the sale — the anxiety, the doubt, the real reason someone hesitates.",image:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80'},
+    {id:6,author:'Tim Hanson',date:'Jan 12, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Single image'},liked:false,text:"Your LinkedIn banner is prime real estate. 99% of people waste it. Here's a simple 3-part formula that converts profile visitors into followers.",image:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80'},
+    {id:7,author:'Alex Hormozi',date:'Jan 10, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},liked:true,text:"The biggest mistake founders make: building before selling. I wasted 18 months on a product nobody wanted. Here's the 1-hour validation process.",image:''},
+    {id:8,author:'Dickie Bush',date:'Jan 9, 2026',platform:'LinkedIn',filters:{Category:'Storytelling',Format:'Carousel'},liked:false,text:'Writing online changed my life. Not the followers. Not the revenue. The clarity. When you write daily, you think better and decide faster.',image:'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80'},
+    {id:9,author:'Nicolas Cole',date:'Jan 7, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},liked:false,text:"Every viral post has one thing in common. It's not the topic. It's the first line. Here are 7 proven hook structures that work every time.",image:''},
+    {id:10,author:'Sahil Bloom',date:'Jan 5, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Single image'},liked:false,text:'I used to optimize for money. Now I optimize for energy. The shift happened after one brutal year where I had everything and felt nothing.',image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80'},
+    {id:11,author:'Wes Kao',date:'Jan 4, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},liked:true,text:'Most people confuse being busy with being effective. Here are 5 async habits that eliminated 90% of my unnecessary meetings.',image:''},
+    {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},liked:false,text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
+  ];
+
+  function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {} }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  let filters = load(LS_FILTERS, DEFAULT_FILTERS);
+  let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
+  let activeFilters = {};
+  let likedOnly = false;
+
+  function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
+  function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
+
+  // ── Filter bar ──────────────────────────────────────────────────────────────
+  function renderFilterBar() {
+    const bar = document.getElementById('filterBar');
+    let html = '';
+    Object.keys(filters).forEach(key => {
+      const active = activeFilters[key];
+      const safeKey = key.replace(/'/g, "\\'");
+      html += `<div class="dropdown" id="dd-${key}">
+        <button class="dropdown-btn ${active ? 'active' : ''}" onclick="toggleDD('${safeKey}')">
+          ${active ? active : key} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
+        </button>
+        <div class="dropdown-menu" id="menu-${key}">
+          <div class="dropdown-item ${!active ? 'selected' : ''}" onclick="setFilter('${safeKey}',null)">
+            All ${key} ${!active ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+          </div>
+          ${filters[key].map(opt => {
+            const safeOpt = opt.replace(/'/g, "\\'");
+            return `<div class="dropdown-item ${active === opt ? 'selected' : ''}" onclick="setFilter('${safeKey}','${safeOpt}')">
+              ${opt} ${active === opt ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+    html += `<div class="divider"></div>
+    <button class="liked-btn ${likedOnly ? 'active' : ''}" onclick="toggleLikedOnly()">
+      <i class="ri-heart-${likedOnly ? 'fill' : 'line'}" style="font-size:14px"></i> Liked
+    </button>
+    <select class="sort-select" onchange="sortSwipes(this.value)">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="liked">Most liked</option>
+    </select>`;
+    bar.innerHTML = html;
+  }
+
+  function toggleDD(key) {
+    document.querySelectorAll('.dropdown-menu').forEach(m => { if (m.id !== `menu-${key}`) m.classList.remove('open'); });
+    const menu = document.getElementById(`menu-${key}`);
+    if (menu) menu.classList.toggle('open');
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dropdown')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+  });
+
+  function setFilter(key, val) {
+    if (val === null) delete activeFilters[key]; else activeFilters[key] = val;
+    renderFilterBar(); applyFilters();
+  }
+
+  function toggleLikedOnly() { likedOnly = !likedOnly; renderFilterBar(); applyFilters(); }
+
+  function sortSwipes(val) {
+    if (val === 'newest') swipes.sort((a,b) => b.id - a.id);
+    if (val === 'oldest') swipes.sort((a,b) => a.id - b.id);
+    if (val === 'liked')  swipes.sort((a,b) => b.liked - a.liked);
+    applyFilters();
+  }
+
+  // ── Apply filters ────────────────────────────────────────────────────────────
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const data = swipes.filter(s => {
+      if (likedOnly && !s.liked) return false;
+      if (q && !s.text.toLowerCase().includes(q) && !s.author.toLowerCase().includes(q)) return false;
+      for (const key of Object.keys(activeFilters)) {
+        if (activeFilters[key] && s.filters[key] !== activeFilters[key]) return false;
+      }
+      return true;
+    });
+    document.getElementById('totalBadge').textContent = swipes.length + ' swipe' + (swipes.length !== 1 ? 's' : '');
+    document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
+    renderCards(data);
+  }
+
+  // ── Render cards ─────────────────────────────────────────────────────────────
+  function renderCards(data) {
+    const grid = document.getElementById('cardGrid');
+    if (!data.length) {
+      grid.innerHTML = `<div class="empty-state">
+        <i class="ri-file-search-line"></i>
+        <p>No swipes match your filters</p>
+        <small>Try adjusting your filters or add a new swipe</small>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = data.map(s => {
+      const av = getAv(s.author);
+      const tags = Object.values(s.filters || {}).filter(Boolean);
+      const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
+      return `<div class="card">
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-author">
+              <div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>
+              <div>
+                <div class="author-name">${s.author}</div>
+                <div class="author-date">${s.date}</div>
+              </div>
+            </div>
+            <span class="platform-badge">${s.platform}</span>
+          </div>
+          <p class="card-text">${s.text}</p>
+        </div>
+        ${s.image
+          ? `<img src="${s.image}" alt="" class="card-img" onerror="this.style.display='none'" />`
+          : `<div class="card-placeholder">${emoji}</div>`
+        }
+        <div class="card-footer">
+          <div class="card-tags">${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+          <div class="card-actions">
+            <button class="card-btn ${s.liked ? 'liked' : ''}" onclick="toggleLike(${s.id},this)" title="Like">
+              <i class="ri-heart-${s.liked ? 'fill' : 'line'}"></i>
+            </button>
+            <button class="card-btn" onclick="copyText(${s.id},this)" title="Copy text">
+              <i class="ri-file-copy-line"></i>
+            </button>
+            <button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Card actions ─────────────────────────────────────────────────────────────
+  function toggleLike(id, btn) {
+    const s = swipes.find(x => x.id === id); if (!s) return;
+    s.liked = !s.liked; persist();
+    btn.classList.toggle('liked', s.liked);
+    btn.querySelector('i').className = s.liked ? 'ri-heart-fill' : 'ri-heart-line';
+    if (likedOnly) applyFilters();
+  }
+
+  function copyText(id, btn) {
+    const s = swipes.find(x => x.id === id); if (!s) return;
+    navigator.clipboard.writeText(s.text).catch(() => {});
+    const icon = btn.querySelector('i');
+    icon.className = 'ri-check-line';
+    setTimeout(() => { icon.className = 'ri-file-copy-line'; }, 1500);
+    showToast('Copied to clipboard ✓');
+  }
+
+  function deleteSwipe(id) {
+    if (!confirm('Delete this swipe?')) return;
+    swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    showToast('Swipe deleted');
+  }
+
+  // ── Add swipe modal ──────────────────────────────────────────────────────────
+  function openAddModal() {
+    document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key => `
+      <div class="field"><label>${key}</label>
+      <select id="ff-${key}">
+        <option value="">— Select ${key} —</option>
+        ${filters[key].map(o => `<option>${o}</option>`).join('')}
+      </select></div>`).join('');
+    document.getElementById('addOverlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('f-author').focus(), 50);
+  }
+
+  function closeAddModal() {
+    document.getElementById('addOverlay').style.display = 'none';
+    ['f-author','f-text','f-image'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function saveSwipe() {
+    const author = document.getElementById('f-author').value.trim();
+    const text   = document.getElementById('f-text').value.trim();
+    if (!author || !text) { showToast('Author and text are required'); return; }
+    const image    = document.getElementById('f-image').value.trim();
+    const platform = document.getElementById('f-platform').value;
+    const sf = {};
+    Object.keys(filters).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
+    const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image });
+    persist(); closeAddModal(); applyFilters();
+    showToast('Swipe saved ✓');
+  }
+
+  // ── Settings modal ───────────────────────────────────────────────────────────
+  function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
+
+  function closeSettings() {
+    document.getElementById('settingsOverlay').style.display = 'none';
+    persist(); renderFilterBar(); applyFilters();
+  }
+
+  function renderSettingsPanel() {
+    document.getElementById('filterGroupList').innerHTML = Object.keys(filters).map(key => {
+      const safeKey = key.replace(/'/g, "\\'");
+      return `<div class="filter-group">
+        <div class="filter-group-header">
+          <input class="rename-input" value="${key}" onblur="renameFilter('${safeKey}', this.value)" />
+          <button class="icon-btn danger" onclick="deleteFilterGroup('${safeKey}')" title="Delete filter">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
+        <div class="filter-options">
+          ${filters[key].map(opt => {
+            const safeOpt = opt.replace(/'/g, "\\'");
+            return `<span class="filter-option-pill">${opt}
+              <button onclick="removeOption('${safeKey}','${safeOpt}')" title="Remove">
+                <i class="ri-close-line"></i>
+              </button>
+            </span>`;
+          }).join('')}
+        </div>
+        <div class="add-option-row">
+          <input type="text" id="newoption-${key}" placeholder="Add option..." onkeydown="if(event.key==='Enter')addOption('${safeKey}')" />
+          <button onclick="addOption('${safeKey}')">+ Add</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renameFilter(oldKey, newKey) {
+    newKey = newKey.trim();
+    if (!newKey || newKey === oldKey) return;
+    const keys = Object.keys(filters);
+    const newF = {};
+    keys.forEach(k => { newF[k === oldKey ? newKey : k] = filters[k]; });
+    filters = newF;
+    if (activeFilters[oldKey]) { activeFilters[newKey] = activeFilters[oldKey]; delete activeFilters[oldKey]; }
+    renderSettingsPanel();
+  }
+
+  function deleteFilterGroup(key) {
+    if (!confirm(`Delete the "${key}" filter?`)) return;
+    delete filters[key]; delete activeFilters[key];
+    renderSettingsPanel();
+  }
+
+  function addOption(key) {
+    const input = document.getElementById(`newoption-${key}`);
+    const val = input.value.trim();
+    if (!val || filters[key].includes(val)) return;
+    filters[key].push(val); input.value = '';
+    renderSettingsPanel();
+  }
+
+  function removeOption(key, opt) {
+    filters[key] = filters[key].filter(o => o !== opt);
+    renderSettingsPanel();
+  }
+
+  function addFilterGroup() {
+    const input = document.getElementById('newFilterName');
+    const name = input.value.trim();
+    if (!name || filters[name]) return;
+    filters[name] = []; input.value = '';
+    renderSettingsPanel();
+  }
+
+  function handleOverlayClick(e, id) {
+    if (e.target.id === id) {
+      if (id === 'addOverlay') closeAddModal();
+      if (id === 'settingsOverlay') closeSettings();
+    }
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeAddModal(); closeSettings(); }
+  });
+
+  // Init
+  renderFilterBar();
+  applyFilters();
+</script>
+</body>
+</html>
