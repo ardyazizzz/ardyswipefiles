@@ -218,6 +218,7 @@
     <div class="field"><label>Post text *</label><textarea id="e-text"></textarea></div>
     <div class="field"><label>Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
     <div class="field"><label>Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
+    <div class="field"><label>Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -547,6 +548,7 @@
     document.getElementById('e-text').value    = s.text;
     document.getElementById('e-image').value   = s.image || '';
     document.getElementById('e-post').value    = s.postUrl || '';
+    document.getElementById('e-date').value    = s.date || '';
     document.getElementById('e-platform').value = s.platform;
     document.getElementById('e-reactions').value = s.reactions || '';
     document.getElementById('e-comments').value  = s.comments || '';
@@ -576,6 +578,7 @@
     s.text     = text;
     s.image    = document.getElementById('e-image').value.trim();
     s.postUrl  = document.getElementById('e-post').value.trim();
+    s.date     = document.getElementById('e-date').value.trim();
     s.platform = document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
