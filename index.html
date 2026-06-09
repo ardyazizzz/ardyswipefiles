@@ -456,7 +456,8 @@
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const data = swipes.filter(s => {
-      if (q && !s.text.toLowerCase().includes(q) && !s.author.toLowerCase().includes(q)) return false;
+      const searchStr = [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl].filter(Boolean).join(' ').toLowerCase();
+      if (q && !searchStr.includes(q)) return false;
       for (const key of Object.keys(activeFilters)) {
         if (activeFilters[key] && activeFilters[key].length && !activeFilters[key].includes(s.filters[key])) return false;
       }
