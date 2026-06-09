@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Swipe.ardy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -173,6 +174,9 @@
       <span class="count-badge" id="totalBadge">0 swipes</span>
     </div>
     <div class="header-right">
+      <button class="btn-ghost" onclick="doLogout()" style="font-size:12px">
+        <i class="ri-logout-box-line"></i>
+      </button>
       <div class="search-box">
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="applyFilters()" />
@@ -191,6 +195,23 @@
   <div class="grid" id="cardGrid"></div>
 </div>
 
+<div class="toast" id="toast"></div>
+
+<!-- Login overlay -->
+<div class="overlay" id="loginOverlay" style="display:flex">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Sign in to Swipe.ardy</span>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="procontentagency1@gmail.com" /></div>
+    <div class="field"><label>Password</label><input type="password" id="login-password" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+    <p id="login-error" style="color:var(--liked);font-size:12px;margin-bottom:8px;display:none"></p>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="doLogin()">Sign in</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit swipe modal -->
 <div class="overlay" id="editOverlay" style="display:none" onclick="handleOverlayClick(event,'editOverlay')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -201,6 +222,7 @@
     <div class="field"><label>Author name *</label><input type="text" id="e-author" /></div>
     <div class="field"><label>Post text *</label><textarea id="e-text"></textarea></div>
     <div class="field"><label>Image URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
+    <div class="field"><label>Or upload image</label><input type="file" id="e-upload" accept="image/*" /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -226,6 +248,7 @@
     <div class="field"><label>Author name *</label><input type="text" id="f-author" placeholder="e.g. Justin Welsh" /></div>
     <div class="field"><label>Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
     <div class="field"><label>Image URL (optional)</label><input type="text" id="f-image" placeholder="https://..." /></div>
+    <div class="field"><label>Or upload image</label><input type="file" id="f-upload" accept="image/*" /></div>
     <div class="field"><label>Platform</label>
       <select id="f-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -259,8 +282,10 @@
 </div>
 
 <script>
-  const LS_SWIPES = 'swipeardy_swipes_v1';
-  const LS_FILTERS = 'swipeardy_filters_v2';
+  const supabase = window.supabase.createClient(
+    'https://dmhiitzunsdqyxopqsby.supabase.co',
+    'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+  );
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -271,7 +296,7 @@
 
   const DEFAULT_FILTERS = {
     Category: ['Hooks','Copywriting','Design','Strategy','Carousel','Personal','Storytelling'],
-    Format:   ['Text only','Single image','Human image','Multiple images','Carousel','Video','Static infographic','GIF infographic','Screenshot','Quote card'],
+    Format: ['Text only','Single image','Human image','Multiple images','Carousel','Video','Static infographic','GIF infographic','Screenshot','Quote card'],
     Platform: ['LinkedIn','Twitter','Instagram'],
   };
 
@@ -290,22 +315,82 @@
     {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},liked:false,text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
   ];
 
-  function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {} }
-
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  let filters = load(LS_FILTERS, DEFAULT_FILTERS);
-  let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
+  let filters = {...DEFAULT_FILTERS};
+  let swipes = [];
   let activeFilters = {};
   let likedOnly = false;
 
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
+
+  // ── Auth ────────────────────────────────────────────────────────────────────
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim() || 'procontentagency1@gmail.com';
+    const password = document.getElementById('login-password').value.trim();
+    if (!password) { showError('Enter password'); return; }
+    const {error} = await supabase.auth.signInWithPassword({email,password});
+    if (error) { showError(error.message); return; }
+    document.getElementById('loginOverlay').style.display = 'none';
+    await initApp();
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  async function doLogout() {
+    await supabase.auth.signOut();
+    swipes = []; filters = {...DEFAULT_FILTERS}; activeFilters = {}; likedOnly = false;
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('login-password').value = '';
+    try { localStorage.removeItem('swipeardy_filters_v1'); localStorage.removeItem('swipeardy_swipes_v1'); } catch(e) {}
+  }
+
+  // ── Data ────────────────────────────────────────────────────────────────────
+  async function loadSwipes() {
+    const {data,error} = await supabase.from('swipes').select('*').order('created_at',{ascending:false});
+    if (error) { console.error(error); return; }
+    if (data && data.length > 0) {
+      swipes = data.map(r => ({...r, filters: r.filters || {}, image: r.image_url || ''}));
+    }
+  }
+
+  async function seedDefaults() {
+    const batch = DEFAULT_SWIPES.map(s => ({
+      id: s.id, author: s.author, date: s.date, platform: s.platform,
+      filters: s.filters || {}, liked: s.liked, text: s.text, image_url: s.image || ''
+    }));
+    const {error} = await supabase.from('swipes').upsert(batch);
+    if (error) console.error(error);
+  }
+
+  async function upsertSwipe(swipe) {
+    await supabase.from('swipes').upsert({
+      id: swipe.id, author: swipe.author, date: swipe.date || '',
+      platform: swipe.platform, filters: swipe.filters || {},
+      liked: swipe.liked || false, text: swipe.text, image_url: swipe.image || ''
+    });
+  }
+
+  async function delSwipe(id) {
+    await supabase.from('swipes').delete().eq('id', id);
+  }
+
+  async function uploadFile(file) {
+    const ext = file.name.split('.').pop();
+    const path = Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+    const {error} = await supabase.storage.from('images').upload(path, file);
+    if (error) { console.error(error); return null; }
+    const {data} = supabase.storage.from('images').getPublicUrl(path);
+    return data.publicUrl;
+  }
 
   // ── Filter bar ──────────────────────────────────────────────────────────────
   function renderFilterBar() {
@@ -314,316 +399,212 @@
     Object.keys(filters).forEach(key => {
       const active = activeFilters[key];
       const safeKey = key.replace(/'/g, "\\'");
-      html += `<div class="dropdown" id="dd-${key}">
-        <button class="dropdown-btn ${active ? 'active' : ''}" onclick="toggleDD('${safeKey}')">
-          ${active ? active : key} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
-        </button>
-        <div class="dropdown-menu" id="menu-${key}">
-          <div class="dropdown-item ${!active ? 'selected' : ''}" onclick="setFilter('${safeKey}',null)">
-            All ${key} ${!active ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
-          </div>
-          ${filters[key].map(opt => {
-            const safeOpt = opt.replace(/'/g, "\\'");
-            return `<div class="dropdown-item ${active === opt ? 'selected' : ''}" onclick="setFilter('${safeKey}','${safeOpt}')">
-              ${opt} ${active === opt ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
+      html += '<div class="dropdown" id="dd-'+key+'"><button class="dropdown-btn '+(active?'active':'')+'" onclick="toggleDD(\''+safeKey+'\')">'+(active||key)+' <i class="ri-arrow-down-s-line" style="font-size:14px"></i></button><div class="dropdown-menu" id="menu-'+key+'"><div class="dropdown-item '+(active?'':'selected')+'" onclick="setFilter(\''+safeKey+'\',null)">All '+key+' '+(active?'':'<i class="ri-check-line" style="font-size:13px"></i>')+'</div>'+filters[key].map(opt => { const so=opt.replace(/'/g,"\\'"); return '<div class="dropdown-item '+(active===opt?'selected':'')+'" onclick="setFilter(\''+safeKey+'\',\''+so+'\')">'+opt+' '+(active===opt?'<i class="ri-check-line" style="font-size:13px"></i>':'')+'</div>'; }).join('')+'</div></div>';
     });
-    html += `<div class="divider"></div>
-    <button class="liked-btn ${likedOnly ? 'active' : ''}" onclick="toggleLikedOnly()">
-      <i class="ri-heart-${likedOnly ? 'fill' : 'line'}" style="font-size:14px"></i> Liked
-    </button>
-    <select class="sort-select" onchange="sortSwipes(this.value)">
-      <option value="newest">Newest</option>
-      <option value="oldest">Oldest</option>
-      <option value="liked">Most liked</option>
-    </select>`;
+    html += '<div class="divider"></div><button class="liked-btn '+(likedOnly?'active':'')+'" onclick="toggleLikedOnly()"><i class="ri-heart-'+(likedOnly?'fill':'line')+'" style="font-size:14px"></i> Liked</button><select class="sort-select" onchange="sortSwipes(this.value)"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="liked">Most liked</option></select>';
     bar.innerHTML = html;
   }
 
   function toggleDD(key) {
-    document.querySelectorAll('.dropdown-menu').forEach(m => { if (m.id !== `menu-${key}`) m.classList.remove('open'); });
-    const menu = document.getElementById(`menu-${key}`);
-    if (menu) menu.classList.toggle('open');
+    document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id!=='menu-'+key) m.classList.remove('open'); });
+    document.getElementById('menu-'+key).classList.toggle('open');
   }
 
   document.addEventListener('click', e => {
     if (!e.target.closest('.dropdown')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
   });
 
-  function setFilter(key, val) {
-    if (val === null) delete activeFilters[key]; else activeFilters[key] = val;
-    renderFilterBar(); applyFilters();
-  }
-
-  function toggleLikedOnly() { likedOnly = !likedOnly; renderFilterBar(); applyFilters(); }
+  function setFilter(key, val) { if(val===null) delete activeFilters[key]; else activeFilters[key]=val; renderFilterBar(); applyFilters(); }
+  function toggleLikedOnly() { likedOnly=!likedOnly; renderFilterBar(); applyFilters(); }
 
   function sortSwipes(val) {
-    if (val === 'newest') swipes.sort((a,b) => b.id - a.id);
-    if (val === 'oldest') swipes.sort((a,b) => a.id - b.id);
-    if (val === 'liked')  swipes.sort((a,b) => b.liked - a.liked);
+    if(val==='newest') swipes.sort((a,b)=>b.id-a.id);
+    if(val==='oldest') swipes.sort((a,b)=>a.id-b.id);
+    if(val==='liked') swipes.sort((a,b)=>b.liked-a.liked);
     applyFilters();
   }
 
-  // ── Apply filters ────────────────────────────────────────────────────────────
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const data = swipes.filter(s => {
-      if (likedOnly && !s.liked) return false;
-      if (q && !s.text.toLowerCase().includes(q) && !s.author.toLowerCase().includes(q)) return false;
-      for (const key of Object.keys(activeFilters)) {
-        if (activeFilters[key] && s.filters[key] !== activeFilters[key]) return false;
-      }
+      if(likedOnly&&!s.liked) return false;
+      if(q&&!s.text.toLowerCase().includes(q)&&!s.author.toLowerCase().includes(q)) return false;
+      for(const key of Object.keys(activeFilters)) { if(activeFilters[key]&&s.filters[key]!==activeFilters[key]) return false; }
       return true;
     });
-    document.getElementById('totalBadge').textContent = swipes.length + ' swipe' + (swipes.length !== 1 ? 's' : '');
-    document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
+    document.getElementById('totalBadge').textContent=swipes.length+' swipe'+(swipes.length!==1?'s':'');
+    document.getElementById('resultsLabel').textContent=data.length+' result'+(data.length!==1?'s':'');
     renderCards(data);
   }
 
-  // ── Render cards ─────────────────────────────────────────────────────────────
   function renderCards(data) {
     const grid = document.getElementById('cardGrid');
-    if (!data.length) {
-      grid.innerHTML = `<div class="empty-state">
-        <i class="ri-file-search-line"></i>
-        <p>No swipes match your filters</p>
-        <small>Try adjusting your filters or add a new swipe</small>
-      </div>`;
-      return;
-    }
+    if(!data.length){ grid.innerHTML='<div class="empty-state"><i class="ri-file-search-line"></i><p>No swipes match your filters</p><small>Try adjusting your filters or add a new swipe</small></div>'; return; }
     grid.innerHTML = data.map(s => {
-      const av = getAv(s.author);
-      const tags = Object.values(s.filters || {}).filter(Boolean);
-      const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
-      return `<div class="card">
-        <div class="card-body" onclick="openEditModal(${s.id})">
-          <div class="card-top">
-            <div class="card-author">
-              <div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>
-              <div>
-                <div class="author-name">${s.author}</div>
-                <div class="author-date">${s.date}</div>
-              </div>
-            </div>
-            <span class="platform-badge">${s.platform}</span>
-          </div>
-          <p class="card-text">${s.text}</p>
-          <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
-        </div>
-        ${s.image
-          ? `<img src="${s.image}" alt="" class="card-img" onerror="this.style.display='none'" />`
-          : `<div class="card-placeholder">${emoji}</div>`
-        }
-        <div class="card-footer">
-          <div class="card-tags">${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
-          <div class="card-actions">
-            <button class="card-btn ${s.liked ? 'liked' : ''}" onclick="toggleLike(${s.id},this)" title="Like">
-              <i class="ri-heart-${s.liked ? 'fill' : 'line'}"></i>
-            </button>
-            <button class="card-btn" onclick="copyText(${s.id},this)" title="Copy text">
-              <i class="ri-file-copy-line"></i>
-            </button>
-            <button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete">
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </div>
-        </div>
-      </div>`;
+      const av=getAv(s.author), tags=Object.values(s.filters||{}).filter(Boolean), emoji=EMOJIS[s.filters&&s.filters.Category]||'📌';
+      const img = s.image || s.image_url;
+      return '<div class="card"><div class="card-body" onclick="openEditModal('+s.id+')"><div class="card-top"><div class="card-author"><div class="avatar" style="background:'+av.bg+';color:'+av.color+'">'+getInitials(s.author)+'</div><div><div class="author-name">'+s.author+'</div><div class="author-date">'+s.date+'</div></div></div><span class="platform-badge">'+s.platform+'</span></div><p class="card-text">'+s.text+'</p><div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div></div>'+(img?'<img src="'+img+'" alt="" class="card-img" onerror="this.style.display=\'none\'" />':'<div class="card-placeholder">'+emoji+'</div>')+'<div class="card-footer"><div class="card-tags">'+tags.map(t=>'<span class="card-tag">'+t+'</span>').join('')+'</div><div class="card-actions"><button class="card-btn '+(s.liked?'liked':'')+'" onclick="toggleLike('+s.id+',this)" title="Like"><i class="ri-heart-'+(s.liked?'fill':'line')+'"></i></button><button class="card-btn" onclick="copyText('+s.id+',this)" title="Copy text"><i class="ri-file-copy-line"></i></button><button class="card-btn" onclick="deleteSwipe('+s.id+')" title="Delete"><i class="ri-delete-bin-line"></i></button></div></div></div>';
     }).join('');
   }
 
   // ── Card actions ─────────────────────────────────────────────────────────────
-  function toggleLike(id, btn) {
-    const s = swipes.find(x => x.id === id); if (!s) return;
-    s.liked = !s.liked; persist();
-    btn.classList.toggle('liked', s.liked);
-    btn.querySelector('i').className = s.liked ? 'ri-heart-fill' : 'ri-heart-line';
-    if (likedOnly) applyFilters();
+  async function toggleLike(id, btn) {
+    const s=swipes.find(x=>x.id===id); if(!s) return;
+    s.liked=!s.liked; await upsertSwipe(s);
+    btn.classList.toggle('liked',s.liked);
+    btn.querySelector('i').className=s.liked?'ri-heart-fill':'ri-heart-line';
+    if(likedOnly) applyFilters();
   }
 
   function copyText(id, btn) {
-    const s = swipes.find(x => x.id === id); if (!s) return;
-    navigator.clipboard.writeText(s.text).catch(() => {});
-    const icon = btn.querySelector('i');
-    icon.className = 'ri-check-line';
-    setTimeout(() => { icon.className = 'ri-file-copy-line'; }, 1500);
-    showToast('Copied to clipboard ✓');
+    const s=swipes.find(x=>x.id===id); if(!s) return;
+    navigator.clipboard.writeText(s.text).catch(()=>{});
+    const icon=btn.querySelector('i'); icon.className='ri-check-line';
+    setTimeout(()=>{icon.className='ri-file-copy-line'},1500);
+    showToast('Copied to clipboard');
   }
 
-  function deleteSwipe(id) {
-    if (!confirm('Delete this swipe?')) return;
-    swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+  async function deleteSwipe(id) {
+    if(!confirm('Delete this swipe?')) return;
+    swipes=swipes.filter(x=>x.id!==id); await delSwipe(id); applyFilters();
     showToast('Swipe deleted');
   }
 
   // ── Add swipe modal ──────────────────────────────────────────────────────────
   function openAddModal() {
-    document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key => `
-      <div class="field"><label>${key}</label>
-      <select id="ff-${key}">
-        <option value="">— Select ${key} —</option>
-        ${filters[key].map(o => `<option>${o}</option>`).join('')}
-      </select></div>`).join('');
-    document.getElementById('addOverlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('f-author').focus(), 50);
+    document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key =>
+      '<div class="field"><label>'+key+'</label><select id="ff-'+key+'"><option value="">— Select '+key+' —</option>'+filters[key].map(o=>'<option>'+o+'</option>').join('')+'</select></div>'
+    ).join('');
+    document.getElementById('addOverlay').style.display='flex';
+    setTimeout(()=>document.getElementById('f-author').focus(),50);
   }
 
   function closeAddModal() {
-    document.getElementById('addOverlay').style.display = 'none';
-    ['f-author','f-text','f-image'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('addOverlay').style.display='none';
+    ['f-author','f-text','f-image','f-upload'].forEach(id=>{const el=document.getElementById(id); if(el&&el.type!=='file') el.value=''; else if(el) el.value='';});
   }
 
-  function saveSwipe() {
-    const author = document.getElementById('f-author').value.trim();
-    const text   = document.getElementById('f-text').value.trim();
-    if (!author || !text) { showToast('Author and text are required'); return; }
-    const image    = document.getElementById('f-image').value.trim();
-    const platform = document.getElementById('f-platform').value;
-    const sf = {};
-    Object.keys(filters).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
-    const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image });
-    persist(); closeAddModal(); applyFilters();
-    showToast('Swipe saved ✓');
+  async function saveSwipe() {
+    const author=document.getElementById('f-author').value.trim(), text=document.getElementById('f-text').value.trim();
+    if(!author||!text){ showToast('Author and text are required'); return; }
+    let image = document.getElementById('f-image').value.trim();
+    const fileInput = document.getElementById('f-upload');
+    if(fileInput&&fileInput.files&&fileInput.files[0]) {
+      showToast('Uploading image...');
+      const url = await uploadFile(fileInput.files[0]);
+      if(url) image=url;
+    }
+    const platform=document.getElementById('f-platform').value;
+    const sf={};
+    Object.keys(filters).forEach(key=>{const v=document.getElementById('ff-'+key)?.value; if(v) sf[key]=v;});
+    const date=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const swipe={id:Date.now(),author,date,platform,filters:sf,liked:false,text,image};
+    swipes.unshift(swipe); await upsertSwipe(swipe); closeAddModal(); applyFilters();
+    showToast('Swipe saved');
   }
 
   // ── Edit swipe modal ─────────────────────────────────────────────────────────
-  let editingId = null;
+  let editingId=null;
 
   function openEditModal(id) {
-    const s = swipes.find(x => x.id === id);
-    if (!s) return;
-    editingId = id;
-    document.getElementById('e-author').value  = s.author;
-    document.getElementById('e-text').value    = s.text;
-    document.getElementById('e-image').value   = s.image || '';
-    document.getElementById('e-platform').value = s.platform;
-    document.getElementById('editDynamicFields').innerHTML = Object.keys(filters).map(key => `
-      <div class="field"><label>${key}</label>
-      <select id="ef-${key}">
-        <option value="">— Select ${key} —</option>
-        ${filters[key].map(o => `<option ${(s.filters&&s.filters[key])===o?'selected':''}>${o}</option>`).join('')}
-      </select></div>`).join('');
-    document.getElementById('editOverlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('e-author').focus(), 50);
+    const s=swipes.find(x=>x.id===id); if(!s) return;
+    editingId=id;
+    document.getElementById('e-author').value=s.author;
+    document.getElementById('e-text').value=s.text;
+    document.getElementById('e-image').value=(s.image||s.image_url||'');
+    document.getElementById('e-platform').value=s.platform;
+    document.getElementById('editDynamicFields').innerHTML=Object.keys(filters).map(key=>
+      '<div class="field"><label>'+key+'</label><select id="ef-'+key+'"><option value="">— Select '+key+' —</option>'+filters[key].map(o=>'<option '+((s.filters&&s.filters[key])===o?'selected':'')+'>'+o+'</option>').join('')+'</select></div>'
+    ).join('');
+    document.getElementById('editOverlay').style.display='flex';
+    setTimeout(()=>document.getElementById('e-author').focus(),50);
   }
 
-  function closeEditModal() {
-    document.getElementById('editOverlay').style.display = 'none';
-    editingId = null;
+  function closeEditModal() { document.getElementById('editOverlay').style.display='none'; editingId=null; }
+
+  async function updateSwipe() {
+    const s=swipes.find(x=>x.id===editingId); if(!s) return;
+    const author=document.getElementById('e-author').value.trim(), text=document.getElementById('e-text').value.trim();
+    if(!author||!text){ showToast('Author and text are required'); return; }
+    s.author=author; s.text=text;
+    let image=document.getElementById('e-image').value.trim();
+    const fileInput=document.getElementById('e-upload');
+    if(fileInput&&fileInput.files&&fileInput.files[0]) {
+      showToast('Uploading image...');
+      const url=await uploadFile(fileInput.files[0]);
+      if(url) image=url;
+    }
+    s.image=image; s.platform=document.getElementById('e-platform').value;
+    Object.keys(filters).forEach(key=>{const v=document.getElementById('ef-'+key)?.value; if(v) s.filters[key]=v; else delete s.filters[key];});
+    await upsertSwipe(s); closeEditModal(); applyFilters();
+    showToast('Swipe updated');
   }
 
-  function updateSwipe() {
-    const s = swipes.find(x => x.id === editingId);
-    if (!s) return;
-    const author = document.getElementById('e-author').value.trim();
-    const text   = document.getElementById('e-text').value.trim();
-    if (!author || !text) { showToast('Author and text are required'); return; }
-    s.author   = author;
-    s.text     = text;
-    s.image    = document.getElementById('e-image').value.trim();
-    s.platform = document.getElementById('e-platform').value;
-    Object.keys(filters).forEach(key => {
-      const v = document.getElementById(`ef-${key}`)?.value;
-      if (v) s.filters[key] = v; else delete s.filters[key];
-    });
-    persist(); closeEditModal(); applyFilters();
-    showToast('Swipe updated ✓');
-  }
-
-
-  function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
+  // ── Settings ────────────────────────────────────────────────────────────────
+  function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display='flex'; }
 
   function closeSettings() {
-    document.getElementById('settingsOverlay').style.display = 'none';
-    persist(); renderFilterBar(); applyFilters();
+    document.getElementById('settingsOverlay').style.display='none';
+    localStorage.setItem('swipeardy_filters_v2', JSON.stringify(filters));
+    renderFilterBar(); applyFilters();
   }
 
   function renderSettingsPanel() {
-    document.getElementById('filterGroupList').innerHTML = Object.keys(filters).map(key => {
-      const safeKey = key.replace(/'/g, "\\'");
-      return `<div class="filter-group">
-        <div class="filter-group-header">
-          <input class="rename-input" value="${key}" onblur="renameFilter('${safeKey}', this.value)" />
-          <button class="icon-btn danger" onclick="deleteFilterGroup('${safeKey}')" title="Delete filter">
-            <i class="ri-delete-bin-line"></i>
-          </button>
-        </div>
-        <div class="filter-options">
-          ${filters[key].map(opt => {
-            const safeOpt = opt.replace(/'/g, "\\'");
-            return `<span class="filter-option-pill">${opt}
-              <button onclick="removeOption('${safeKey}','${safeOpt}')" title="Remove">
-                <i class="ri-close-line"></i>
-              </button>
-            </span>`;
-          }).join('')}
-        </div>
-        <div class="add-option-row">
-          <input type="text" id="newoption-${key}" placeholder="Add option..." onkeydown="if(event.key==='Enter')addOption('${safeKey}')" />
-          <button onclick="addOption('${safeKey}')">+ Add</button>
-        </div>
-      </div>`;
+    document.getElementById('filterGroupList').innerHTML=Object.keys(filters).map(key=>{
+      const sk=key.replace(/'/g,"\\'");
+      return '<div class="filter-group"><div class="filter-group-header"><input class="rename-input" value="'+key+'" onblur="renameFilter(\''+sk+'\',this.value)" /><button class="icon-btn danger" onclick="deleteFilterGroup(\''+sk+'\')" title="Delete filter"><i class="ri-delete-bin-line"></i></button></div><div class="filter-options">'+filters[key].map(opt=>{const so=opt.replace(/'/g,"\\'"); return '<span class="filter-option-pill">'+opt+'<button onclick="removeOption(\''+sk+'\',\''+so+'\')" title="Remove"><i class="ri-close-line"></i></button></span>';}).join('')+'</div><div class="add-option-row"><input type="text" id="newoption-'+key+'" placeholder="Add option..." onkeydown="if(event.key===\'Enter\')addOption(\''+sk+'\')" /><button onclick="addOption(\''+sk+'\')">+ Add</button></div></div>';
     }).join('');
   }
 
-  function renameFilter(oldKey, newKey) {
-    newKey = newKey.trim();
-    if (!newKey || newKey === oldKey) return;
-    const keys = Object.keys(filters);
-    const newF = {};
-    keys.forEach(k => { newF[k === oldKey ? newKey : k] = filters[k]; });
-    filters = newF;
-    if (activeFilters[oldKey]) { activeFilters[newKey] = activeFilters[oldKey]; delete activeFilters[oldKey]; }
+  function renameFilter(oldKey,newKey) {
+    newKey=newKey.trim(); if(!newKey||newKey===oldKey) return;
+    const nf={};
+    Object.keys(filters).forEach(k=>{nf[k===oldKey?newKey:k]=filters[k]});
+    filters=nf;
+    if(activeFilters[oldKey]){activeFilters[newKey]=activeFilters[oldKey]; delete activeFilters[oldKey];}
     renderSettingsPanel();
   }
 
-  function deleteFilterGroup(key) {
-    if (!confirm(`Delete the "${key}" filter?`)) return;
-    delete filters[key]; delete activeFilters[key];
-    renderSettingsPanel();
-  }
-
-  function addOption(key) {
-    const input = document.getElementById(`newoption-${key}`);
-    const val = input.value.trim();
-    if (!val || filters[key].includes(val)) return;
-    filters[key].push(val); input.value = '';
-    renderSettingsPanel();
-  }
-
-  function removeOption(key, opt) {
-    filters[key] = filters[key].filter(o => o !== opt);
-    renderSettingsPanel();
-  }
+  function deleteFilterGroup(key) { if(!confirm('Delete the "'+key+'" filter?')) return; delete filters[key]; delete activeFilters[key]; renderSettingsPanel(); }
+  function addOption(key) { const input=document.getElementById('newoption-'+key); const val=input.value.trim(); if(!val||filters[key].includes(val)) return; filters[key].push(val); input.value=''; renderSettingsPanel(); }
+  function removeOption(key,opt) { filters[key]=filters[key].filter(o=>o!==opt); renderSettingsPanel(); }
 
   function addFilterGroup() {
-    const input = document.getElementById('newFilterName');
-    const name = input.value.trim();
-    if (!name || filters[name]) return;
-    filters[name] = []; input.value = '';
-    renderSettingsPanel();
+    const input=document.getElementById('newFilterName'), name=input.value.trim();
+    if(!name||filters[name]) return; filters[name]=[]; input.value=''; renderSettingsPanel();
   }
 
-  function handleOverlayClick(e, id) {
-    if (e.target.id === id) {
-      if (id === 'addOverlay') closeAddModal();
-      if (id === 'editOverlay') closeEditModal();
-      if (id === 'settingsOverlay') closeSettings();
+  function handleOverlayClick(e,id) {
+    if(e.target.id===id){ if(id==='addOverlay') closeAddModal(); if(id==='editOverlay') closeEditModal(); if(id==='settingsOverlay') closeSettings(); }
+  }
+
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeAddModal(); closeEditModal(); closeSettings(); } });
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  async function initApp() {
+    filters = JSON.parse(localStorage.getItem('swipeardy_filters_v2') || JSON.stringify(DEFAULT_FILTERS));
+    await loadSwipes();
+    if (swipes.length === 0) {
+      await seedDefaults();
+      await loadSwipes();
     }
+    renderFilterBar();
+    applyFilters();
   }
 
-  // Keyboard shortcuts
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); }
+  supabase.auth.onAuthStateChange((event,session) => {
+    if (!session) {
+      document.getElementById('loginOverlay').style.display = 'flex';
+    }
   });
 
-  // Init
-  renderFilterBar();
-  applyFilters();
+  (async () => {
+    const {data:{session}} = await supabase.auth.getSession();
+    if (session) {
+      document.getElementById('loginOverlay').style.display = 'none';
+      await initApp();
+    }
+  })();
 </script>
 </body>
 </html>
