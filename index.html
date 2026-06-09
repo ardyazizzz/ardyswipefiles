@@ -411,9 +411,13 @@
       <option value="newest">Newest</option>
       <option value="oldest">Oldest</option>
       <option value="most-engaged">Most engagements</option>
+      <option value="least-engaged">Least engagements</option>
       <option value="most-liked">Most likes</option>
+      <option value="least-liked">Least likes</option>
       <option value="most-commented">Most comments</option>
+      <option value="least-commented">Least comments</option>
       <option value="most-reposted">Most reposts</option>
+      <option value="least-reposted">Least reposts</option>
       <option value="longest">Longest read</option>
       <option value="shortest">Quickest read</option>
       <option value="media-first">Has media first</option>
@@ -456,9 +460,13 @@
     if (val === 'newest') swipes.sort((a,b) => b.id - a.id);
     if (val === 'oldest') swipes.sort((a,b) => a.id - b.id);
     if (val === 'most-engaged') swipes.sort((a,b) => ((b.reactions||0)+(b.comments||0)+(b.reposts||0)) - ((a.reactions||0)+(a.comments||0)+(a.reposts||0)));
+    if (val === 'least-engaged') swipes.sort((a,b) => ((a.reactions||0)+(a.comments||0)+(a.reposts||0)) - ((b.reactions||0)+(b.comments||0)+(b.reposts||0)));
     if (val === 'most-liked') swipes.sort((a,b) => (b.reactions||0) - (a.reactions||0));
+    if (val === 'least-liked') swipes.sort((a,b) => (a.reactions||0) - (b.reactions||0));
     if (val === 'most-commented') swipes.sort((a,b) => (b.comments||0) - (a.comments||0));
+    if (val === 'least-commented') swipes.sort((a,b) => (a.comments||0) - (b.comments||0));
     if (val === 'most-reposted') swipes.sort((a,b) => (b.reposts||0) - (a.reposts||0));
+    if (val === 'least-reposted') swipes.sort((a,b) => (a.reposts||0) - (b.reposts||0));
     if (val === 'longest') swipes.sort((a,b) => b.text.length - a.text.length);
     if (val === 'shortest') swipes.sort((a,b) => a.text.length - b.text.length);
     if (val === 'media-first') swipes.sort((a,b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
