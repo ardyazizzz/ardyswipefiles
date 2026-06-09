@@ -287,6 +287,7 @@
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
+  const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -323,7 +324,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -334,7 +335,8 @@
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
   let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
-  let activeFilters = {};
+  let activeFilters = load(LS_FILTER_STATE, {});
+  Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
 
   function fmtNum(n) { return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'K' : n; }
 
@@ -383,24 +385,26 @@
     const bar = document.getElementById('filterBar');
     let html = '';
     Object.keys(filters).forEach(key => {
-      const active = activeFilters[key];
+      const selected = activeFilters[key] || [];
       const safeKey = key.replace(/'/g, "\\'");
+      let btnText = key;
+      if (selected.length === 1) btnText = selected[0];
+      else if (selected.length > 1) btnText = `${selected[0]} +${selected.length - 1} more`;
       html += `<div class="dropdown" id="dd-${key}">
-        <button class="dropdown-btn ${active ? 'active' : ''}" onclick="toggleDD('${safeKey}')">
-          ${active ? active : key} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
+        <button class="dropdown-btn ${selected.length ? 'active' : ''}" onclick="toggleDD('${safeKey}')">
+          ${btnText} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
         </button>
         <div class="dropdown-menu" id="menu-${key}">
-          <div class="dropdown-item ${!active ? 'selected' : ''}" onclick="setFilter('${safeKey}',null)">
-            All ${key} ${!active ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
-          </div>
           ${filters[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
             const c = filterColors[key] && filterColors[key][opt];
             const dot = c ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>` : '';
-            return `<div class="dropdown-item ${active === opt ? 'selected' : ''}" onclick="setFilter('${safeKey}','${safeOpt}')">
-              ${dot}${opt} ${active === opt ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+            const isChecked = selected.includes(opt);
+            return `<div class="dropdown-item ${isChecked ? 'selected' : ''}" onclick="toggleFilter('${safeKey}','${safeOpt}')">
+              ${dot}${opt} ${isChecked ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
             </div>`;
           }).join('')}
+          ${selected.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="clearCategoryFilters('${safeKey}')">Clear ${key}</div>` : ''}
         </div>
       </div>`;
     });
@@ -409,6 +413,8 @@
       <option value="newest">Newest</option>
       <option value="oldest">Oldest</option>
     </select>`;
+    const totalSelected = Object.values(activeFilters).reduce((s, a) => s + a.length, 0);
+    if (totalSelected) html += `<button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
   }
 
@@ -422,9 +428,23 @@
     if (!e.target.closest('.dropdown')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
   });
 
-  function setFilter(key, val) {
-    if (val === null) delete activeFilters[key]; else activeFilters[key] = val;
-    renderFilterBar(); applyFilters();
+  function toggleFilter(key, val) {
+    if (!activeFilters[key]) activeFilters[key] = [];
+    const idx = activeFilters[key].indexOf(val);
+    if (idx === -1) activeFilters[key].push(val);
+    else activeFilters[key].splice(idx, 1);
+    if (!activeFilters[key].length) delete activeFilters[key];
+    persist(); renderFilterBar(); applyFilters();
+  }
+
+  function clearCategoryFilters(key) {
+    delete activeFilters[key];
+    persist(); renderFilterBar(); applyFilters();
+  }
+
+  function clearAllFilters() {
+    activeFilters = {};
+    persist(); renderFilterBar(); applyFilters();
   }
 
   function sortSwipes(val) {
@@ -438,7 +458,7 @@
     const data = swipes.filter(s => {
       if (q && !s.text.toLowerCase().includes(q) && !s.author.toLowerCase().includes(q)) return false;
       for (const key of Object.keys(activeFilters)) {
-        if (activeFilters[key] && s.filters[key] !== activeFilters[key]) return false;
+        if (activeFilters[key] && activeFilters[key].length && !activeFilters[key].includes(s.filters[key])) return false;
       }
       return true;
     });
@@ -640,6 +660,7 @@
   function deleteFilterGroup(key) {
     if (!confirm(`Delete the "${key}" filter?`)) return;
     delete filters[key]; delete activeFilters[key]; delete filterColors[key];
+    persist();
     renderSettingsPanel();
   }
 
@@ -659,6 +680,8 @@
   function removeOption(key, opt) {
     filters[key] = filters[key].filter(o => o !== opt);
     if (filterColors[key]) delete filterColors[key][opt];
+    if (activeFilters[key]) { activeFilters[key] = activeFilters[key].filter(v => v !== opt); if (!activeFilters[key].length) delete activeFilters[key]; }
+    persist();
     renderSettingsPanel();
   }
 
