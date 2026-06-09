@@ -22,10 +22,6 @@
       --shadow: 0 4px 16px rgba(0,0,0,0.08);
       --accent: #1a1a1a;
       --accent-text: #ffffff;
-      --liked: #E24B4A;
-      --liked-bg: #FCEBEB;
-      --liked-border: #F09595;
-      --liked-text: #A32D2D;
       --info-bg: #E6F1FB;
       --info-text: #185FA5;
     }
@@ -144,14 +140,14 @@
     .rename-input:focus { border-color: var(--border-hover); }
     .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 16px; padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: all 0.15s; }
     .icon-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); }
-    .icon-btn.danger:hover { color: var(--liked); }
+    .icon-btn.danger:hover { color: #E24B4A; }
     .filter-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .filter-option-pill { display: flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); }
     .option-color { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); padding: 0; cursor: pointer; flex-shrink: 0; -webkit-appearance: none; appearance: none; overflow: hidden; }
     .option-color::-webkit-color-swatch-wrapper { padding: 0; }
     .option-color::-webkit-color-swatch { border: none; border-radius: 50%; }
     .filter-option-pill button { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 13px; padding: 0; line-height: 1; display: flex; align-items: center; transition: color 0.15s; }
-    .filter-option-pill button:hover { color: var(--liked); }
+    .filter-option-pill button:hover { color: #E24B4A; }
     .add-option-row { display: flex; gap: 6px; }
     .add-option-row input { flex: 1; font-size: 12px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 10px; background: var(--bg); color: var(--text-primary); outline: none; }
     .add-option-row input:focus { border-color: var(--border-hover); }
@@ -312,18 +308,18 @@
   };
 
   const DEFAULT_SWIPES = [
-    {id:1,author:'Ruben Hassid',date:'Jan 21, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Single image'},liked:false,text:'Stop embarrassing yourself with outdated tools. Here are the 8 tools I actually use in 2026 — completely changed how I work.',image:'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80'},
-    {id:2,author:'Lara Acosta',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Carousel'},liked:false,text:"You don't need algorithm hacks to grow on LinkedIn. I spent 90 days testing every growth hack. Here's what actually works.",image:'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=400&q=80'},
-    {id:3,author:'Josh Lowman',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Text only'},liked:true,text:'My intense desire to win makes me question everything. Did I choose the right path? So I build ideas that let me see in the dark.',image:''},
-    {id:4,author:'Justin Welsh',date:'Jan 15, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},liked:false,text:"I made $5M online with one simple system. No team. No investors. No office. Here's the exact framework I use every week.",image:''},
-    {id:5,author:'Katelyn Bourgoin',date:'Jan 14, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Single image'},liked:true,text:"Most copywriters focus on features. The best ones focus on the moment before the sale — the anxiety, the doubt, the real reason someone hesitates.",image:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80'},
-    {id:6,author:'Tim Hanson',date:'Jan 12, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Single image'},liked:false,text:"Your LinkedIn banner is prime real estate. 99% of people waste it. Here's a simple 3-part formula that converts profile visitors into followers.",image:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80'},
-    {id:7,author:'Alex Hormozi',date:'Jan 10, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},liked:true,text:"The biggest mistake founders make: building before selling. I wasted 18 months on a product nobody wanted. Here's the 1-hour validation process.",image:''},
-    {id:8,author:'Dickie Bush',date:'Jan 9, 2026',platform:'LinkedIn',filters:{Category:'Storytelling',Format:'Carousel'},liked:false,text:'Writing online changed my life. Not the followers. Not the revenue. The clarity. When you write daily, you think better and decide faster.',image:'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80'},
-    {id:9,author:'Nicolas Cole',date:'Jan 7, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},liked:false,text:"Every viral post has one thing in common. It's not the topic. It's the first line. Here are 7 proven hook structures that work every time.",image:''},
-    {id:10,author:'Sahil Bloom',date:'Jan 5, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Single image'},liked:false,text:'I used to optimize for money. Now I optimize for energy. The shift happened after one brutal year where I had everything and felt nothing.',image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80'},
-    {id:11,author:'Wes Kao',date:'Jan 4, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},liked:true,text:'Most people confuse being busy with being effective. Here are 5 async habits that eliminated 90% of my unnecessary meetings.',image:''},
-    {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},liked:false,text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
+    {id:1,author:'Ruben Hassid',date:'Jan 21, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Single image'},text:'Stop embarrassing yourself with outdated tools. Here are the 8 tools I actually use in 2026 — completely changed how I work.',image:'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80'},
+    {id:2,author:'Lara Acosta',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Carousel'},text:"You don't need algorithm hacks to grow on LinkedIn. I spent 90 days testing every growth hack. Here's what actually works.",image:'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=400&q=80'},
+    {id:3,author:'Josh Lowman',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Text only'},text:'My intense desire to win makes me question everything. Did I choose the right path? So I build ideas that let me see in the dark.',image:''},
+    {id:4,author:'Justin Welsh',date:'Jan 15, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},text:"I made $5M online with one simple system. No team. No investors. No office. Here's the exact framework I use every week.",image:''},
+    {id:5,author:'Katelyn Bourgoin',date:'Jan 14, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Single image'},text:"Most copywriters focus on features. The best ones focus on the moment before the sale — the anxiety, the doubt, the real reason someone hesitates.",image:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80'},
+    {id:6,author:'Tim Hanson',date:'Jan 12, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Single image'},text:"Your LinkedIn banner is prime real estate. 99% of people waste it. Here's a simple 3-part formula that converts profile visitors into followers.",image:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80'},
+    {id:7,author:'Alex Hormozi',date:'Jan 10, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},text:"The biggest mistake founders make: building before selling. I wasted 18 months on a product nobody wanted. Here's the 1-hour validation process.",image:''},
+    {id:8,author:'Dickie Bush',date:'Jan 9, 2026',platform:'LinkedIn',filters:{Category:'Storytelling',Format:'Carousel'},text:'Writing online changed my life. Not the followers. Not the revenue. The clarity. When you write daily, you think better and decide faster.',image:'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80'},
+    {id:9,author:'Nicolas Cole',date:'Jan 7, 2026',platform:'LinkedIn',filters:{Category:'Hooks',Format:'Text only'},text:"Every viral post has one thing in common. It's not the topic. It's the first line. Here are 7 proven hook structures that work every time.",image:''},
+    {id:10,author:'Sahil Bloom',date:'Jan 5, 2026',platform:'LinkedIn',filters:{Category:'Personal',Format:'Single image'},text:'I used to optimize for money. Now I optimize for energy. The shift happened after one brutal year where I had everything and felt nothing.',image:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80'},
+    {id:11,author:'Wes Kao',date:'Jan 4, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Text only'},text:'Most people confuse being busy with being effective. Here are 5 async habits that eliminated 90% of my unnecessary meetings.',image:''},
+    {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
@@ -533,7 +529,7 @@
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image, postUrl, reactions, comments, reposts });
+    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts });
     persist(); closeAddModal(); applyFilters();
     showToast('Swipe saved ✓');
   }
