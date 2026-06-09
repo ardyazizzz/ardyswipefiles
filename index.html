@@ -335,7 +335,6 @@
 
   function getMedia(url) {
     if (!url) return '';
-    if (/linkedin\.com/i.test(url)) return `<a href="${url}" target="_blank" class="card-linkedin"><i class="ri-play-circle-fill"></i> LinkedIn Video<small>Click to view post</small></a>`;
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
