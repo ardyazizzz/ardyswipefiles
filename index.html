@@ -101,6 +101,7 @@
     .platform-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: var(--info-bg); color: var(--info-text); white-space: nowrap; flex-shrink: 0; }
     .card-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
     .card-placeholder { width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 30px; }
     .card-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
@@ -316,6 +317,16 @@
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
 
+  function getMedia(url) {
+    if (!url) return '';
+    const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
+    const vm = url.match(/vimeo\.com\/(\d+)/);
+    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
+    if (/\.(mp4|webm|mov)$/i.test(url)) return `<video class="card-video" controls src="${url}"></video>`;
+    return `<img src="${url}" alt="" class="card-img" onerror="this.style.display='none'" />`;
+  }
+
   function exportData() {
     const blob = new Blob([JSON.stringify(swipes, null, 2)], {type: 'application/json'});
     const a = document.createElement('a');
@@ -448,7 +459,7 @@
           <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
         </div>
         ${s.image
-          ? `<img src="${s.image}" alt="" class="card-img" onerror="this.style.display='none'" />`
+          ? getMedia(s.image)
           : `<div class="card-placeholder">${emoji}</div>`
         }
         <div class="card-footer">
