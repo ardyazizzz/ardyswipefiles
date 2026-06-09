@@ -112,6 +112,8 @@
     .results-label { font-size: 12px; font-weight: 500; color: var(--text-tertiary); margin-bottom: 16px; letter-spacing: 0.2px; }
 
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .grid.dense { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+    .grid.comfortable { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
 
     .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow); }
@@ -331,6 +333,7 @@
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
   const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
+  const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -367,7 +370,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -380,6 +383,23 @@
   let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
+  let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
+
+  function applyDensity() {
+    const grid = document.getElementById('cardGrid');
+    grid.classList.remove('dense', 'comfortable');
+    if (gridDensity === 1) grid.classList.add('dense');
+    if (gridDensity === 2) grid.classList.add('comfortable');
+  }
+
+  function cycleDensity() {
+    gridDensity = (gridDensity + 1) % 3;
+    persist(); applyDensity(); renderFilterBar();
+  }
+
+  function densityLabel() {
+    return ['Default', 'Compact', 'Comfortable'][gridDensity];
+  }
 
   function fmtNum(n) { return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'K' : n; }
 
@@ -465,6 +485,7 @@
       <option value="shortest">Quickest read</option>
       <option value="media-first">Has media first</option>
     </select>`;
+    html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-grid-fill" style="font-size:13px"></i></button>`;
     const totalSelected = Object.values(activeFilters).reduce((s, a) => s + a.length, 0);
     if (totalSelected) html += `<button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
@@ -775,6 +796,7 @@
   });
 
   renderFilterBar();
+  applyDensity();
   applyFilters();
 </script>
 </body>
