@@ -147,6 +147,9 @@
     .icon-btn.danger:hover { color: var(--liked); }
     .filter-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .filter-option-pill { display: flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); }
+    .option-color { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); padding: 0; cursor: pointer; flex-shrink: 0; -webkit-appearance: none; appearance: none; overflow: hidden; }
+    .option-color::-webkit-color-swatch-wrapper { padding: 0; }
+    .option-color::-webkit-color-swatch { border: none; border-radius: 50%; }
     .filter-option-pill button { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 13px; padding: 0; line-height: 1; display: flex; align-items: center; transition: color 0.15s; }
     .filter-option-pill button:hover { color: var(--liked); }
     .add-option-row { display: flex; gap: 6px; }
@@ -286,6 +289,7 @@
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
+  const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -298,6 +302,12 @@
     Category: ['Hooks','Copywriting','Design','Strategy','Carousel','Personal','Storytelling'],
     Format: ['Text only','Single image','Human image','Multiple images','Carousel','Video','Static infographic','GIF infographic','Screenshot','Quote card'],
     Platform: ['LinkedIn','Twitter','Instagram'],
+  };
+
+  const DEFAULT_FILTER_COLORS = {
+    Category: {Hooks:'#E74C3C',Copywriting:'#3498DB',Design:'#9B59B6',Strategy:'#2ECC71',Carousel:'#F39C12',Personal:'#1ABC9C',Storytelling:'#E67E22'},
+    Format: {Textonly:'#6B7280',Singleimage:'#3B82F6',Humanimage:'#10B981',Multipleimages:'#6366F1',Carousel:'#F59E0B',Video:'#EF4444',Staticinfographic:'#8B5CF6',GIFinfographic:'#EC4899',Screenshot:'#64748B',Quotecard:'#F97316'},
+    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F'},
   };
 
   const DEFAULT_SWIPES = [
@@ -316,7 +326,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -325,6 +335,7 @@
   }
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
+  let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
   let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
   let activeFilters = {};
 
@@ -387,8 +398,10 @@
           </div>
           ${filters[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
+            const c = filterColors[key] && filterColors[key][opt];
+            const dot = c ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>` : '';
             return `<div class="dropdown-item ${active === opt ? 'selected' : ''}" onclick="setFilter('${safeKey}','${safeOpt}')">
-              ${opt} ${active === opt ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+              ${dot}${opt} ${active === opt ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
             </div>`;
           }).join('')}
         </div>
@@ -449,7 +462,7 @@
     }
     grid.innerHTML = data.map(s => {
       const av = getAv(s.author);
-      const tags = Object.values(s.filters || {}).filter(Boolean);
+      const tags = Object.entries(s.filters || {}).filter(([,v]) => v);
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
       return `<div class="card">
         <div class="card-body" onclick="openEditModal(${s.id})">
@@ -474,7 +487,7 @@
           (s.image ? getMedia(s.image) : `<div class="card-placeholder">${emoji}</div>`)
         }
         <div class="card-footer">
-          <div class="card-tags">${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+          <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
           `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
@@ -595,7 +608,10 @@
         <div class="filter-options">
           ${filters[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
-            return `<span class="filter-option-pill">${opt}
+            const color = (filterColors[key] && filterColors[key][opt]) || '#6B7280';
+            return `<span class="filter-option-pill">
+              <input type="color" class="option-color" value="${color}" onchange="setOptionColor('${safeKey}','${safeOpt}',this.value)" title="Pick color" />
+              ${opt}
               <button onclick="removeOption('${safeKey}','${safeOpt}')" title="Remove">
                 <i class="ri-close-line"></i>
               </button>
@@ -617,27 +633,40 @@
     const newF = {};
     keys.forEach(k => { newF[k === oldKey ? newKey : k] = filters[k]; });
     filters = newF;
+    if (filterColors[oldKey]) { filterColors[newKey] = filterColors[oldKey]; delete filterColors[oldKey]; }
     if (activeFilters[oldKey]) { activeFilters[newKey] = activeFilters[oldKey]; delete activeFilters[oldKey]; }
     renderSettingsPanel();
   }
 
   function deleteFilterGroup(key) {
     if (!confirm(`Delete the "${key}" filter?`)) return;
-    delete filters[key]; delete activeFilters[key];
+    delete filters[key]; delete activeFilters[key]; delete filterColors[key];
     renderSettingsPanel();
   }
+
+  const COLOR_PALETTE = ['#E74C3C','#3498DB','#2ECC71','#9B59B6','#F39C12','#1ABC9C','#E67E22','#3B82F6','#EF4444','#8B5CF6'];
 
   function addOption(key) {
     const input = document.getElementById(`newoption-${key}`);
     const val = input.value.trim();
     if (!val || filters[key].includes(val)) return;
-    filters[key].push(val); input.value = '';
+    filters[key].push(val);
+    if (!filterColors[key]) filterColors[key] = {};
+    filterColors[key][val] = COLOR_PALETTE[filters[key].length % COLOR_PALETTE.length];
+    input.value = '';
     renderSettingsPanel();
   }
 
   function removeOption(key, opt) {
     filters[key] = filters[key].filter(o => o !== opt);
+    if (filterColors[key]) delete filterColors[key][opt];
     renderSettingsPanel();
+  }
+
+  function setOptionColor(key, opt, color) {
+    if (!filterColors[key]) filterColors[key] = {};
+    filterColors[key][opt] = color;
+    persist();
   }
 
   function addFilterGroup() {
