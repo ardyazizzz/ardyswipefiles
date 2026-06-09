@@ -397,11 +397,9 @@
         <div class="dropdown-menu" id="menu-${key}">
           ${filters[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
-            const c = filterColors[key] && filterColors[key][opt];
-            const dot = c ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>` : '';
             const isChecked = selected.includes(opt);
             return `<div class="dropdown-item ${isChecked ? 'selected' : ''}" onclick="toggleFilter('${safeKey}','${safeOpt}')">
-              ${dot}${opt} ${isChecked ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+              ${opt} ${isChecked ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
             </div>`;
           }).join('')}
           ${selected.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="clearCategoryFilters('${safeKey}')">Clear ${key}</div>` : ''}
