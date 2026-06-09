@@ -174,9 +174,6 @@
       <span class="count-badge" id="totalBadge">0 swipes</span>
     </div>
     <div class="header-right">
-      <button class="btn-ghost" onclick="doLogout()" style="font-size:12px">
-        <i class="ri-logout-box-line"></i>
-      </button>
       <div class="search-box">
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="applyFilters()" />
@@ -196,21 +193,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- Login overlay -->
-<div class="overlay" id="loginOverlay" style="display:flex">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Sign in to Swipe.ardy</span>
-    </div>
-    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="procontentagency1@gmail.com" /></div>
-    <div class="field"><label>Password</label><input type="password" id="login-password" onkeydown="if(event.key==='Enter')doLogin()" /></div>
-    <p id="login-error" style="color:var(--liked);font-size:12px;margin-bottom:8px;display:none"></p>
-    <div class="modal-actions">
-      <button class="btn-save" onclick="doLogin()">Sign in</button>
-    </div>
-  </div>
-</div>
 
 <!-- Edit swipe modal -->
 <div class="overlay" id="editOverlay" style="display:none" onclick="handleOverlayClick(event,'editOverlay')">
@@ -328,30 +310,6 @@
 
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
-
-  // ── Auth ────────────────────────────────────────────────────────────────────
-  async function doLogin() {
-    const email = document.getElementById('login-email').value.trim() || 'procontentagency1@gmail.com';
-    const password = document.getElementById('login-password').value.trim();
-    if (!password) { showError('Enter password'); return; }
-    const {error} = await supabase.auth.signInWithPassword({email,password});
-    if (error) { showError(error.message); return; }
-    document.getElementById('loginOverlay').style.display = 'none';
-    await initApp();
-  }
-
-  function showError(msg) {
-    const el = document.getElementById('login-error');
-    el.textContent = msg; el.style.display = 'block';
-  }
-
-  async function doLogout() {
-    await supabase.auth.signOut();
-    swipes = []; filters = {...DEFAULT_FILTERS}; activeFilters = {}; likedOnly = false;
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('login-password').value = '';
-    try { localStorage.removeItem('swipeardy_filters_v1'); localStorage.removeItem('swipeardy_swipes_v1'); } catch(e) {}
-  }
 
   // ── Data ────────────────────────────────────────────────────────────────────
   async function loadSwipes() {
@@ -592,19 +550,7 @@
     applyFilters();
   }
 
-  supabase.auth.onAuthStateChange((event,session) => {
-    if (!session) {
-      document.getElementById('loginOverlay').style.display = 'flex';
-    }
-  });
-
-  (async () => {
-    const {data:{session}} = await supabase.auth.getSession();
-    if (session) {
-      document.getElementById('loginOverlay').style.display = 'none';
-      await initApp();
-    }
-  })();
+  initApp();
 </script>
 </body>
 </html>
