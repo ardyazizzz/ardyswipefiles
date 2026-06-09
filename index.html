@@ -68,7 +68,7 @@
     .count-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); letter-spacing: 0.1px; }
     .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 13px; transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease); box-shadow: var(--shadow-sm); }
+    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 13px; cursor: text; transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease); box-shadow: var(--shadow-sm); }
     .search-box:focus-within { border-color: var(--accent); box-shadow: var(--ring); }
     .search-box input { border: none; background: transparent; font-size: 13px; color: var(--text-primary); outline: none; width: 190px; font-family: inherit; }
     .search-box input::placeholder { color: var(--text-tertiary); }
@@ -221,7 +221,7 @@
       <span class="count-badge" id="totalBadge">0 swipes</span>
     </div>
     <div class="header-right">
-      <div class="search-box">
+      <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="applyFilters()" />
       </div>
