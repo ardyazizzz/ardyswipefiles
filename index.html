@@ -102,6 +102,9 @@
     .card-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+    .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 500; }
+    .card-linkedin i { font-size: 32px; }
+    .card-linkedin small { font-size: 11px; opacity: 0.7; }
     .card-placeholder { width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 30px; }
     .card-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
@@ -319,6 +322,7 @@
 
   function getMedia(url) {
     if (!url) return '';
+    if (/linkedin\.com/i.test(url)) return `<a href="${url}" target="_blank" class="card-linkedin"><i class="ri-play-circle-fill"></i> LinkedIn Video<small>Click to view post</small></a>`;
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
