@@ -103,7 +103,7 @@
     .card-linkedin i { font-size: 32px; }
     .card-linkedin small { font-size: 11px; opacity: 0.7; }
     .card-media-wrap { position: relative; }
-    .card-engagement-bar { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; justify-content: center; }
+    .card-engagement-bar { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .card-engagement-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(239,68,68,0.1); color: #DC2626; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(239,68,68,0.15); white-space: nowrap; }
     .card-placeholder { width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 30px; }
     .card-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -471,12 +471,10 @@
         }
         <div class="card-footer">
           <div class="card-tags">${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
-          <button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete">
-            <i class="ri-delete-bin-line"></i>
-          </button>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
-          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div></div>` : ''
+          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
+          `<div class="card-engagement-bar"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
         }
       </div>`;
     }).join('');
