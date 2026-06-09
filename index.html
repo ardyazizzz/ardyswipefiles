@@ -75,9 +75,6 @@
     .dropdown-item { padding: 8px 10px; font-size: 13px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background 0.1s; }
     .dropdown-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
     .dropdown-item.selected { color: var(--text-primary); font-weight: 500; }
-    .liked-btn { display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12px; border-radius: var(--radius-md); background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; }
-    .liked-btn.active { background: var(--liked-bg); color: var(--liked-text); border-color: var(--liked-border); }
-    .sort-select { padding: 7px 12px; font-size: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; font-family: inherit; outline: none; margin-left: auto; }
     .divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
 
     /* Results */
@@ -105,14 +102,14 @@
     .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 500; }
     .card-linkedin i { font-size: 32px; }
     .card-linkedin small { font-size: 11px; opacity: 0.7; }
+    .card-stats { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-tertiary); }
+    .card-stats span { display: flex; align-items: center; gap: 3px; }
     .card-placeholder { width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 30px; }
     .card-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
     .card-tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
-    .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
-    .card-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 4px; font-size: 16px; transition: color 0.15s; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+    .card-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 4px; font-size: 16px; transition: color 0.15s; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .card-btn:hover { color: var(--text-primary); background: var(--bg-secondary); }
-    .card-btn.liked { color: var(--liked); }
     .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-tertiary); }
     .empty-state i { font-size: 36px; display: block; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; margin-bottom: 8px; }
@@ -219,6 +216,11 @@
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
       </select>
     </div>
+    <div class="field" style="display:flex;gap:8px">
+      <div style="flex:1"><label>Reactions</label><input type="number" id="e-reactions" placeholder="0" /></div>
+      <div style="flex:1"><label>Comments</label><input type="number" id="e-comments" placeholder="0" /></div>
+      <div style="flex:1"><label>Reposts</label><input type="number" id="e-reposts" placeholder="0" /></div>
+    </div>
     <div id="editDynamicFields"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
@@ -243,6 +245,11 @@
       <select id="f-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
       </select>
+    </div>
+    <div class="field" style="display:flex;gap:8px">
+      <div style="flex:1"><label>Reactions</label><input type="number" id="f-reactions" placeholder="0" /></div>
+      <div style="flex:1"><label>Comments</label><input type="number" id="f-comments" placeholder="0" /></div>
+      <div style="flex:1"><label>Reposts</label><input type="number" id="f-reposts" placeholder="0" /></div>
     </div>
     <div id="dynamicFields"></div>
     <div class="modal-actions">
@@ -315,7 +322,8 @@
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
   let activeFilters = {};
-  let likedOnly = false;
+
+  function fmtNum(n) { return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'K' : n; }
 
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
@@ -383,13 +391,9 @@
       </div>`;
     });
     html += `<div class="divider"></div>
-    <button class="liked-btn ${likedOnly ? 'active' : ''}" onclick="toggleLikedOnly()">
-      <i class="ri-heart-${likedOnly ? 'fill' : 'line'}" style="font-size:14px"></i> Liked
-    </button>
     <select class="sort-select" onchange="sortSwipes(this.value)">
       <option value="newest">Newest</option>
       <option value="oldest">Oldest</option>
-      <option value="liked">Most liked</option>
     </select>`;
     bar.innerHTML = html;
   }
@@ -409,19 +413,15 @@
     renderFilterBar(); applyFilters();
   }
 
-  function toggleLikedOnly() { likedOnly = !likedOnly; renderFilterBar(); applyFilters(); }
-
   function sortSwipes(val) {
     if (val === 'newest') swipes.sort((a,b) => b.id - a.id);
     if (val === 'oldest') swipes.sort((a,b) => a.id - b.id);
-    if (val === 'liked')  swipes.sort((a,b) => b.liked - a.liked);
     applyFilters();
   }
 
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const data = swipes.filter(s => {
-      if (likedOnly && !s.liked) return false;
       if (q && !s.text.toLowerCase().includes(q) && !s.author.toLowerCase().includes(q)) return false;
       for (const key of Object.keys(activeFilters)) {
         if (activeFilters[key] && s.filters[key] !== activeFilters[key]) return false;
@@ -468,37 +468,17 @@
         }
         <div class="card-footer">
           <div class="card-tags">${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
-          <div class="card-actions">
-            <button class="card-btn ${s.liked ? 'liked' : ''}" onclick="toggleLike(${s.id},this)" title="Like">
-              <i class="ri-heart-${s.liked ? 'fill' : 'line'}"></i>
-            </button>
-            <button class="card-btn" onclick="copyText(${s.id},this)" title="Copy text">
-              <i class="ri-file-copy-line"></i>
-            </button>
-            <button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete">
-              <i class="ri-delete-bin-line"></i>
-            </button>
+          <div class="card-stats">
+            ${s.reactions ? `<span>${fmtNum(s.reactions)} ❤</span>` : ''}
+            ${s.comments ? `<span>${fmtNum(s.comments)} 💬</span>` : ''}
+            ${s.reposts ? `<span>${fmtNum(s.reposts)} 🔄</span>` : ''}
           </div>
+          <button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete">
+            <i class="ri-delete-bin-line"></i>
+          </button>
         </div>
       </div>`;
     }).join('');
-  }
-
-  function toggleLike(id, btn) {
-    const s = swipes.find(x => x.id === id); if (!s) return;
-    s.liked = !s.liked; persist();
-    btn.classList.toggle('liked', s.liked);
-    btn.querySelector('i').className = s.liked ? 'ri-heart-fill' : 'ri-heart-line';
-    if (likedOnly) applyFilters();
-  }
-
-  function copyText(id, btn) {
-    const s = swipes.find(x => x.id === id); if (!s) return;
-    navigator.clipboard.writeText(s.text).catch(() => {});
-    const icon = btn.querySelector('i');
-    icon.className = 'ri-check-line';
-    setTimeout(() => { icon.className = 'ri-file-copy-line'; }, 1500);
-    showToast('Copied to clipboard ✓');
   }
 
   function deleteSwipe(id) {
@@ -520,7 +500,7 @@
 
   function closeAddModal() {
     document.getElementById('addOverlay').style.display = 'none';
-    ['f-author','f-text','f-image'].forEach(id => document.getElementById(id).value = '');
+    ['f-author','f-text','f-image','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
   }
 
   function saveSwipe() {
@@ -532,7 +512,10 @@
     const sf = {};
     Object.keys(filters).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
     const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image });
+    const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
+    const comments  = parseInt(document.getElementById('f-comments').value) || 0;
+    const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
+    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image, reactions, comments, reposts });
     persist(); closeAddModal(); applyFilters();
     showToast('Swipe saved ✓');
   }
@@ -547,6 +530,9 @@
     document.getElementById('e-text').value    = s.text;
     document.getElementById('e-image').value   = s.image || '';
     document.getElementById('e-platform').value = s.platform;
+    document.getElementById('e-reactions').value = s.reactions || '';
+    document.getElementById('e-comments').value  = s.comments || '';
+    document.getElementById('e-reposts').value   = s.reposts || '';
     document.getElementById('editDynamicFields').innerHTML = Object.keys(filters).map(key => `
       <div class="field"><label>${key}</label>
       <select id="ef-${key}">
@@ -572,6 +558,9 @@
     s.text     = text;
     s.image    = document.getElementById('e-image').value.trim();
     s.platform = document.getElementById('e-platform').value;
+    s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
+    s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
+    s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
     Object.keys(filters).forEach(key => {
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
