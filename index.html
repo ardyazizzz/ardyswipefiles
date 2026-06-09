@@ -320,15 +320,6 @@
     }
   }
 
-  async function seedDefaults() {
-    const batch = DEFAULT_SWIPES.map(s => ({
-      id: s.id, author: s.author, date: s.date, platform: s.platform,
-      filters: s.filters || {}, liked: s.liked, text: s.text, image_url: s.image || ''
-    }));
-    const {error} = await supabase.from('swipes').upsert(batch);
-    if (error) console.error(error);
-  }
-
   async function upsertSwipe(swipe) {
     await supabase.from('swipes').upsert({
       id: swipe.id, author: swipe.author, date: swipe.date || '',
@@ -542,10 +533,6 @@
   async function initApp() {
     filters = JSON.parse(localStorage.getItem('swipeardy_filters_v2') || JSON.stringify(DEFAULT_FILTERS));
     await loadSwipes();
-    if (swipes.length === 0) {
-      await seedDefaults();
-      await loadSwipes();
-    }
     renderFilterBar();
     applyFilters();
   }
