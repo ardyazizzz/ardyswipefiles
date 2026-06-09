@@ -92,8 +92,8 @@
     .author-name { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .author-date { font-size: 11px; color: var(--text-tertiary); }
     .platform-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: var(--info-bg); color: var(--info-text); white-space: nowrap; flex-shrink: 0; }
-    .card-post-link { font-size: 11px; color: var(--info-text); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; flex-shrink: 0; }
-    .card-post-link:hover { opacity: 0.75; }
+    .card-post-link { font-size: 14px; color: var(--text-tertiary); text-decoration: none; display: flex; align-items: center; padding: 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0; }
+    .card-post-link:hover { color: var(--info-text); background: var(--bg-secondary); }
     .card-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
@@ -513,7 +513,6 @@
               </div>
             </div>
             <span class="platform-badge">${s.platform}</span>
-            ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i> Post</a>` : ''}
           </div>
           <p class="card-text">${s.text}</p>
           <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
@@ -528,8 +527,8 @@
           <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
-          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
-          `<div class="card-engagement-bar" style="justify-content:flex-end"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
+          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div>${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}<button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
+          `<div class="card-engagement-bar" style="justify-content:flex-end">${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}<button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
         }
       </div>`;
     }).join('');
