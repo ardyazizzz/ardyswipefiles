@@ -512,7 +512,7 @@
                 <div class="author-date">${s.date}</div>
               </div>
             </div>
-            <span class="platform-badge">${s.platform}</span>
+            ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}
           </div>
           <p class="card-text">${s.text}</p>
           <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
@@ -527,8 +527,8 @@
           <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
-          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div>${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}<button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
-          `<div class="card-engagement-bar" style="justify-content:flex-end">${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}<button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
+          `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
+          `<div class="card-engagement-bar" style="justify-content:flex-end"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
         }
       </div>`;
     }).join('');
