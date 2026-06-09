@@ -96,6 +96,8 @@
     .author-name { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .author-date { font-size: 11px; color: var(--text-tertiary); }
     .platform-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; background: var(--info-bg); color: var(--info-text); white-space: nowrap; flex-shrink: 0; }
+    .card-post-link { font-size: 11px; color: var(--info-text); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; flex-shrink: 0; }
+    .card-post-link:hover { opacity: 0.75; }
     .card-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
@@ -211,7 +213,8 @@
     </div>
     <div class="field"><label>Author name *</label><input type="text" id="e-author" /></div>
     <div class="field"><label>Post text *</label><textarea id="e-text"></textarea></div>
-    <div class="field"><label>Image URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
+    <div class="field"><label>Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
+    <div class="field"><label>Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -241,7 +244,8 @@
     </div>
     <div class="field"><label>Author name *</label><input type="text" id="f-author" placeholder="e.g. Justin Welsh" /></div>
     <div class="field"><label>Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
-    <div class="field"><label>Image URL (optional)</label><input type="text" id="f-image" placeholder="https://..." /></div>
+    <div class="field"><label>Media URL (optional)</label><input type="text" id="f-image" placeholder="Image, video, YouTube, etc..." /></div>
+    <div class="field"><label>Post URL (optional)</label><input type="text" id="f-post" placeholder="Link to original post..." /></div>
     <div class="field"><label>Platform</label>
       <select id="f-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -459,6 +463,7 @@
               </div>
             </div>
             <span class="platform-badge">${s.platform}</span>
+            ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i> Post</a>` : ''}
           </div>
           <p class="card-text">${s.text}</p>
           <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
@@ -499,7 +504,7 @@
 
   function closeAddModal() {
     document.getElementById('addOverlay').style.display = 'none';
-    ['f-author','f-text','f-image','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
+    ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
   }
 
   function saveSwipe() {
@@ -507,6 +512,7 @@
     const text   = document.getElementById('f-text').value.trim();
     if (!author || !text) { showToast('Author and text are required'); return; }
     const image    = document.getElementById('f-image').value.trim();
+    const postUrl  = document.getElementById('f-post').value.trim();
     const platform = document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(filters).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
@@ -514,7 +520,7 @@
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image, reactions, comments, reposts });
+    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, liked: false, text, image, postUrl, reactions, comments, reposts });
     persist(); closeAddModal(); applyFilters();
     showToast('Swipe saved ✓');
   }
@@ -528,6 +534,7 @@
     document.getElementById('e-author').value  = s.author;
     document.getElementById('e-text').value    = s.text;
     document.getElementById('e-image').value   = s.image || '';
+    document.getElementById('e-post').value    = s.postUrl || '';
     document.getElementById('e-platform').value = s.platform;
     document.getElementById('e-reactions').value = s.reactions || '';
     document.getElementById('e-comments').value  = s.comments || '';
@@ -556,6 +563,7 @@
     s.author   = author;
     s.text     = text;
     s.image    = document.getElementById('e-image').value.trim();
+    s.postUrl  = document.getElementById('e-post').value.trim();
     s.platform = document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
