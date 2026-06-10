@@ -1052,6 +1052,15 @@
     } catch(e) { showToast('Invalid local data'); }
   }
 
+  window.addEventListener('load', function() {
+    if (!supabase && window.supabase) {
+      supabase = window.supabase.createClient(
+        'https://dmhiitzunsdqyxopqsby.supabase.co',
+        'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+      );
+    }
+  });
+
 </script>
 </body>
 </html>
