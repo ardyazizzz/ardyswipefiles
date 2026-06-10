@@ -1053,7 +1053,7 @@
     } catch(e) { showToast('Invalid local data'); }
   }
 
-  window.addEventListener('load', function() {
+  window.addEventListener('DOMContentLoaded', function() {
     if (!supabase && window.supabase) {
       supabase = window.supabase.createClient(
         'https://dmhiitzunsdqyxopqsby.supabase.co',
