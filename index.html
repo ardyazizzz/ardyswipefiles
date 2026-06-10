@@ -358,6 +358,13 @@
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
+  const SB_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/rest/v1';
+  const SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
+
+  function sbFetch(path, opts = {}) {
+    return fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', ...opts.headers }, ...opts });
+  }
+
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
     {bg:'#FAECE7',color:'#993C1D'},{bg:'#FBEAF0',color:'#993556'},
@@ -403,7 +410,17 @@
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
-  let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
+  let swipes  = [];
+  let dataReady = false;
+
+  async function loadSwipes() {
+    try {
+      const r = await sbFetch('/swipes?order=id.desc');
+      if (r.ok) { const data = await r.json(); if (data && data.length) { swipes = data; dataReady = true; return; } }
+    } catch(e) {}
+    swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
+    dataReady = true;
+  }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
@@ -786,6 +803,7 @@
   function deleteSwipe(id) {
     if (!confirm('Delete this swipe?')) return;
     swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
     showToast('Swipe deleted');
   }
 
@@ -820,6 +838,7 @@
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts });
     persist(); closeAddModal(); applyFilters();
+    sbFetch('/swipes', { method: 'POST', body: JSON.stringify(swipes[0]) }).catch(()=>{});
     showToast('Swipe saved ✓');
   }
 
@@ -873,6 +892,7 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
+    sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s) }).catch(()=>{});
     showToast('Swipe updated ✓');
   }
 
@@ -983,8 +1003,12 @@
 
   renderFilterBar();
   applyDensity();
-  applyFilters();
-  loadFromHash();
+  document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
+  (async function init() {
+    await loadSwipes();
+    applyFilters();
+    loadFromHash();
+  })();
 </script>
 </body>
 </html>
