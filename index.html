@@ -6,7 +6,6 @@
   <title>Swipe.ardy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -218,6 +217,7 @@
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
+  <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -410,6 +410,15 @@
   let dataReady = false;
 
   async function loadSwipes() {
+    if (!supabase) {
+      for (let i = 0; i < 12 && !supabase; i++) {
+        if (window.supabase && window.supabase.createClient) {
+          supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
+        }
+        if (!supabase) await new Promise(r => setTimeout(r, 500));
+      }
+    }
+    if (!supabase) { swipes = DEFAULT_SWIPES; dataReady = true; return; }
     const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
     if (error || !data || !data.length) {
       swipes = DEFAULT_SWIPES;
