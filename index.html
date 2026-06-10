@@ -459,7 +459,7 @@
     if (mode !== activeMode) {
       activeMode = mode;
       currentSort = 'newest';
-      document.getElementById('searchInput').value = '';
+      if (!skipRender) document.getElementById('searchInput').value = '';
       currentViewName = null;
     }
     document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
@@ -640,11 +640,12 @@
     }
     const newFilters = {};
     const filterKeys = Object.keys(getF());
+    let searchVal = '';
     params.forEach((val, key) => {
       if (key === 'mode') return;
       if (key === 'sort') { currentSort = val; applySort(val); return; }
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
-      if (key === 'q') { document.getElementById('searchInput').value = val; return; }
+      if (key === 'q') { searchVal = val; return; }
       for (const fk of filterKeys) {
         if (fk.toLowerCase().startsWith(key) || fk.slice(0,3).toLowerCase() === key) {
           newFilters[fk] = val.split(',').map(decodeURIComponent);
@@ -653,6 +654,7 @@
       }
     });
     if (activeMode === 'posts') activeFilters = newFilters; else creatorActiveFilters = newFilters;
+    if (searchVal) document.getElementById('searchInput').value = searchVal;
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
     setTimeout(() => showToast('<i class="ri-share-line"></i> Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
