@@ -396,7 +396,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -410,10 +410,17 @@
   let dataReady = false;
 
   async function loadSwipes() {
+    const localData = load(LS_SWIPES, null);
+    if (!supabase) {
+      swipes = localData || DEFAULT_SWIPES;
+      dataReady = true;
+      return;
+    }
     const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
-    if (error) { console.warn('Supabase load failed, using defaults'); swipes = DEFAULT_SWIPES; }
-    else if (data && data.length) swipes = data;
-    else { swipes = DEFAULT_SWIPES; await supabase.from('swipes').upsert(DEFAULT_SWIPES); }
+    if (error || !data || !data.length) {
+      if (localData) { swipes = localData; await supabase.from('swipes').upsert(localData).catch(()=>{}); }
+      else { swipes = DEFAULT_SWIPES; await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{}); }
+    } else { swipes = data; }
     dataReady = true;
   }
   let activeFilters = load(LS_FILTER_STATE, {});
@@ -798,7 +805,7 @@
   async function deleteSwipe(id) {
     if (!confirm('Delete this swipe?')) return;
     swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
-    await supabase.from('swipes').delete().eq('id', id);
+    if (supabase) await supabase.from('swipes').delete().eq('id', id).catch(()=>{});
     showToast('Swipe deleted');
   }
 
@@ -834,9 +841,11 @@
     const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
     swipes.unshift(newSwipe);
     closeAddModal(); applyFilters();
-    const { error } = await supabase.from('swipes').insert(newSwipe);
-    if (error) showToast('Cloud save failed — try again');
-    else showToast('Swipe saved ✓');
+    if (supabase) {
+      const { error } = await supabase.from('swipes').insert(newSwipe);
+      if (error) showToast('Cloud save failed — try again');
+    }
+    showToast('Swipe saved ✓');
   }
 
   let editingId = null;
@@ -889,9 +898,11 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
-    const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
-    if (error) showToast('Save failed — try again');
-    else showToast('Swipe updated ✓');
+    if (supabase) {
+      const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
+      if (error) showToast('Save failed — try again');
+    }
+    showToast('Swipe updated ✓');
   }
 
   function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
@@ -999,10 +1010,12 @@
     if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); }
   });
 
-  supabase = window.supabase.createClient(
-    'https://dmhiitzunsdqyxopqsby.supabase.co',
-    'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
-  );
+  try {
+    supabase = window.supabase.createClient(
+      'https://dmhiitzunsdqyxopqsby.supabase.co',
+      'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+    );
+  } catch(e) { supabase = null; }
 
   renderFilterBar();
   applyDensity();
