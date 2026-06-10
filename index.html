@@ -611,7 +611,6 @@
       </button>
       <div class="dropdown-menu" id="menu-views">
         ${currentViewName ? `<div class="dropdown-item" onclick="currentViewName=null;renderFilterBar()">Unsaved view</div>` : ''}
-        ${currentViewName ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);padding-top:6px;border-radius:0"></div>` : ''}
         ${views.map((v,i) => `
           <div class="dropdown-item" onclick="applyView(${i})" style="justify-content:space-between">
             <span>${v.name}</span>
@@ -621,11 +620,11 @@
         ${!views.length && !currentViewName ? `
           <div class="views-empty">
             <p>No saved views yet.<br>Save your current filters and layout as a view.</p>
-            ${savingView ? savePrompt : `<div class="dropdown-item" style="justify-content:center" onclick="showSaveViewPrompt()"><i class="ri-save-line"></i> Save these filters</div>`}
+            ${savingView ? savePrompt : `<div class="dropdown-item" style="justify-content:center" onclick="showSaveViewPrompt()">Save these filters</div>`}
           </div>
         ` : ''}
-        ${views.length || currentViewName ? (savingView ? savePrompt : `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="showSaveViewPrompt()"><i class="ri-save-line"></i> Save these filters</div>`) : ''}
-        ${views.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="openViewsEditor()"><i class="ri-settings-3-line"></i> Edit views</div>` : ''}
+        ${views.length || currentViewName ? (savingView ? savePrompt : `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="showSaveViewPrompt()">Save these filters</div>`) : ''}
+        ${views.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="openViewsEditor()">Edit views</div>` : ''}
       </div>
     </div>
     <div class="divider"></div>`;
