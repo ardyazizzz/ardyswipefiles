@@ -455,7 +455,7 @@
     creators = load(LS_CREATORS, null) || DEFAULT_CREATORS;
   }
 
-  function setMode(mode) {
+  function setMode(mode, skipRender) {
     if (mode !== activeMode) {
       activeMode = mode;
       document.getElementById('searchInput').value = '';
@@ -465,9 +465,11 @@
     document.querySelector(`.mode-segment[onclick="setMode('${mode}')"]`).classList.add('active');
     document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${mode === 'posts' ? 'swipe' : 'creator'}`;
     document.getElementById('searchInput').placeholder = mode === 'posts' ? 'Search swipes...' : 'Search creators...';
-    persist();
-    renderFilterBar();
-    applyFilters();
+    if (!skipRender) {
+      persist();
+      renderFilterBar();
+      applyFilters();
+    }
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
@@ -514,7 +516,7 @@
 
   function applyView(index) {
     const v = views[index];
-    if (v.mode) setMode(v.mode);
+    if (v.mode) setMode(v.mode, true);
     if (v.filters) {
       if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
       const af = getAF();
