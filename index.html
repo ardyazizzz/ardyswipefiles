@@ -724,7 +724,7 @@
       `}
     </select>`;
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-grid-fill" style="font-size:13px"></i></button>`;
-    const totalSelected = Object.values(activeFilters).reduce((s, a) => s + a.length, 0);
+    const totalSelected = Object.values(getAF()).reduce((s, a) => s + a.length, 0);
     if (totalSelected) html += `<button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
   }
