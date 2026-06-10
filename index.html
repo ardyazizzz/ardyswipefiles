@@ -805,6 +805,9 @@
   async function deleteSwipe(id) {
     if (!confirm('Delete this swipe?')) return;
     swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    if (!supabase && window.supabase) {
+      supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
+    }
     if (supabase) await supabase.from('swipes').delete().eq('id', id).catch(()=>{});
     showToast('Swipe deleted');
   }
@@ -841,6 +844,9 @@
     const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
     swipes.unshift(newSwipe);
     closeAddModal(); applyFilters();
+    if (!supabase && window.supabase) {
+      supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
+    }
     if (supabase) {
       const { error } = await supabase.from('swipes').insert(newSwipe);
       if (error) showToast('Cloud save failed — try again');
@@ -898,6 +904,9 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
+    if (!supabase && window.supabase) {
+      supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
+    }
     if (supabase) {
       const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
       if (error) showToast('Save failed — try again');
@@ -1037,6 +1046,13 @@
   })();
 
   async function migrateLocalData() {
+    if (!supabase && window.supabase) {
+      supabase = window.supabase.createClient(
+        'https://dmhiitzunsdqyxopqsby.supabase.co',
+        'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+      );
+    }
+    if (!supabase) { showToast('Still loading — try again'); return; }
     const localRaw = localStorage.getItem('swipeardy_swipes_v1');
     if (!localRaw) return;
     try {
