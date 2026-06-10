@@ -850,6 +850,7 @@
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
     swipes.unshift(newSwipe);
+    activeFilters = {};
     closeAddModal(); applyFilters();
     if (!supabase && window.supabase) {
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
@@ -910,6 +911,7 @@
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
+    activeFilters = {};
     persist(); closeEditModal(); applyFilters();
     if (!supabase && window.supabase) {
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
@@ -1041,15 +1043,6 @@
     await loadSwipes();
     applyFilters();
     loadFromHash();
-    const localRaw = localStorage.getItem('swipeardy_swipes_v1');
-    if (localRaw) {
-      try {
-        const localData = JSON.parse(localRaw);
-        if (localData.length) {
-          document.getElementById('resultsLabel').insertAdjacentHTML('beforebegin', `<div id="migrateBanner" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary)"><span><i class="ri-cloud-upload-line"></i> ${localData.length} swipes found in local storage.</span><a href="#" style="color:var(--accent);font-weight:600;margin-left:8px" onclick="event.preventDefault();migrateLocalData()">Migrate to cloud ↗</a></div>`);
-        }
-      } catch(e) {}
-    }
   })();
 
   async function migrateLocalData() {
