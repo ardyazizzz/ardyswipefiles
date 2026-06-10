@@ -161,6 +161,11 @@
     .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--text-primary); color: #fff; padding: 11px 22px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.22s var(--ease), transform 0.22s var(--ease); pointer-events: none; z-index: 9999; white-space: nowrap; box-shadow: var(--shadow-lg); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    .debug-panel { position: fixed; bottom: 12px; right: 12px; background: rgba(0,0,0,0.82); color: #0f0; padding: 10px 14px; border-radius: 8px; font-family: monospace; font-size: 11px; max-width: 340px; z-index: 99999; line-height: 1.6; max-height: 200px; overflow-y: auto; }
+    .debug-panel .err { color: #f44; }
+    .debug-panel .warn { color: #fa0; }
+    .debug-panel .ok { color: #0f0; }
+
     .overlay { position: fixed; inset: 0; background: rgba(16,24,40,0.45); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 1rem; animation: fadeIn 0.18s var(--ease); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal { background: var(--bg); border-radius: var(--radius-xl); border: 1px solid var(--border); padding: 1.75rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn 0.22s var(--ease); }
@@ -404,6 +409,15 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
+  function debugLog(msg, cls) {
+    const panel = document.getElementById('debugPanel');
+    panel.style.display = 'block';
+    const t = new Date().toLocaleTimeString();
+    panel.innerHTML += `<div class="${cls||''}">[${t}] ${msg}</div>`;
+    if (panel.children.length > 20) panel.firstChild.remove();
+    panel.scrollTop = panel.scrollHeight;
+  }
+
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
   let swipes  = [];
@@ -418,12 +432,14 @@
         if (!supabase) await new Promise(r => setTimeout(r, 500));
       }
     }
-    if (!supabase) { swipes = DEFAULT_SWIPES; dataReady = true; return; }
+    if (!supabase) { debugLog('SDK never loaded, using defaults', 'warn'); swipes = DEFAULT_SWIPES; dataReady = true; return; }
+    debugLog('Fetching swipes from Supabase...');
     const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
     if (error || !data || !data.length) {
+      debugLog('Fetch: ' + (error ? error.message : 'empty'), 'warn');
       swipes = DEFAULT_SWIPES;
       await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{});
-    } else { swipes = data; }
+    } else { swipes = data; debugLog('Loaded ' + data.length + ' swipes OK', 'ok'); }
     dataReady = true;
   }
   let activeFilters = load(LS_FILTER_STATE, {});
@@ -811,7 +827,7 @@
     if (!supabase && window.supabase) {
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
     }
-    if (supabase) await supabase.from('swipes').delete().eq('id', id).catch(()=>{});
+    if (supabase) await supabase.from('swipes').delete().eq('id', id).then(() => debugLog('Delete id=' + id + ' OK', 'ok')).catch(e => debugLog('Delete FAILED: ' + e.message, 'err'));
     showToast('Swipe deleted');
   }
 
@@ -853,9 +869,11 @@
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
     }
     if (supabase) {
+      debugLog('Inserting swipe id=' + newSwipe.id);
       const { error } = await supabase.from('swipes').insert(newSwipe);
-      if (error) { showToast('Save failed — ' + error.message); return; }
-    }
+      if (error) { debugLog('Insert FAILED: ' + error.message, 'err'); showToast('Save failed — ' + error.message); return; }
+      debugLog('Insert OK', 'ok');
+    } else { debugLog('supabase null, save to memory only', 'warn'); }
     showToast('Swipe saved ✓');
   }
 
@@ -914,9 +932,11 @@
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
     }
     if (supabase) {
+      debugLog('Updating swipe id=' + editingId);
       const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
-      if (error) { showToast('Update failed — ' + error.message); return; }
-    }
+      if (error) { debugLog('Update FAILED: ' + error.message, 'err'); showToast('Update failed — ' + error.message); return; }
+      debugLog('Update OK', 'ok');
+    } else { debugLog('supabase null, update in memory only', 'warn'); }
     showToast('Swipe updated ✓');
   }
 
@@ -1030,7 +1050,8 @@
       'https://dmhiitzunsdqyxopqsby.supabase.co',
       'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
     );
-  } catch(e) { supabase = null; }
+    debugLog('Supabase client created OK', 'ok');
+  } catch(e) { supabase = null; debugLog('Supabase init FAILED: ' + e.message, 'err'); }
 
   renderFilterBar();
   applyDensity();
@@ -1066,5 +1087,6 @@
   }
 
 </script>
+<div class="debug-panel" id="debugPanel" style="display:none"></div>
 </body>
 </html>
