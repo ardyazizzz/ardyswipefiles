@@ -240,7 +240,7 @@
       </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
-        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
+        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="dz('SEARCH oninput val='+this.value.slice(0,20));currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
       </div>
       <button class="btn-ghost" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
@@ -355,6 +355,9 @@
 </div>
 
 <script>
+  const DZ = true;
+  function dz(msg) { if (DZ) console.log(`[${performance.now().toFixed(0).padStart(5)}ms]`, msg); }
+
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_CREATORS = 'swipeardy_creators_v1';
   const LS_MODE = 'swipeardy_mode_v1';
@@ -456,10 +459,11 @@
   }
 
   function setMode(mode, skipRender) {
+    dz('setMode in='+mode+' skip='+!!skipRender+' cur='+activeMode);
     if (mode !== activeMode) {
       activeMode = mode;
       currentSort = 'newest';
-      if (!skipRender) document.getElementById('searchInput').value = '';
+      if (!skipRender) { document.getElementById('searchInput').value = ''; dz('  cleared searchInput'); }
       currentViewName = null;
     }
     document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
@@ -470,8 +474,9 @@
       persist();
       renderFilterBar();
       applyFilters();
+      syncHash();
     }
-    syncHash();
+    dz('setMode done mode='+activeMode);
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
@@ -526,6 +531,7 @@
     if (gridDensity) p.push('density=' + gridDensity);
     let hash = '#' + p.join('&');
     if (hash === '#mode=posts') hash = '';
+    dz('syncHash → '+(hash||'(clean)')+'  af='+JSON.stringify(af)+' sort='+currentSort);
     history.replaceState(null, '', location.pathname + hash);
   }
 
@@ -632,9 +638,11 @@
 
   function loadFromHash() {
     const hash = window.location.hash.slice(1);
+    dz('loadFromHash raw='+hash);
     if (!hash) return;
     const params = new URLSearchParams(hash);
     const hashMode = params.get('mode');
+    dz('  hashMode='+hashMode);
     if (hashMode && (hashMode === 'posts' || hashMode === 'creators')) {
       setMode(hashMode, true);
     }
@@ -653,8 +661,9 @@
         }
       }
     });
+    dz('  newFilters='+JSON.stringify(newFilters)+' sort='+currentSort+' searchVal='+searchVal);
     if (activeMode === 'posts') activeFilters = newFilters; else creatorActiveFilters = newFilters;
-    if (searchVal) document.getElementById('searchInput').value = searchVal;
+    if (searchVal) { document.getElementById('searchInput').value = searchVal; dz('  applied searchVal'); }
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
     setTimeout(() => showToast('<i class="ri-share-line"></i> Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
@@ -1168,10 +1177,16 @@
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
   (async function init() {
+    dz('INIT start hash='+location.hash+' mode='+activeMode);
     await loadSwipes();
+    dz('INIT swipes='+swipes.length+' creators='+creators.length);
     loadCreators();
-    setMode(activeMode);
+    setMode(activeMode, true);
+    dz('INIT setMode done, rendering default');
+    persist(); renderFilterBar(); applyFilters();
+    dz('INIT default rendered, about to loadFromHash');
     loadFromHash();
+    dz('INIT complete');
   })();
 </script>
 </body>
