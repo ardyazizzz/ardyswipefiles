@@ -410,36 +410,18 @@
   let dataReady = false;
 
   async function loadSwipes() {
-    if (!supabase && typeof window.supabase === 'undefined') {
-      await new Promise(r => {
-        let tries = 0, max = 30;
-        const check = () => {
-          if (window.supabase && window.supabase.createClient) { r(); return; }
-          if (++tries >= max) { r(); return; }
-          const delay = Math.min(500 + tries * 200, 3000);
-          setTimeout(check, delay);
-        };
-        check();
-      });
-      if (!supabase && window.supabase) {
-        supabase = window.supabase.createClient(
-          'https://dmhiitzunsdqyxopqsby.supabase.co',
-          'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
-        );
-      }
-    }
-    if (supabase) {
-      const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
-      if (!error && data && data.length) { swipes = data; dataReady = true; return; }
-    }
-    const localData = load(LS_SWIPES, null);
-    swipes = localData || DEFAULT_SWIPES;
-    if (supabase && swipes === DEFAULT_SWIPES) {
-      await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{});
-    } else if (supabase && localData) {
-      await supabase.from('swipes').upsert(localData).catch(()=>{});
-    }
+    swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
     dataReady = true;
+    setTimeout(async () => {
+      if (!supabase && window.supabase && window.supabase.createClient) {
+        supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
+      }
+      if (!supabase) return;
+      const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
+      if (error || !data || !data.length) return;
+      swipes = data;
+      applyFilters();
+    }, 1000);
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
