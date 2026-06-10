@@ -350,6 +350,7 @@
   </div>
 </div>
 
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
@@ -357,6 +358,8 @@
   const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
+
+  let supabase;
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -403,7 +406,23 @@
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
-  let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
+  let swipes  = [];
+  let dataReady = false;
+
+  async function loadSwipes() {
+    const localData = load(LS_SWIPES, null);
+    if (!supabase) {
+      swipes = localData || DEFAULT_SWIPES;
+      dataReady = true;
+      return;
+    }
+    const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
+    if (error || !data || !data.length) {
+      if (localData) { swipes = localData; await supabase.from('swipes').upsert(localData).catch(()=>{}); }
+      else { swipes = DEFAULT_SWIPES; await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{}); }
+    } else { swipes = data; }
+    dataReady = true;
+  }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
@@ -783,9 +802,10 @@
     }).join('');
   }
 
-  function deleteSwipe(id) {
+  async function deleteSwipe(id) {
     if (!confirm('Delete this swipe?')) return;
     swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    if (supabase) await supabase.from('swipes').delete().eq('id', id).catch(()=>{});
     showToast('Swipe deleted');
   }
 
@@ -805,7 +825,7 @@
     ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
   }
 
-  function saveSwipe() {
+  async function saveSwipe() {
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
     if (!author || !text) { showToast('Author and text are required'); return; }
@@ -818,8 +838,13 @@
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts });
-    persist(); closeAddModal(); applyFilters();
+    const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
+    swipes.unshift(newSwipe);
+    closeAddModal(); applyFilters();
+    if (supabase) {
+      const { error } = await supabase.from('swipes').insert(newSwipe);
+      if (error) showToast('Cloud save failed — try again');
+    }
     showToast('Swipe saved ✓');
   }
 
@@ -853,7 +878,7 @@
     editingId = null;
   }
 
-  function updateSwipe() {
+  async function updateSwipe() {
     const s = swipes.find(x => x.id === editingId);
     if (!s) return;
     const author = document.getElementById('e-author').value.trim();
@@ -873,6 +898,10 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
+    if (supabase) {
+      const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
+      if (error) showToast('Save failed — try again');
+    }
     showToast('Swipe updated ✓');
   }
 
@@ -981,10 +1010,48 @@
     if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); }
   });
 
+  try {
+    supabase = window.supabase.createClient(
+      'https://dmhiitzunsdqyxopqsby.supabase.co',
+      'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+    );
+  } catch(e) { supabase = null; }
+
   renderFilterBar();
   applyDensity();
-  applyFilters();
-  loadFromHash();
+  document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
+
+  (async function init() {
+    await loadSwipes();
+    applyFilters();
+    loadFromHash();
+    const localRaw = localStorage.getItem('swipeardy_swipes_v1');
+    if (localRaw) {
+      try {
+        const localData = JSON.parse(localRaw);
+        if (localData.length) {
+          document.getElementById('resultsLabel').insertAdjacentHTML('beforebegin', `<div id="migrateBanner" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary)"><span><i class="ri-cloud-upload-line"></i> ${localData.length} swipes found in local storage.</span><a href="#" style="color:var(--accent);font-weight:600;margin-left:8px" onclick="event.preventDefault();migrateLocalData()">Migrate to cloud ↗</a></div>`);
+        }
+      } catch(e) {}
+    }
+  })();
+
+  async function migrateLocalData() {
+    const localRaw = localStorage.getItem('swipeardy_swipes_v1');
+    if (!localRaw) return;
+    try {
+      const localData = JSON.parse(localRaw);
+      if (!localData.length) return;
+      const { error } = await supabase.from('swipes').upsert(localData);
+      if (error) { showToast('Migration failed — try again'); return; }
+      swipes = localData.concat(swipes.filter(s => !localData.find(ld => ld.id === s.id)));
+      localStorage.removeItem('swipeardy_swipes_v1');
+      document.getElementById('migrateBanner')?.remove();
+      showToast('Migrated ' + localData.length + ' swipes to cloud ✓');
+      applyFilters();
+    } catch(e) { showToast('Invalid local data'); }
+  }
+
 </script>
 </body>
 </html>
