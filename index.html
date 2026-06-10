@@ -242,13 +242,6 @@
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters()" />
       </div>
-      <button class="btn-ghost" onclick="exportData()">
-        <i class="ri-download-2-line"></i> Export
-      </button>
-      <button class="btn-ghost" onclick="document.getElementById('importInput').click()">
-        <i class="ri-upload-2-line"></i> Import
-      </button>
-      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(event)" />
       <button class="btn-ghost" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
       </button>
@@ -625,38 +618,6 @@
     if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
     if (/\.(mp4|webm|mov)$/i.test(url)) return `<video class="card-video" controls src="${url}"></video>`;
     return `<img src="${url}" alt="" class="card-img" onerror="this.style.display='none'" />`;
-  }
-
-  function exportData() {
-    const data = activeMode === 'posts' ? swipes : creators;
-    const label = activeMode === 'posts' ? 'swipes' : 'creators';
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'swipeardy-' + label + '-' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
-    showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' exported ✓');
-  }
-
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const imported = JSON.parse(e.target.result);
-        if (!Array.isArray(imported)) { showToast('Invalid file format'); return; }
-        const label = activeMode === 'posts' ? 'swipes' : 'creators';
-        if (!confirm('Import ' + imported.length + ' ' + label + '? Existing ' + label + ' will be merged.')) return;
-        const target = activeMode === 'posts' ? swipes : creators;
-        const existing = new Set(target.map(s => s.id));
-        imported.forEach(s => { if (!existing.has(s.id)) target.push(s); });
-        persist(); applyFilters();
-        showToast('Imported ' + imported.length + ' ' + label + ' ✓');
-      } catch(err) { showToast('Invalid JSON file'); }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
   }
 
   function renderFilterBar() {
