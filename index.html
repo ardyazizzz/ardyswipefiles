@@ -355,7 +355,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
@@ -430,15 +430,7 @@
   let dataReady = false;
 
   async function loadSwipes() {
-    if (!supabase) {
-      for (let i = 0; i < 12 && !supabase; i++) {
-        if (window.supabase && window.supabase.createClient) {
-          supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
-        }
-        if (!supabase) await new Promise(r => setTimeout(r, 500));
-      }
-    }
-    if (!supabase) { debugLog('SDK never loaded, using defaults', 'warn'); swipes = DEFAULT_SWIPES; dataReady = true; return; }
+    if (!supabase) { swipes = DEFAULT_SWIPES; dataReady = true; return; }
     debugLog('Fetching swipes from Supabase...');
     const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
     if (error || !data || !data.length) {
