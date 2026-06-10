@@ -409,12 +409,18 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
+  let _debugBuffer = [];
+
   function debugLog(msg, cls) {
+    _debugBuffer.push({msg,cls,time:new Date().toLocaleTimeString()});
     const panel = document.getElementById('debugPanel');
+    if (!panel) return;
     panel.style.display = 'block';
-    const t = new Date().toLocaleTimeString();
-    panel.innerHTML += `<div class="${cls||''}">[${t}] ${msg}</div>`;
-    if (panel.children.length > 20) panel.firstChild.remove();
+    if (_debugBuffer.length) {
+      _debugBuffer.forEach(d => panel.innerHTML += `<div class="${d.cls||''}">[${d.time}] ${d.msg}</div>`);
+      _debugBuffer = [];
+    }
+    if (panel.children.length > 20) { while (panel.children.length > 15) panel.firstChild.remove(); }
     panel.scrollTop = panel.scrollHeight;
   }
 
@@ -1086,7 +1092,7 @@
     } catch(e) { showToast('Invalid local data'); }
   }
 
-</script>
 <div class="debug-panel" id="debugPanel" style="display:none"></div>
+</script>
 </body>
 </html>
