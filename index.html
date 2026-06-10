@@ -504,6 +504,7 @@
 
   function encodeShareLink(preset) {
     const p = [];
+    if (preset.mode) p.push('mode='+preset.mode);
     if (preset.filters) Object.entries(preset.filters).forEach(([k,v]) => p.push(encodeURIComponent(k.slice(0,3))+'='+v.map(encodeURIComponent).join(',')));
     if (preset.sort) p.push('sort='+preset.sort);
     if (preset.density) p.push('density='+preset.density);
@@ -616,9 +617,14 @@
     const hash = window.location.hash.slice(1);
     if (!hash) return;
     const params = new URLSearchParams(hash);
+    const hashMode = params.get('mode');
+    if (hashMode && (hashMode === 'posts' || hashMode === 'creators')) {
+      setMode(hashMode, true);
+    }
     const newFilters = {};
     const filterKeys = Object.keys(getF());
     params.forEach((val, key) => {
+      if (key === 'mode') return;
       if (key === 'sort') { currentSort = val; applySort(val); return; }
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
       if (key === 'q') { document.getElementById('searchInput').value = val; return; }
