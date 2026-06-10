@@ -240,7 +240,7 @@
       </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
-        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="dz('SEARCH oninput val='+this.value.slice(0,20));currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
+        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
       </div>
       <button class="btn-ghost" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
@@ -252,7 +252,6 @@
   </div>
 
   <div class="filterbar" id="filterBar"></div>
-  <div id="debugPanel" style="background:#14181f;color:#0f0;font-family:monospace;font-size:10px;padding:6px 10px;border-radius:6px;margin-bottom:8px;max-height:200px;overflow-y:auto;display:block;white-space:pre-wrap;line-height:1.4"></div>
   <div class="results-label" id="resultsLabel"></div>
   <div class="grid" id="cardGrid"></div>
 </div>
@@ -356,12 +355,6 @@
 </div>
 
 <script>
-  const DZ = true;
-  function dz(msg) {
-    const t = `[${performance.now().toFixed(0).padStart(5)}ms] ${msg}`;
-    if (DZ) console.log(t);
-    try { const p = document.getElementById('debugPanel'); if (p) { p.textContent += t + '\n'; p.scrollTop = p.scrollHeight; } } catch(e) {}
-  }
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_CREATORS = 'swipeardy_creators_v1';
@@ -464,11 +457,10 @@
   }
 
   function setMode(mode, skipRender) {
-    dz('setMode in='+mode+' skip='+!!skipRender+' cur='+activeMode);
     if (mode !== activeMode) {
       activeMode = mode;
       currentSort = 'newest';
-      if (!skipRender) { document.getElementById('searchInput').value = ''; dz('  cleared searchInput'); }
+      if (!skipRender) document.getElementById('searchInput').value = '';
       currentViewName = null;
     }
     document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
@@ -481,7 +473,6 @@
       applyFilters();
       syncHash();
     }
-    dz('setMode done mode='+activeMode);
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
@@ -496,6 +487,7 @@
   let views = load(LS_VIEWS, []);
   let currentViewName = null;
   let currentSort = 'newest';
+  let skipSync = true;
 
   function applyDensity() {
     const grid = document.getElementById('cardGrid');
@@ -524,6 +516,7 @@
   }
 
   function syncHash() {
+    if (skipSync) return;
     const p = [];
     p.push('mode=' + activeMode);
     const af = getAF();
@@ -536,7 +529,6 @@
     if (gridDensity) p.push('density=' + gridDensity);
     let hash = '#' + p.join('&');
     if (hash === '#mode=posts') hash = '';
-    dz('syncHash → '+(hash||'(clean)')+'  af='+JSON.stringify(af)+' sort='+currentSort);
     history.replaceState(null, '', location.pathname + hash);
   }
 
@@ -643,11 +635,9 @@
 
   function loadFromHash() {
     const hash = window.location.hash.slice(1);
-    dz('loadFromHash raw='+hash);
     if (!hash) return;
     const params = new URLSearchParams(hash);
     const hashMode = params.get('mode');
-    dz('  hashMode='+hashMode);
     if (hashMode && (hashMode === 'posts' || hashMode === 'creators')) {
       setMode(hashMode, true);
     }
@@ -666,9 +656,8 @@
         }
       }
     });
-    dz('  newFilters='+JSON.stringify(newFilters)+' sort='+currentSort+' searchVal='+searchVal);
     if (activeMode === 'posts') activeFilters = newFilters; else creatorActiveFilters = newFilters;
-    if (searchVal) { document.getElementById('searchInput').value = searchVal; dz('  applied searchVal'); }
+    if (searchVal) document.getElementById('searchInput').value = searchVal;
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
     setTimeout(() => showToast('<i class="ri-share-line"></i> Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
@@ -1182,16 +1171,12 @@
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
   (async function init() {
-    dz('INIT start hash='+location.hash+' mode='+activeMode);
     await loadSwipes();
-    dz('INIT swipes='+swipes.length+' creators='+creators.length);
     loadCreators();
     setMode(activeMode, true);
-    dz('INIT setMode done, rendering default');
     persist(); renderFilterBar(); applyFilters();
-    dz('INIT default rendered, about to loadFromHash');
     loadFromHash();
-    dz('INIT complete');
+    skipSync = false;
   })();
 </script>
 </body>
