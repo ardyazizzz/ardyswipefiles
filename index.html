@@ -350,7 +350,7 @@
   </div>
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
@@ -396,7 +396,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -410,18 +410,12 @@
   let dataReady = false;
 
   async function loadSwipes() {
-    swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
+    const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
+    if (error || !data || !data.length) {
+      swipes = DEFAULT_SWIPES;
+      await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{});
+    } else { swipes = data; }
     dataReady = true;
-    setTimeout(async () => {
-      if (!supabase && window.supabase && window.supabase.createClient) {
-        supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
-      }
-      if (!supabase) return;
-      const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
-      if (error || !data || !data.length) return;
-      swipes = data;
-      applyFilters();
-    }, 1000);
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
