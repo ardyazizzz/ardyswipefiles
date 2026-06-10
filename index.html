@@ -265,10 +265,10 @@
       <span class="modal-title">Edit swipe</span>
       <button class="modal-close" onclick="closeEditModal()"><i class="ri-close-line"></i></button>
     </div>
-    <div class="field"><label>Author name *</label><input type="text" id="e-author" /></div>
-    <div class="field"><label>Post text *</label><textarea id="e-text"></textarea></div>
-    <div class="field"><label>Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
-    <div class="field"><label>Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
+    <div class="field"><label id="e-label-author">Author name *</label><input type="text" id="e-author" /></div>
+    <div class="field"><label id="e-label-text">Post text *</label><textarea id="e-text"></textarea></div>
+    <div class="field"><label id="e-label-image">Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
+    <div class="field"><label id="e-label-post">Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
     <div class="field"><label>Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
@@ -298,10 +298,10 @@
       <span class="modal-title">Add new swipe</span>
       <button class="modal-close" onclick="closeAddModal()"><i class="ri-close-line"></i></button>
     </div>
-    <div class="field"><label>Author name *</label><input type="text" id="f-author" placeholder="e.g. Justin Welsh" /></div>
-    <div class="field"><label>Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
-    <div class="field"><label>Media URL (optional)</label><input type="text" id="f-image" placeholder="Image, video, YouTube, etc..." /></div>
-    <div class="field"><label>Post URL (optional)</label><input type="text" id="f-post" placeholder="Link to original post..." /></div>
+    <div class="field"><label id="f-label-author">Author name *</label><input type="text" id="f-author" placeholder="e.g. Justin Welsh" /></div>
+    <div class="field"><label id="f-label-text">Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
+    <div class="field"><label id="f-label-image">Media URL (optional)</label><input type="text" id="f-image" placeholder="Image, video, YouTube, etc..." /></div>
+    <div class="field"><label id="f-label-post">Post URL (optional)</label><input type="text" id="f-post" placeholder="Link to original post..." /></div>
     <div class="field"><label>Platform</label>
       <select id="f-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -413,7 +413,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, activeMode); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -864,10 +864,10 @@
     const isCreator = activeMode === 'creators';
     document.getElementById('addOverlay').querySelector('.modal-title').textContent = isCreator ? 'Add creator' : 'Add new swipe';
     document.getElementById('saveBtn').textContent = isCreator ? 'Save creator' : 'Save swipe';
-    document.querySelector('#addOverlay .field:nth-of-type(1) label').textContent = isCreator ? 'Creator name *' : 'Author name *';
-    document.querySelector('#addOverlay .field:nth-of-type(2) label').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
-    document.querySelector('#addOverlay .field:nth-of-type(3) label').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
-    document.querySelector('#addOverlay .field:nth-of-type(4) label').textContent = isCreator ? 'Profile URL *' : 'Post URL (optional)';
+    document.getElementById('f-label-author').textContent = isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('f-label-text').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('f-label-image').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('f-label-post').textContent = isCreator ? 'Profile URL *' : 'Post URL (optional)';
     document.getElementById('f-engagement-row').style.display = isCreator ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key => `
@@ -928,10 +928,10 @@
     editingId = id;
     const isCreator = activeMode === 'creators';
     document.getElementById('editOverlay').querySelector('.modal-title').textContent = isCreator ? 'Edit creator' : 'Edit swipe';
-    document.querySelector('#editOverlay .field:nth-of-type(1) label').textContent = isCreator ? 'Creator name *' : 'Author name *';
-    document.querySelector('#editOverlay .field:nth-of-type(2) label').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
-    document.querySelector('#editOverlay .field:nth-of-type(3) label').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
-    document.querySelector('#editOverlay .field:nth-of-type(4) label').textContent = isCreator ? 'Profile URL' : 'Post URL (optional)';
+    document.getElementById('e-label-author').textContent = isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('e-label-text').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('e-label-image').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('e-label-post').textContent = isCreator ? 'Profile URL' : 'Post URL (optional)';
     document.getElementById('e-engagement-row').style.display = isCreator ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('e-author').value  = s.author;
