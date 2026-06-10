@@ -1039,6 +1039,7 @@
   async function migrateLocalData() {
     const localRaw = localStorage.getItem('swipeardy_swipes_v1');
     if (!localRaw) return;
+    if (!supabase) { showToast('Cloud still connecting — try again in a moment'); return; }
     try {
       const localData = JSON.parse(localRaw);
       if (!localData.length) return;
