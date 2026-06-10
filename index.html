@@ -109,6 +109,11 @@
     .sort-select:hover { border-color: var(--border-hover); color: var(--text-primary); background-color: var(--bg-tertiary); }
     .sort-select:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
 
+    .mode-toggle { display: inline-flex; background: var(--border); border-radius: var(--radius-md); padding: 3px; gap: 0; }
+    .mode-segment { border: none; background: transparent; padding: 6px 15px; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: calc(var(--radius-md) - 2px); color: var(--text-tertiary); transition: all 0.18s var(--ease); white-space: nowrap; }
+    .mode-segment.active { background: var(--bg); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+    .mode-segment:hover:not(.active) { color: var(--text-secondary); }
+
     .views-save-row { display: flex; gap: 6px; padding: 4px 10px; }
     .views-save-input { flex: 1; font-size: 12px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 9px; background: var(--bg); color: var(--text-primary); outline: none; transition: border-color 0.16s var(--ease); }
     .views-save-input:focus { border-color: var(--accent); box-shadow: var(--ring); }
@@ -229,6 +234,10 @@
       <span class="count-badge" id="totalBadge">0 swipes</span>
     </div>
     <div class="header-right">
+      <div class="mode-toggle" id="modeToggle">
+        <button class="mode-segment active" onclick="setMode('posts')">Posts</button>
+        <button class="mode-segment" onclick="setMode('creators')">Creators</button>
+      </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters()" />
@@ -243,7 +252,7 @@
       <button class="btn-ghost" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
       </button>
-      <button class="btn-primary" onclick="openAddModal()">
+      <button class="btn-primary" onclick="openAddModal()" id="addBtn">
         <i class="ri-add-line"></i> Add swipe
       </button>
     </div>
@@ -273,11 +282,12 @@
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
       </select>
     </div>
-    <div class="field" style="display:flex;gap:8px">
+    <div class="field" style="display:flex;gap:8px" id="e-engagement-row">
       <div style="flex:1"><label>Reactions</label><input type="number" id="e-reactions" placeholder="0" /></div>
       <div style="flex:1"><label>Comments</label><input type="number" id="e-comments" placeholder="0" /></div>
       <div style="flex:1"><label>Reposts</label><input type="number" id="e-reposts" placeholder="0" /></div>
     </div>
+    <div class="field" id="e-followers-row" style="display:none"><label>Followers</label><input type="number" id="e-followers" placeholder="e.g. 50000" /></div>
     <div id="editDynamicFields"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
@@ -304,15 +314,16 @@
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
       </select>
     </div>
-    <div class="field" style="display:flex;gap:8px">
+    <div class="field" style="display:flex;gap:8px" id="f-engagement-row">
       <div style="flex:1"><label>Reactions</label><input type="number" id="f-reactions" placeholder="0" /></div>
       <div style="flex:1"><label>Comments</label><input type="number" id="f-comments" placeholder="0" /></div>
       <div style="flex:1"><label>Reposts</label><input type="number" id="f-reposts" placeholder="0" /></div>
     </div>
+    <div class="field" id="f-followers-row" style="display:none"><label>Followers</label><input type="number" id="f-followers" placeholder="e.g. 50000" /></div>
     <div id="dynamicFields"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-      <button class="btn-save" onclick="saveSwipe()">Save swipe</button>
+      <button class="btn-save" id="saveBtn" onclick="saveSwipe()">Save swipe</button>
     </div>
   </div>
 </div>
@@ -352,6 +363,8 @@
 
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
+  const LS_CREATORS = 'swipeardy_creators_v1';
+  const LS_MODE = 'swipeardy_mode_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
   const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
@@ -399,8 +412,15 @@
     {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
   ];
 
+  const DEFAULT_CREATORS = [
+    {id:1001,author:'Justin Welsh',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Solo business builder. $5M+ revenue writing about LinkedIn growth, lifestyle businesses, and content strategy.',image:'',postUrl:'https://linkedin.com/in/justinwelsh',followers:250000},
+    {id:1002,author:'Alex Hormozi',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Founder of Acquisition.com. Scaling businesses through content, offers, and value-driven marketing.',image:'',postUrl:'https://linkedin.com/in/alexhormozi',followers:3000000},
+    {id:1003,author:'Sahil Bloom',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Personal Growth'},text:'Creator and investor. Writing about wealth, health, and curiosity.',image:'',postUrl:'https://linkedin.com/in/sahilbloom',followers:1200000},
+    {id:1004,author:'Katelyn Bourgoin',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Marketing'},text:'The Buyer Psychologist. Helping marketers understand why people buy.',image:'',postUrl:'https://linkedin.com/in/katelynbourgoin',followers:85000},
+  ];
+
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, activeMode); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -410,7 +430,10 @@
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
-  let swipes  = [];
+  let swipes = [];
+  let creators = [];
+  let activeMode = load(LS_MODE, 'posts');
+  if (activeMode !== 'posts' && activeMode !== 'creators') activeMode = 'posts';
   let dataReady = false;
 
   async function loadSwipes() {
@@ -420,6 +443,24 @@
     } catch(e) {}
     swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
     dataReady = true;
+  }
+  function loadCreators() {
+    creators = load(LS_CREATORS, null) || DEFAULT_CREATORS;
+  }
+
+  function setMode(mode) {
+    if (mode !== activeMode) {
+      activeMode = mode;
+      document.getElementById('searchInput').value = '';
+      currentViewName = null;
+    }
+    document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.mode-segment[onclick="setMode('${mode}')"]`).classList.add('active');
+    document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${mode === 'posts' ? 'swipe' : 'creator'}`;
+    document.getElementById('searchInput').placeholder = mode === 'posts' ? 'Search swipes...' : 'Search creators...';
+    persist();
+    renderFilterBar();
+    applyFilters();
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
@@ -587,12 +628,14 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify(swipes, null, 2)], {type: 'application/json'});
+    const data = activeMode === 'posts' ? swipes : creators;
+    const label = activeMode === 'posts' ? 'swipes' : 'creators';
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'swipeardy-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.download = 'swipeardy-' + label + '-' + new Date().toISOString().slice(0,10) + '.json';
     a.click();
-    showToast('Swipes exported ✓');
+    showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' exported ✓');
   }
 
   function importData(event) {
@@ -603,11 +646,13 @@
       try {
         const imported = JSON.parse(e.target.result);
         if (!Array.isArray(imported)) { showToast('Invalid file format'); return; }
-        if (!confirm('Import ' + imported.length + ' swipes? Existing swipes will be merged.')) return;
-        const existing = new Set(swipes.map(s => s.id));
-        imported.forEach(s => { if (!existing.has(s.id)) swipes.push(s); });
+        const label = activeMode === 'posts' ? 'swipes' : 'creators';
+        if (!confirm('Import ' + imported.length + ' ' + label + '? Existing ' + label + ' will be merged.')) return;
+        const target = activeMode === 'posts' ? swipes : creators;
+        const existing = new Set(target.map(s => s.id));
+        imported.forEach(s => { if (!existing.has(s.id)) target.push(s); });
         persist(); applyFilters();
-        showToast('Imported ' + imported.length + ' swipes ✓');
+        showToast('Imported ' + imported.length + ' ' + label + ' ✓');
       } catch(err) { showToast('Invalid JSON file'); }
     };
     reader.readAsText(file);
@@ -671,6 +716,7 @@
     <select class="sort-select" onchange="sortSwipes(this.value)">
       <option value="newest">Newest</option>
       <option value="oldest">Oldest</option>
+      ${activeMode === 'posts' ? `
       <option value="most-engaged">Most engagements</option>
       <option value="least-engaged">Least engagements</option>
       <option value="most-liked">Most likes</option>
@@ -682,6 +728,12 @@
       <option value="longest">Longest read</option>
       <option value="shortest">Quickest read</option>
       <option value="media-first">Has media first</option>
+      ` : `
+      <option value="most-followers">Most followers</option>
+      <option value="least-followers">Least followers</option>
+      <option value="az">A-Z</option>
+      <option value="za">Z-A</option>
+      `}
     </select>`;
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-grid-fill" style="font-size:13px"></i></button>`;
     const totalSelected = Object.values(activeFilters).reduce((s, a) => s + a.length, 0);
@@ -722,45 +774,57 @@
   }
 
   function sortSwipes(val) {
-    if (val === 'newest') swipes.sort((a,b) => b.id - a.id);
-    if (val === 'oldest') swipes.sort((a,b) => a.id - b.id);
-    if (val === 'most-engaged') swipes.sort((a,b) => ((b.reactions||0)+(b.comments||0)+(b.reposts||0)) - ((a.reactions||0)+(a.comments||0)+(a.reposts||0)));
-    if (val === 'least-engaged') swipes.sort((a,b) => ((a.reactions||0)+(a.comments||0)+(a.reposts||0)) - ((b.reactions||0)+(b.comments||0)+(b.reposts||0)));
-    if (val === 'most-liked') swipes.sort((a,b) => (b.reactions||0) - (a.reactions||0));
-    if (val === 'least-liked') swipes.sort((a,b) => (a.reactions||0) - (b.reactions||0));
-    if (val === 'most-commented') swipes.sort((a,b) => (b.comments||0) - (a.comments||0));
-    if (val === 'least-commented') swipes.sort((a,b) => (a.comments||0) - (b.comments||0));
-    if (val === 'most-reposted') swipes.sort((a,b) => (b.reposts||0) - (a.reposts||0));
-    if (val === 'least-reposted') swipes.sort((a,b) => (a.reposts||0) - (b.reposts||0));
-    if (val === 'longest') swipes.sort((a,b) => b.text.length - a.text.length);
-    if (val === 'shortest') swipes.sort((a,b) => a.text.length - b.text.length);
-    if (val === 'media-first') swipes.sort((a,b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
+    const arr = activeMode === 'posts' ? swipes : creators;
+    if (val === 'newest') arr.sort((a,b) => b.id - a.id);
+    if (val === 'oldest') arr.sort((a,b) => a.id - b.id);
+    if (val === 'most-engaged') arr.sort((a,b) => ((b.reactions||0)+(b.comments||0)+(b.reposts||0)) - ((a.reactions||0)+(a.comments||0)+(a.reposts||0)));
+    if (val === 'least-engaged') arr.sort((a,b) => ((a.reactions||0)+(a.comments||0)+(a.reposts||0)) - ((b.reactions||0)+(b.comments||0)+(b.reposts||0)));
+    if (val === 'most-liked') arr.sort((a,b) => (b.reactions||0) - (a.reactions||0));
+    if (val === 'least-liked') arr.sort((a,b) => (a.reactions||0) - (b.reactions||0));
+    if (val === 'most-commented') arr.sort((a,b) => (b.comments||0) - (a.comments||0));
+    if (val === 'least-commented') arr.sort((a,b) => (a.comments||0) - (b.comments||0));
+    if (val === 'most-reposted') arr.sort((a,b) => (b.reposts||0) - (a.reposts||0));
+    if (val === 'least-reposted') arr.sort((a,b) => (a.reposts||0) - (b.reposts||0));
+    if (val === 'longest') arr.sort((a,b) => b.text.length - a.text.length);
+    if (val === 'shortest') arr.sort((a,b) => a.text.length - b.text.length);
+    if (val === 'media-first') arr.sort((a,b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
+    if (val === 'most-followers') arr.sort((a,b) => (b.followers||0) - (a.followers||0));
+    if (val === 'least-followers') arr.sort((a,b) => (a.followers||0) - (b.followers||0));
+    if (val === 'az') arr.sort((a,b) => a.author.localeCompare(b.author));
+    if (val === 'za') arr.sort((a,b) => b.author.localeCompare(a.author));
     currentViewName = null; renderFilterBar();
     applyFilters();
   }
 
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const data = swipes.filter(s => {
-      const searchStr = [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl].filter(Boolean).join(' ').toLowerCase();
+    const source = activeMode === 'posts' ? swipes : creators;
+    const data = source.filter(s => {
+      const searchFields = activeMode === 'posts'
+        ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl]
+        : [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')];
+      const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
       if (q && !searchStr.includes(q)) return false;
       for (const key of Object.keys(activeFilters)) {
         if (activeFilters[key] && activeFilters[key].length && !activeFilters[key].includes(s.filters[key])) return false;
       }
       return true;
     });
-    document.getElementById('totalBadge').textContent = swipes.length + ' swipe' + (swipes.length !== 1 ? 's' : '');
+    const totalCount = activeMode === 'posts' ? swipes.length : creators.length;
+    const totalLabel = activeMode === 'posts' ? 'swipe' : 'creator';
+    document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     renderCards(data);
   }
 
   function renderCards(data) {
     const grid = document.getElementById('cardGrid');
+    const noResultsLabel = activeMode === 'posts' ? 'No swipes match your filters' : 'No creators match your filters';
     if (!data.length) {
       grid.innerHTML = `<div class="empty-state">
         <i class="ri-file-search-line"></i>
-        <p>No swipes match your filters</p>
-        <small>Try adjusting your filters or add a new swipe</small>
+        <p>${noResultsLabel}</p>
+        <small>Try adjusting your filters or add a new ${activeMode === 'posts' ? 'swipe' : 'creator'}</small>
       </div>`;
       return;
     }
@@ -768,6 +832,28 @@
       const av = getAv(s.author);
       const tags = Object.entries(s.filters || {}).filter(([,v]) => v);
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
+      if (activeMode === 'creators') {
+        return `<div class="card">
+          <div class="card-body" onclick="openEditModal(${s.id})">
+            <div class="card-top">
+              <div class="card-author">
+                <div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>
+                <div>
+                  <div class="author-name">${s.author}</div>
+                  <div class="author-date">${s.platform} · ${s.date}</div>
+                </div>
+              </div>
+              ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View profile"><i class="ri-user-line"></i></a>` : ''}
+            </div>
+            ${s.text ? `<p class="card-text">${s.text}</p>` : ''}
+            <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
+          </div>
+          <div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-user-follow-line" style="font-size:13px"></i>${s.followers ? fmtNum(s.followers) + ' followers' : '— followers'}</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>
+        </div>`;
+      }
       return `<div class="card">
         <div class="card-body" onclick="openEditModal(${s.id})">
           <div class="card-top">
@@ -801,13 +887,28 @@
   }
 
   function deleteSwipe(id) {
-    if (!confirm('Delete this swipe?')) return;
-    swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    const label = activeMode === 'posts' ? 'swipe' : 'creator';
+    if (!confirm('Delete this ' + label + '?')) return;
+    if (activeMode === 'posts') {
+      swipes = swipes.filter(x => x.id !== id);
+    } else {
+      creators = creators.filter(x => x.id !== id);
+    }
+    persist(); applyFilters();
     sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
-    showToast('Swipe deleted');
+    showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' deleted');
   }
 
   function openAddModal() {
+    const isCreator = activeMode === 'creators';
+    document.getElementById('addOverlay').querySelector('.modal-title').textContent = isCreator ? 'Add creator' : 'Add new swipe';
+    document.getElementById('saveBtn').textContent = isCreator ? 'Save creator' : 'Save swipe';
+    document.querySelector('#addOverlay .field:nth-of-type(1) label').textContent = isCreator ? 'Creator name *' : 'Author name *';
+    document.querySelector('#addOverlay .field:nth-of-type(2) label').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
+    document.querySelector('#addOverlay .field:nth-of-type(3) label').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.querySelector('#addOverlay .field:nth-of-type(4) label').textContent = isCreator ? 'Profile URL *' : 'Post URL (optional)';
+    document.getElementById('f-engagement-row').style.display = isCreator ? 'none' : 'flex';
+    document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key => `
       <div class="field"><label>${key}</label>
       <select id="ff-${key}">
@@ -820,13 +921,19 @@
 
   function closeAddModal() {
     document.getElementById('addOverlay').style.display = 'none';
-    ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
+    ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts','f-followers'].forEach(id => document.getElementById(id).value = '');
   }
 
   function saveSwipe() {
+    const isCreator = activeMode === 'creators';
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
-    if (!author || !text) { showToast('Author and text are required'); return; }
+    if (isCreator) {
+      const postUrl = document.getElementById('f-post').value.trim();
+      if (!author || !postUrl) { showToast('Creator name and profile URL are required'); return; }
+    } else {
+      if (!author || !text) { showToast('Author and text are required'); return; }
+    }
     const image    = document.getElementById('f-image').value.trim();
     const postUrl  = document.getElementById('f-post').value.trim();
     const platform = document.getElementById('f-platform').value;
@@ -836,18 +943,36 @@
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts });
-    persist(); closeAddModal(); applyFilters();
-    sbFetch('/swipes', { method: 'POST', body: JSON.stringify(swipes[0]) }).catch(()=>{});
-    showToast('Swipe saved ✓');
+    const followers = parseInt(document.getElementById('f-followers').value) || 0;
+    const item = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
+    if (isCreator) {
+      creators.unshift(item);
+      persist(); closeAddModal(); applyFilters();
+      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      showToast('Creator saved ✓');
+    } else {
+      swipes.unshift(item);
+      persist(); closeAddModal(); applyFilters();
+      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      showToast('Swipe saved ✓');
+    }
   }
 
   let editingId = null;
 
   function openEditModal(id) {
-    const s = swipes.find(x => x.id === id);
+    const source = activeMode === 'posts' ? swipes : creators;
+    const s = source.find(x => x.id === id);
     if (!s) return;
     editingId = id;
+    const isCreator = activeMode === 'creators';
+    document.getElementById('editOverlay').querySelector('.modal-title').textContent = isCreator ? 'Edit creator' : 'Edit swipe';
+    document.querySelector('#editOverlay .field:nth-of-type(1) label').textContent = isCreator ? 'Creator name *' : 'Author name *';
+    document.querySelector('#editOverlay .field:nth-of-type(2) label').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
+    document.querySelector('#editOverlay .field:nth-of-type(3) label').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.querySelector('#editOverlay .field:nth-of-type(4) label').textContent = isCreator ? 'Profile URL' : 'Post URL (optional)';
+    document.getElementById('e-engagement-row').style.display = isCreator ? 'none' : 'flex';
+    document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('e-author').value  = s.author;
     document.getElementById('e-text').value    = s.text;
     document.getElementById('e-image').value   = s.image || '';
@@ -857,6 +982,7 @@
     document.getElementById('e-reactions').value = s.reactions || '';
     document.getElementById('e-comments').value  = s.comments || '';
     document.getElementById('e-reposts').value   = s.reposts || '';
+    document.getElementById('e-followers').value = s.followers || '';
     document.getElementById('editDynamicFields').innerHTML = Object.keys(filters).map(key => `
       <div class="field"><label>${key}</label>
       <select id="ef-${key}">
@@ -873,11 +999,18 @@
   }
 
   function updateSwipe() {
-    const s = swipes.find(x => x.id === editingId);
+    const source = activeMode === 'posts' ? swipes : creators;
+    const s = source.find(x => x.id === editingId);
     if (!s) return;
+    const isCreator = activeMode === 'creators';
     const author = document.getElementById('e-author').value.trim();
     const text   = document.getElementById('e-text').value.trim();
-    if (!author || !text) { showToast('Author and text are required'); return; }
+    if (isCreator) {
+      const postUrl = document.getElementById('e-post').value.trim();
+      if (!author || !postUrl) { showToast('Creator name and profile URL are required'); return; }
+    } else {
+      if (!author || !text) { showToast('Author and text are required'); return; }
+    }
     s.author   = author;
     s.text     = text;
     s.image    = document.getElementById('e-image').value.trim();
@@ -887,13 +1020,14 @@
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
+    s.followers = parseInt(document.getElementById('e-followers').value) || 0;
     Object.keys(filters).forEach(key => {
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
     sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s) }).catch(()=>{});
-    showToast('Swipe updated ✓');
+    showToast(isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
   function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
@@ -1006,7 +1140,8 @@
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
   (async function init() {
     await loadSwipes();
-    applyFilters();
+    loadCreators();
+    setMode(activeMode);
     loadFromHash();
   })();
 </script>
