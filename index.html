@@ -458,6 +458,7 @@
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
       activeMode = mode;
+      currentSort = 'newest';
       document.getElementById('searchInput').value = '';
       currentViewName = null;
     }
@@ -483,6 +484,7 @@
   if (gridDensity > 1) gridDensity = 1;
   let views = load(LS_VIEWS, []);
   let currentViewName = null;
+  let currentSort = 'newest';
 
   function applyDensity() {
     const grid = document.getElementById('cardGrid');
@@ -524,7 +526,8 @@
     } else {
       if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
     }
-    if (v.sort) document.querySelector('.sort-select').value = v.sort;
+    if (v.sort) currentSort = v.sort; else currentSort = 'newest';
+    applySort(currentSort);
     if (v.density !== undefined) { gridDensity = v.density; applyDensity(); }
     if (v.search !== undefined) { document.getElementById('searchInput').value = v.search; }
     currentViewName = v.name;
@@ -616,7 +619,7 @@
     const newFilters = {};
     const filterKeys = Object.keys(getF());
     params.forEach((val, key) => {
-      if (key === 'sort') { document.querySelector('.sort-select').value = val; return; }
+      if (key === 'sort') { currentSort = val; applySort(val); return; }
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
       if (key === 'q') { document.getElementById('searchInput').value = val; return; }
       for (const fk of filterKeys) {
@@ -702,25 +705,25 @@
     });
     html += `<div class="divider"></div>
     <select class="sort-select" onchange="sortSwipes(this.value)">
-      <option value="newest">Newest</option>
-      <option value="oldest">Oldest</option>
+      <option value="newest"${currentSort==='newest'?' selected':''}>Newest</option>
+      <option value="oldest"${currentSort==='oldest'?' selected':''}>Oldest</option>
       ${activeMode === 'posts' ? `
-      <option value="most-engaged">Most engagements</option>
-      <option value="least-engaged">Least engagements</option>
-      <option value="most-liked">Most likes</option>
-      <option value="least-liked">Least likes</option>
-      <option value="most-commented">Most comments</option>
-      <option value="least-commented">Least comments</option>
-      <option value="most-reposted">Most reposts</option>
-      <option value="least-reposted">Least reposts</option>
-      <option value="longest">Longest read</option>
-      <option value="shortest">Quickest read</option>
-      <option value="media-first">Has media first</option>
+      <option value="most-engaged"${currentSort==='most-engaged'?' selected':''}>Most engagements</option>
+      <option value="least-engaged"${currentSort==='least-engaged'?' selected':''}>Least engagements</option>
+      <option value="most-liked"${currentSort==='most-liked'?' selected':''}>Most likes</option>
+      <option value="least-liked"${currentSort==='least-liked'?' selected':''}>Least likes</option>
+      <option value="most-commented"${currentSort==='most-commented'?' selected':''}>Most comments</option>
+      <option value="least-commented"${currentSort==='least-commented'?' selected':''}>Least comments</option>
+      <option value="most-reposted"${currentSort==='most-reposted'?' selected':''}>Most reposts</option>
+      <option value="least-reposted"${currentSort==='least-reposted'?' selected':''}>Least reposts</option>
+      <option value="longest"${currentSort==='longest'?' selected':''}>Longest read</option>
+      <option value="shortest"${currentSort==='shortest'?' selected':''}>Quickest read</option>
+      <option value="media-first"${currentSort==='media-first'?' selected':''}>Has media first</option>
       ` : `
-      <option value="most-followers">Most followers</option>
-      <option value="least-followers">Least followers</option>
-      <option value="az">A-Z</option>
-      <option value="za">Z-A</option>
+      <option value="most-followers"${currentSort==='most-followers'?' selected':''}>Most followers</option>
+      <option value="least-followers"${currentSort==='least-followers'?' selected':''}>Least followers</option>
+      <option value="az"${currentSort==='az'?' selected':''}>A-Z</option>
+      <option value="za"${currentSort==='za'?' selected':''}>Z-A</option>
       `}
     </select>`;
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-grid-fill" style="font-size:13px"></i></button>`;
@@ -762,7 +765,7 @@
     persist(); renderFilterBar(); applyFilters();
   }
 
-  function sortSwipes(val) {
+  function applySort(val) {
     const arr = activeMode === 'posts' ? swipes : creators;
     if (val === 'newest') arr.sort((a,b) => b.id - a.id);
     if (val === 'oldest') arr.sort((a,b) => a.id - b.id);
@@ -781,6 +784,10 @@
     if (val === 'least-followers') arr.sort((a,b) => (a.followers||0) - (b.followers||0));
     if (val === 'az') arr.sort((a,b) => a.author.localeCompare(b.author));
     if (val === 'za') arr.sort((a,b) => b.author.localeCompare(a.author));
+  }
+  function sortSwipes(val) {
+    currentSort = val;
+    applySort(val);
     currentViewName = null; renderFilterBar();
     applyFilters();
   }
