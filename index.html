@@ -410,17 +410,35 @@
   let dataReady = false;
 
   async function loadSwipes() {
-    const localData = load(LS_SWIPES, null);
-    if (!supabase) {
-      swipes = localData || DEFAULT_SWIPES;
-      dataReady = true;
-      return;
+    if (!supabase && typeof window.supabase === 'undefined') {
+      await new Promise(r => {
+        let tries = 0, max = 30;
+        const check = () => {
+          if (window.supabase && window.supabase.createClient) { r(); return; }
+          if (++tries >= max) { r(); return; }
+          const delay = Math.min(500 + tries * 200, 3000);
+          setTimeout(check, delay);
+        };
+        check();
+      });
+      if (!supabase && window.supabase) {
+        supabase = window.supabase.createClient(
+          'https://dmhiitzunsdqyxopqsby.supabase.co',
+          'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+        );
+      }
     }
-    const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
-    if (error || !data || !data.length) {
-      if (localData) { swipes = localData; await supabase.from('swipes').upsert(localData).catch(()=>{}); }
-      else { swipes = DEFAULT_SWIPES; await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{}); }
-    } else { swipes = data; }
+    if (supabase) {
+      const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
+      if (!error && data && data.length) { swipes = data; dataReady = true; return; }
+    }
+    const localData = load(LS_SWIPES, null);
+    swipes = localData || DEFAULT_SWIPES;
+    if (supabase && swipes === DEFAULT_SWIPES) {
+      await supabase.from('swipes').upsert(DEFAULT_SWIPES).catch(()=>{});
+    } else if (supabase && localData) {
+      await supabase.from('swipes').upsert(localData).catch(()=>{});
+    }
     dataReady = true;
   }
   let activeFilters = load(LS_FILTER_STATE, {});
