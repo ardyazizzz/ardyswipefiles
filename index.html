@@ -6,7 +6,7 @@
   <title>Swipe.ardy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -359,10 +359,7 @@
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
-  const supabase = window.supabase.createClient(
-    'https://dmhiitzunsdqyxopqsby.supabase.co',
-    'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
-  );
+  let supabase;
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -1002,6 +999,13 @@
     if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); }
   });
 
+  document.addEventListener('DOMContentLoaded', function() {
+
+  supabase = window.supabase.createClient(
+    'https://dmhiitzunsdqyxopqsby.supabase.co',
+    'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+  );
+
   renderFilterBar();
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
@@ -1036,6 +1040,8 @@
       applyFilters();
     } catch(e) { showToast('Invalid local data'); }
   }
+
+  }); // end DOMContentLoaded
 </script>
 </body>
 </html>
