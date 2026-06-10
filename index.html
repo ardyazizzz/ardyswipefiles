@@ -6,6 +6,7 @@
   <title>Swipe.ardy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -358,6 +359,11 @@
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
+  const supabase = window.supabase.createClient(
+    'https://dmhiitzunsdqyxopqsby.supabase.co',
+    'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
+  );
+
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
     {bg:'#FAECE7',color:'#993C1D'},{bg:'#FBEAF0',color:'#993556'},
@@ -393,7 +399,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -403,7 +409,16 @@
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
-  let swipes  = load(LS_SWIPES,  DEFAULT_SWIPES);
+  let swipes  = [];
+  let dataReady = false;
+
+  async function loadSwipes() {
+    const { data, error } = await supabase.from('swipes').select('*').order('id', { ascending: false });
+    if (error) { console.warn('Supabase load failed, using defaults'); swipes = DEFAULT_SWIPES; }
+    else if (data && data.length) swipes = data;
+    else { swipes = DEFAULT_SWIPES; await supabase.from('swipes').upsert(DEFAULT_SWIPES); }
+    dataReady = true;
+  }
   let activeFilters = load(LS_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
@@ -783,9 +798,10 @@
     }).join('');
   }
 
-  function deleteSwipe(id) {
+  async function deleteSwipe(id) {
     if (!confirm('Delete this swipe?')) return;
     swipes = swipes.filter(x => x.id !== id); persist(); applyFilters();
+    await supabase.from('swipes').delete().eq('id', id);
     showToast('Swipe deleted');
   }
 
@@ -805,7 +821,7 @@
     ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts'].forEach(id => document.getElementById(id).value = '');
   }
 
-  function saveSwipe() {
+  async function saveSwipe() {
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
     if (!author || !text) { showToast('Author and text are required'); return; }
@@ -818,9 +834,12 @@
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
-    swipes.unshift({ id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts });
-    persist(); closeAddModal(); applyFilters();
-    showToast('Swipe saved ✓');
+    const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
+    swipes.unshift(newSwipe);
+    closeAddModal(); applyFilters();
+    const { error } = await supabase.from('swipes').insert(newSwipe);
+    if (error) showToast('Cloud save failed — try again');
+    else showToast('Swipe saved ✓');
   }
 
   let editingId = null;
@@ -853,7 +872,7 @@
     editingId = null;
   }
 
-  function updateSwipe() {
+  async function updateSwipe() {
     const s = swipes.find(x => x.id === editingId);
     if (!s) return;
     const author = document.getElementById('e-author').value.trim();
@@ -873,7 +892,9 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
-    showToast('Swipe updated ✓');
+    const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
+    if (error) showToast('Save failed — try again');
+    else showToast('Swipe updated ✓');
   }
 
   function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
@@ -983,8 +1004,38 @@
 
   renderFilterBar();
   applyDensity();
-  applyFilters();
-  loadFromHash();
+  document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
+
+  (async function init() {
+    await loadSwipes();
+    applyFilters();
+    loadFromHash();
+    const localRaw = localStorage.getItem('swipeardy_swipes_v1');
+    if (localRaw) {
+      try {
+        const localData = JSON.parse(localRaw);
+        if (localData.length) {
+          document.getElementById('resultsLabel').insertAdjacentHTML('beforebegin', `<div id="migrateBanner" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary)"><span><i class="ri-cloud-upload-line"></i> ${localData.length} swipes found in local storage.</span><a href="#" style="color:var(--accent);font-weight:600;margin-left:8px" onclick="event.preventDefault();migrateLocalData()">Migrate to cloud ↗</a></div>`);
+        }
+      } catch(e) {}
+    }
+  })();
+
+  async function migrateLocalData() {
+    const localRaw = localStorage.getItem('swipeardy_swipes_v1');
+    if (!localRaw) return;
+    try {
+      const localData = JSON.parse(localRaw);
+      if (!localData.length) return;
+      const { error } = await supabase.from('swipes').upsert(localData);
+      if (error) { showToast('Migration failed — try again'); return; }
+      swipes = localData.concat(swipes.filter(s => !localData.find(ld => ld.id === s.id)));
+      localStorage.removeItem('swipeardy_swipes_v1');
+      document.getElementById('migrateBanner')?.remove();
+      showToast('Migrated ' + localData.length + ' swipes to cloud ✓');
+      applyFilters();
+    } catch(e) { showToast('Invalid local data'); }
+  }
 </script>
 </body>
 </html>
