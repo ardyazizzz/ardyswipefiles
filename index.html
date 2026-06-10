@@ -1053,14 +1053,15 @@
     } catch(e) { showToast('Invalid local data'); }
   }
 
-  window.addEventListener('DOMContentLoaded', function() {
-    if (!supabase && window.supabase) {
+  (function checkSupabase() {
+    if (!supabase && window.supabase && window.supabase.createClient) {
       supabase = window.supabase.createClient(
         'https://dmhiitzunsdqyxopqsby.supabase.co',
         'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F'
       );
     }
-  });
+    if (!supabase) setTimeout(checkSupabase, 400);
+  })();
 
 </script>
 </body>
