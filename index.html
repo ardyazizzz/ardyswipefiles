@@ -833,7 +833,11 @@
           <div class="card-body" onclick="openEditModal(${s.id})">
             <div class="card-top">
               <div class="card-author">
-                <div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>
+                ${s.image
+                  ? `<img src="${s.image}" class="avatar" style="width:32px;height:32px;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="" />
+                     <div class="avatar" style="background:${av.bg};color:${av.color};display:none">${getInitials(s.author)}</div>`
+                  : `<div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>`
+                }
                 <div>
                   <div class="author-name">${s.author}</div>
                   <div class="author-date">${s.platform} · ${s.date}</div>
