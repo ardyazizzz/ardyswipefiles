@@ -494,6 +494,7 @@
 
   function applyView(index) {
     const v = views[index];
+    if (v.mode) setMode(v.mode);
     if (v.filters) {
       activeFilters = {};
       Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) activeFilters[k] = arr; });
@@ -524,6 +525,7 @@
     if (!name) { showToast('Enter a name for this view'); return; }
     const preset = {
       name,
+      mode: activeMode,
       filters: JSON.parse(JSON.stringify(activeFilters)),
       sort: document.querySelector('.sort-select').value,
       density: gridDensity,
