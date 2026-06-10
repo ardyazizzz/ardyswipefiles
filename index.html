@@ -396,7 +396,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -847,13 +847,14 @@
     const newSwipe = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts };
     swipes.unshift(newSwipe);
     activeFilters = {};
+    persist();
     closeAddModal(); applyFilters();
     if (!supabase && window.supabase) {
       supabase = window.supabase.createClient('https://dmhiitzunsdqyxopqsby.supabase.co', 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F');
     }
     if (supabase) {
       const { error } = await supabase.from('swipes').insert(newSwipe);
-      if (error) showToast('Cloud save failed — try again');
+      if (error) { showToast('Save failed — ' + error.message); return; }
     }
     showToast('Swipe saved ✓');
   }
@@ -914,7 +915,7 @@
     }
     if (supabase) {
       const { error } = await supabase.from('swipes').update(s).eq('id', editingId);
-      if (error) showToast('Save failed — try again');
+      if (error) { showToast('Update failed — ' + error.message); return; }
     }
     showToast('Swipe updated ✓');
   }
