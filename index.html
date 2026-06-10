@@ -110,7 +110,7 @@
     .sort-select:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
 
     .mode-toggle { display: inline-flex; background: var(--border); border-radius: var(--radius-md); padding: 3px; gap: 0; }
-    .mode-segment { display: inline-flex; align-items: center; gap: 5px; border: none; background: transparent; padding: 6px 15px; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: calc(var(--radius-md) - 2px); color: var(--text-tertiary); transition: all 0.18s var(--ease); white-space: nowrap; }
+    .mode-segment { border: none; background: transparent; padding: 6px 15px; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: calc(var(--radius-md) - 2px); color: var(--text-tertiary); transition: all 0.18s var(--ease); white-space: nowrap; }
     .mode-segment.active { background: var(--bg); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
     .mode-segment:hover:not(.active) { color: var(--text-secondary); }
 
@@ -235,8 +235,8 @@
     </div>
     <div class="header-right">
       <div class="mode-toggle" id="modeToggle">
-        <button class="mode-segment active" onclick="setMode('posts')"><i class="ri-article-line"></i> Posts</button>
-        <button class="mode-segment" onclick="setMode('creators')"><i class="ri-user-star-line"></i> Creators</button>
+        <button class="mode-segment active" onclick="setMode('posts')">Posts</button>
+        <button class="mode-segment" onclick="setMode('creators')">Creators</button>
       </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
