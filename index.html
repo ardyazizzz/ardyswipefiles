@@ -223,7 +223,7 @@
     <div class="header-right">
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
-        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="applyFilters()" />
+        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters()" />
       </div>
       <button class="btn-ghost" onclick="exportData()">
         <i class="ri-download-2-line"></i> Export
@@ -328,12 +328,27 @@
   </div>
 </div>
 
+<!-- Views editor modal -->
+<div class="overlay" id="viewsEditorOverlay" style="display:none" onclick="handleOverlayClick(event,'viewsEditorOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">Edit views</span>
+      <button class="modal-close" onclick="closeViewsEditor()"><i class="ri-close-line"></i></button>
+    </div>
+    <div id="viewsEditorList"></div>
+    <div class="modal-actions" style="margin-top:1.25rem;">
+      <button class="btn-save" onclick="closeViewsEditor()">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
   const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
+  const LS_VIEWS = 'swipeardy_views_v1';
 
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
@@ -370,7 +385,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -385,6 +400,8 @@
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
   if (gridDensity > 1) gridDensity = 1;
+  let views = load(LS_VIEWS, []);
+  let currentViewName = null;
 
   function applyDensity() {
     const grid = document.getElementById('cardGrid');
@@ -394,11 +411,134 @@
 
   function cycleDensity() {
     gridDensity = (gridDensity + 1) % 2;
+    currentViewName = null;
     persist(); applyDensity(); renderFilterBar();
   }
 
   function densityLabel() {
     return ['Default', 'Comfortable'][gridDensity];
+  }
+
+  function encodeShareLink(preset) {
+    const p = [];
+    if (preset.filters) Object.entries(preset.filters).forEach(([k,v]) => p.push(encodeURIComponent(k.slice(0,3))+'='+v.map(encodeURIComponent).join(',')));
+    if (preset.sort) p.push('sort='+preset.sort);
+    if (preset.density) p.push('density='+preset.density);
+    if (preset.search) p.push('q='+encodeURIComponent(preset.search));
+    return location.origin + location.pathname + '#' + p.join('&');
+  }
+
+  function copyShareLink(index) {
+    const url = encodeShareLink(views[index]);
+    navigator.clipboard.writeText(url).then(() => showToast('Link copied ✓'));
+  }
+
+  function applyView(index) {
+    const v = views[index];
+    if (v.filters) {
+      activeFilters = {};
+      Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) activeFilters[k] = arr; });
+    } else { activeFilters = {}; }
+    if (v.sort) document.querySelector('.sort-select').value = v.sort;
+    if (v.density !== undefined) { gridDensity = v.density; applyDensity(); }
+    if (v.search !== undefined) { document.getElementById('searchInput').value = v.search; }
+    currentViewName = v.name;
+    persist(); renderFilterBar(); applyFilters();
+  }
+
+  let savingView = false;
+
+  function showSaveViewPrompt() {
+    savingView = true;
+    renderFilterBar();
+    setTimeout(() => { const inp = document.getElementById('viewNameInput'); if (inp) inp.focus(); }, 50);
+  }
+
+  function saveCurrentView() {
+    const inp = document.getElementById('viewNameInput');
+    const name = inp ? inp.value.trim() : '';
+    if (!name) { showToast('Enter a name for this view'); return; }
+    const preset = {
+      name,
+      filters: JSON.parse(JSON.stringify(activeFilters)),
+      sort: document.querySelector('.sort-select').value,
+      density: gridDensity,
+      search: document.getElementById('searchInput').value
+    };
+    views.push(preset);
+    currentViewName = name;
+    savingView = false;
+    persist(); renderFilterBar();
+    showToast('View saved ✓');
+  }
+
+  function cancelSaveView() {
+    savingView = false;
+    renderFilterBar();
+  }
+
+  function openViewsEditor() {
+    renderViewsEditor();
+    document.getElementById('viewsEditorOverlay').style.display = 'flex';
+  }
+
+  function closeViewsEditor() {
+    document.getElementById('viewsEditorOverlay').style.display = 'none';
+    renderFilterBar();
+  }
+
+  function renderViewsEditor() {
+    document.getElementById('viewsEditorList').innerHTML = views.map((v, i) => `
+      <div class="filter-group" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:500;cursor:pointer" onclick="editViewName(${i})" id="viewName-${i}">${v.name}</span>
+        <button class="icon-btn danger" onclick="deleteView(${i})" title="Delete"><i class="ri-delete-bin-line"></i></button>
+      </div>
+    `).join('') || '<div style="color:var(--text-tertiary);font-size:13px;text-align:center;padding:2rem">No saved views</div>';
+  }
+
+  function editViewName(index) {
+    const el = document.getElementById('viewName-'+index);
+    const current = views[index].name;
+    el.innerHTML = `<input type="text" value="${current.replace(/"/g,'&quot;')}" style="font-size:13px;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;width:100%;background:var(--bg);color:var(--text-primary)" onblur="renameView(${index},this.value)" onkeydown="if(event.key==='Enter')this.blur()" />`;
+    setTimeout(() => el.querySelector('input').focus(), 10);
+  }
+
+  function renameView(index, newName) {
+    newName = newName.trim();
+    if (!newName || newName === views[index].name) { renderViewsEditor(); return; }
+    if (currentViewName === views[index].name) currentViewName = newName;
+    views[index].name = newName;
+    persist(); renderViewsEditor(); renderFilterBar();
+  }
+
+  function deleteView(index) {
+    if (!confirm('Delete "' + views[index].name + '"?')) return;
+    if (currentViewName === views[index].name) currentViewName = null;
+    views.splice(index, 1);
+    persist(); renderViewsEditor(); renderFilterBar();
+  }
+
+  function loadFromHash() {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const params = new URLSearchParams(hash);
+    const newFilters = {};
+    const filterKeys = Object.keys(filters);
+    params.forEach((val, key) => {
+      if (key === 'sort') { document.querySelector('.sort-select').value = val; return; }
+      if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
+      if (key === 'q') { document.getElementById('searchInput').value = val; return; }
+      for (const fk of filterKeys) {
+        if (fk.toLowerCase().startsWith(key) || fk.slice(0,3).toLowerCase() === key) {
+          newFilters[fk] = val.split(',').map(decodeURIComponent);
+          return;
+        }
+      }
+    });
+    activeFilters = newFilters;
+    currentViewName = null;
+    persist(); renderFilterBar(); applyFilters();
+    setTimeout(() => showToast('📋 Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
   }
 
   function fmtNum(n) { return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'K' : n; }
@@ -447,6 +587,44 @@
   function renderFilterBar() {
     const bar = document.getElementById('filterBar');
     let html = '';
+    html += `<div class="dropdown" id="dd-views">
+      <button class="dropdown-btn ${currentViewName ? 'active' : ''}" onclick="toggleDD('views')">
+        ${currentViewName || 'Unsaved view'} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
+      </button>
+      <div class="dropdown-menu" id="menu-views">
+        ${currentViewName ? `<div class="dropdown-item" onclick="currentViewName=null;renderFilterBar()">Unsaved view</div>` : ''}
+        ${currentViewName ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);padding-top:6px;border-radius:0"></div>` : ''}
+        ${views.map((v,i) => `
+          <div class="dropdown-item" onclick="applyView(${i})" style="justify-content:space-between">
+            <span>${v.name}</span>
+            <span onclick="event.stopPropagation();copyShareLink(${i})" title="Copy shareable link" style="cursor:pointer;font-size:13px;color:var(--text-tertiary);padding:2px 6px;border-radius:4px" onmouseenter="this.style.background='var(--bg-secondary)'" onmouseleave="this.style.background='none'">📋</span>
+          </div>
+        `).join('')}
+        ${!views.length && !currentViewName ? `
+          <div style="padding:12px 10px;text-align:center">
+            <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px">No saved views yet.<br>Save your current filters and layout as a view.</div>
+            ${savingView ? `
+              <div style="display:flex;gap:4px">
+                <input type="text" id="viewNameInput" placeholder="Name this view..." style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')saveCurrentView()" />
+                <button onclick="saveCurrentView()" style="padding:5px 10px;font-size:12px;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-family:inherit">Save</button>
+                <button onclick="cancelSaveView()" style="padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-family:inherit;color:var(--text-secondary)">✕</button>
+              </div>
+            ` : `<div class="dropdown-item" style="justify-content:center" onclick="showSaveViewPrompt()">💾 Save these filters</div>`}
+          </div>
+        ` : ''}
+        ${views.length || currentViewName ? (!savingView ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="showSaveViewPrompt()">💾 Save these filters</div>` : `
+          <div style="padding:8px 10px">
+            <div style="display:flex;gap:4px">
+              <input type="text" id="viewNameInput" placeholder="Name this view..." style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')saveCurrentView()" />
+              <button onclick="saveCurrentView()" style="padding:5px 10px;font-size:12px;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-family:inherit">Save</button>
+              <button onclick="cancelSaveView()" style="padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-family:inherit;color:var(--text-secondary)">✕</button>
+            </div>
+          </div>
+        `) : ''}
+        ${views.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="openViewsEditor()">⚙ Edit views</div>` : ''}
+      </div>
+    </div>
+    <div class="divider"></div>`;
     Object.keys(filters).forEach(key => {
       const selected = activeFilters[key] || [];
       const safeKey = key.replace(/'/g, "\\'");
@@ -507,16 +685,19 @@
     if (idx === -1) activeFilters[key].push(val);
     else activeFilters[key].splice(idx, 1);
     if (!activeFilters[key].length) delete activeFilters[key];
+    currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
 
   function clearCategoryFilters(key) {
     delete activeFilters[key];
+    currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
 
   function clearAllFilters() {
     activeFilters = {};
+    currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
 
@@ -534,6 +715,7 @@
     if (val === 'longest') swipes.sort((a,b) => b.text.length - a.text.length);
     if (val === 'shortest') swipes.sort((a,b) => a.text.length - b.text.length);
     if (val === 'media-first') swipes.sort((a,b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
+    currentViewName = null; renderFilterBar();
     applyFilters();
   }
 
@@ -788,16 +970,18 @@
       if (id === 'addOverlay') closeAddModal();
       if (id === 'editOverlay') closeEditModal();
       if (id === 'settingsOverlay') closeSettings();
+      if (id === 'viewsEditorOverlay') closeViewsEditor();
     }
   }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); }
+    if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); }
   });
 
   renderFilterBar();
   applyDensity();
   applyFilters();
+  loadFromHash();
 </script>
 </body>
 </html>
