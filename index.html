@@ -508,7 +508,7 @@
   function encodeShareLink(preset) {
     const p = [];
     if (preset.mode) p.push('mode='+preset.mode);
-    if (preset.filters) Object.entries(preset.filters).forEach(([k,v]) => p.push(encodeURIComponent(k.slice(0,3))+'='+v.map(encodeURIComponent).join(',')));
+    if (preset.filters) Object.entries(preset.filters).forEach(([k,v]) => p.push(encodeURIComponent(k.slice(0,3).toLowerCase())+'='+v.map(encodeURIComponent).join(',')));
     if (preset.sort) p.push('sort='+preset.sort);
     if (preset.density) p.push('density='+preset.density);
     if (preset.search) p.push('q='+encodeURIComponent(preset.search));
@@ -521,7 +521,7 @@
     p.push('mode=' + activeMode);
     const af = getAF();
     Object.entries(af).forEach(([k, v]) => {
-      if (v && v.length) p.push(encodeURIComponent(k.slice(0,3)) + '=' + v.map(encodeURIComponent).join(','));
+      if (v && v.length) p.push(encodeURIComponent(k.slice(0,3).toLowerCase()) + '=' + v.map(encodeURIComponent).join(','));
     });
     if (currentSort !== 'newest') p.push('sort=' + currentSort);
     const q = document.getElementById('searchInput').value.trim();
@@ -650,7 +650,8 @@
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
       if (key === 'q') { searchVal = val; return; }
       for (const fk of filterKeys) {
-        if (fk.toLowerCase().startsWith(key) || fk.slice(0,3).toLowerCase() === key) {
+        const kl = key.toLowerCase();
+        if (fk.toLowerCase().startsWith(kl) || fk.slice(0,3).toLowerCase() === kl) {
           newFilters[fk] = val.split(',').map(decodeURIComponent);
           return;
         }
