@@ -361,6 +361,9 @@
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
   const LS_FILTER_STATE = 'swipeardy_filter_state_v1';
+  const LS_CREATOR_FILTERS = 'swipeardy_creator_filters_v1';
+  const LS_CREATOR_FILTER_COLORS = 'swipeardy_creator_filter_colors_v1';
+  const LS_CREATOR_FILTER_STATE = 'swipeardy_creator_filter_state_v1';
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
@@ -390,6 +393,15 @@
     Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F'},
   };
 
+  const DEFAULT_CREATOR_FILTERS = {
+    Niche: ['Business','Marketing','Personal Growth','Design','Tech','Writing'],
+    Platform: ['LinkedIn','Twitter','Instagram'],
+  };
+  const DEFAULT_CREATOR_FILTER_COLORS = {
+    Niche: {Business:'#3498DB',Marketing:'#E74C3C','Personal Growth':'#2ECC71',Design:'#9B59B6',Tech:'#F39C12',Writing:'#1ABC9C'},
+    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F'},
+  };
+
   const DEFAULT_SWIPES = [
     {id:1,author:'Ruben Hassid',date:'Jan 21, 2026',platform:'LinkedIn',filters:{Category:'Strategy',Format:'Single image'},text:'Stop embarrassing yourself with outdated tools. Here are the 8 tools I actually use in 2026 — completely changed how I work.',image:'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80'},
     {id:2,author:'Lara Acosta',date:'Jan 18, 2026',platform:'LinkedIn',filters:{Category:'Copywriting',Format:'Carousel'},text:"You don't need algorithm hacks to grow on LinkedIn. I spent 90 days testing every growth hack. Here's what actually works.",image:'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=400&q=80'},
@@ -413,7 +425,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -423,6 +435,8 @@
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
+  let creatorFilters = load(LS_CREATOR_FILTERS, DEFAULT_CREATOR_FILTERS);
+  let creatorFilterColors = load(LS_CREATOR_FILTER_COLORS, DEFAULT_CREATOR_FILTER_COLORS);
   let swipes = [];
   let creators = [];
   let activeMode = load(LS_MODE, 'posts');
@@ -456,7 +470,13 @@
     applyFilters();
   }
   let activeFilters = load(LS_FILTER_STATE, {});
+  let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
+  Object.keys(creatorActiveFilters).forEach(k => { if (!Array.isArray(creatorActiveFilters[k])) creatorActiveFilters[k] = [creatorActiveFilters[k]]; });
+
+  const getF  = () => activeMode === 'posts' ? filters : creatorFilters;
+  const getFC = () => activeMode === 'posts' ? filterColors : creatorFilterColors;
+  const getAF = () => activeMode === 'posts' ? activeFilters : creatorActiveFilters;
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
   if (gridDensity > 1) gridDensity = 1;
   let views = load(LS_VIEWS, []);
@@ -496,9 +516,12 @@
     const v = views[index];
     if (v.mode) setMode(v.mode);
     if (v.filters) {
-      activeFilters = {};
-      Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) activeFilters[k] = arr; });
-    } else { activeFilters = {}; }
+      if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
+      const af = getAF();
+      Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) af[k] = arr; });
+    } else {
+      if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
+    }
     if (v.sort) document.querySelector('.sort-select').value = v.sort;
     if (v.density !== undefined) { gridDensity = v.density; applyDensity(); }
     if (v.search !== undefined) { document.getElementById('searchInput').value = v.search; }
@@ -526,7 +549,7 @@
     const preset = {
       name,
       mode: activeMode,
-      filters: JSON.parse(JSON.stringify(activeFilters)),
+      filters: JSON.parse(JSON.stringify(getAF())),
       sort: document.querySelector('.sort-select').value,
       density: gridDensity,
       search: document.getElementById('searchInput').value
@@ -589,7 +612,7 @@
     if (!hash) return;
     const params = new URLSearchParams(hash);
     const newFilters = {};
-    const filterKeys = Object.keys(filters);
+    const filterKeys = Object.keys(getF());
     params.forEach((val, key) => {
       if (key === 'sort') { document.querySelector('.sort-select').value = val; return; }
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
@@ -601,7 +624,7 @@
         }
       }
     });
-    activeFilters = newFilters;
+    if (activeMode === 'posts') activeFilters = newFilters; else creatorActiveFilters = newFilters;
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
     setTimeout(() => showToast('<i class="ri-share-line"></i> Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
@@ -653,8 +676,8 @@
       </div>
     </div>
     <div class="divider"></div>`;
-    Object.keys(filters).forEach(key => {
-      const selected = activeFilters[key] || [];
+    Object.keys(getF()).forEach(key => {
+      const selected = getAF()[key] || [];
       const safeKey = key.replace(/'/g, "\\'");
       let btnText = key;
       if (selected.length === 1) btnText = selected[0];
@@ -664,7 +687,7 @@
           ${btnText} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
         </button>
         <div class="dropdown-menu" id="menu-${key}">
-          ${filters[key].map(opt => {
+          ${getF()[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
             const isChecked = selected.includes(opt);
             return `<div class="dropdown-item ${isChecked ? 'selected' : ''}" onclick="toggleFilter('${safeKey}','${safeOpt}')">
@@ -715,23 +738,24 @@
   });
 
   function toggleFilter(key, val) {
-    if (!activeFilters[key]) activeFilters[key] = [];
-    const idx = activeFilters[key].indexOf(val);
-    if (idx === -1) activeFilters[key].push(val);
-    else activeFilters[key].splice(idx, 1);
-    if (!activeFilters[key].length) delete activeFilters[key];
+    const af = getAF();
+    if (!af[key]) af[key] = [];
+    const idx = af[key].indexOf(val);
+    if (idx === -1) af[key].push(val);
+    else af[key].splice(idx, 1);
+    if (!af[key].length) delete af[key];
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
 
   function clearCategoryFilters(key) {
-    delete activeFilters[key];
+    delete getAF()[key];
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
 
   function clearAllFilters() {
-    activeFilters = {};
+    if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters();
   }
@@ -768,8 +792,8 @@
         : [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')];
       const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
       if (q && !searchStr.includes(q)) return false;
-      for (const key of Object.keys(activeFilters)) {
-        if (activeFilters[key] && activeFilters[key].length && !activeFilters[key].includes(s.filters[key])) return false;
+      for (const key of Object.keys(getAF())) {
+        if (getAF()[key] && getAF()[key].length && !getAF()[key].includes(s.filters[key])) return false;
       }
       return true;
     });
@@ -812,7 +836,7 @@
             <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
           </div>
           <div class="card-footer">
-            <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
+            <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
           </div>
           <div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-user-follow-line" style="font-size:13px"></i>${s.followers ? fmtNum(s.followers) + ' followers' : '— followers'}</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>
         </div>`;
@@ -839,7 +863,7 @@
           (s.image ? getMedia(s.image) : `<div class="card-placeholder">${emoji}</div>`)
         }
         <div class="card-footer">
-          <div class="card-tags">${tags.map(([k,v]) => { const c = filterColors[k] && filterColors[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
+          <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
           `<div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-line-chart-line" style="font-size:13px"></i>${fmtNum((s.reactions||0)+(s.comments||0)+(s.reposts||0))} engagements</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>` :
@@ -872,11 +896,11 @@
     document.getElementById('f-label-post').textContent = isCreator ? 'Profile URL *' : 'Post URL (optional)';
     document.getElementById('f-engagement-row').style.display = isCreator ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
-    document.getElementById('dynamicFields').innerHTML = Object.keys(filters).map(key => `
+    document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
       <select id="ff-${key}">
         <option value="">— Select ${key} —</option>
-        ${filters[key].map(o => `<option>${o}</option>`).join('')}
+        ${getF()[key].map(o => `<option>${o}</option>`).join('')}
       </select></div>`).join('');
     document.getElementById('addOverlay').style.display = 'flex';
     setTimeout(() => document.getElementById('f-author').focus(), 50);
@@ -901,7 +925,7 @@
     const postUrl  = document.getElementById('f-post').value.trim();
     const platform = document.getElementById('f-platform').value;
     const sf = {};
-    Object.keys(filters).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
+    Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
     const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
@@ -946,11 +970,11 @@
     document.getElementById('e-comments').value  = s.comments || '';
     document.getElementById('e-reposts').value   = s.reposts || '';
     document.getElementById('e-followers').value = s.followers || '';
-    document.getElementById('editDynamicFields').innerHTML = Object.keys(filters).map(key => `
+    document.getElementById('editDynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
       <select id="ef-${key}">
         <option value="">— Select ${key} —</option>
-        ${filters[key].map(o => `<option ${(s.filters&&s.filters[key])===o?'selected':''}>${o}</option>`).join('')}
+        ${getF()[key].map(o => `<option ${(s.filters&&s.filters[key])===o?'selected':''}>${o}</option>`).join('')}
       </select></div>`).join('');
     document.getElementById('editOverlay').style.display = 'flex';
     setTimeout(() => document.getElementById('e-author').focus(), 50);
@@ -984,7 +1008,7 @@
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
     s.followers = parseInt(document.getElementById('e-followers').value) || 0;
-    Object.keys(filters).forEach(key => {
+    Object.keys(getF()).forEach(key => {
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
@@ -1001,7 +1025,7 @@
   }
 
   function renderSettingsPanel() {
-    document.getElementById('filterGroupList').innerHTML = Object.keys(filters).map(key => {
+    document.getElementById('filterGroupList').innerHTML = Object.keys(getF()).map(key => {
       const safeKey = key.replace(/'/g, "\\'");
       return `<div class="filter-group">
         <div class="filter-group-header">
@@ -1011,9 +1035,9 @@
           </button>
         </div>
         <div class="filter-options">
-          ${filters[key].map(opt => {
+          ${getF()[key].map(opt => {
             const safeOpt = opt.replace(/'/g, "\\'");
-            const color = (filterColors[key] && filterColors[key][opt]) || '#6B7280';
+            const color = (getFC()[key] && getFC()[key][opt]) || '#6B7280';
             return `<span class="filter-option-pill">
               <input type="color" class="option-color" value="${color}" onchange="setOptionColor('${safeKey}','${safeOpt}',this.value)" title="Pick color" />
               ${opt}
@@ -1034,18 +1058,21 @@
   function renameFilter(oldKey, newKey) {
     newKey = newKey.trim();
     if (!newKey || newKey === oldKey) return;
-    const keys = Object.keys(filters);
+    const f = getF();
+    const keys = Object.keys(f);
     const newF = {};
-    keys.forEach(k => { newF[k === oldKey ? newKey : k] = filters[k]; });
-    filters = newF;
-    if (filterColors[oldKey]) { filterColors[newKey] = filterColors[oldKey]; delete filterColors[oldKey]; }
-    if (activeFilters[oldKey]) { activeFilters[newKey] = activeFilters[oldKey]; delete activeFilters[oldKey]; }
+    keys.forEach(k => { newF[k === oldKey ? newKey : k] = f[k]; });
+    if (activeMode === 'posts') filters = newF; else creatorFilters = newF;
+    const fc = getFC();
+    if (fc[oldKey]) { fc[newKey] = fc[oldKey]; delete fc[oldKey]; }
+    const af = getAF();
+    if (af[oldKey]) { af[newKey] = af[oldKey]; delete af[oldKey]; }
     renderSettingsPanel();
   }
 
   function deleteFilterGroup(key) {
     if (!confirm(`Delete the "${key}" filter?`)) return;
-    delete filters[key]; delete activeFilters[key]; delete filterColors[key];
+    delete getF()[key]; delete getAF()[key]; delete getFC()[key];
     persist();
     renderSettingsPanel();
   }
@@ -1055,33 +1082,34 @@
   function addOption(key) {
     const input = document.getElementById(`newoption-${key}`);
     const val = input.value.trim();
-    if (!val || filters[key].includes(val)) return;
-    filters[key].push(val);
-    if (!filterColors[key]) filterColors[key] = {};
-    filterColors[key][val] = COLOR_PALETTE[filters[key].length % COLOR_PALETTE.length];
+    if (!val || getF()[key].includes(val)) return;
+    getF()[key].push(val);
+    if (!getFC()[key]) getFC()[key] = {};
+    getFC()[key][val] = COLOR_PALETTE[getF()[key].length % COLOR_PALETTE.length];
     input.value = '';
     renderSettingsPanel();
   }
 
   function removeOption(key, opt) {
-    filters[key] = filters[key].filter(o => o !== opt);
-    if (filterColors[key]) delete filterColors[key][opt];
-    if (activeFilters[key]) { activeFilters[key] = activeFilters[key].filter(v => v !== opt); if (!activeFilters[key].length) delete activeFilters[key]; }
+    const f = getF(); const af = getAF(); const fc = getFC();
+    f[key] = f[key].filter(o => o !== opt);
+    if (fc[key]) delete fc[key][opt];
+    if (af[key]) { af[key] = af[key].filter(v => v !== opt); if (!af[key].length) delete af[key]; }
     persist();
     renderSettingsPanel();
   }
 
   function setOptionColor(key, opt, color) {
-    if (!filterColors[key]) filterColors[key] = {};
-    filterColors[key][opt] = color;
+    if (!getFC()[key]) getFC()[key] = {};
+    getFC()[key][opt] = color;
     persist();
   }
 
   function addFilterGroup() {
     const input = document.getElementById('newFilterName');
     const name = input.value.trim();
-    if (!name || filters[name]) return;
-    filters[name] = []; input.value = '';
+    if (!name || getF()[name]) return;
+    getF()[name] = []; input.value = '';
     renderSettingsPanel();
   }
 
