@@ -252,6 +252,7 @@
   </div>
 
   <div class="filterbar" id="filterBar"></div>
+  <div id="debugPanel" style="background:#14181f;color:#0f0;font-family:monospace;font-size:10px;padding:6px 10px;border-radius:6px;margin-bottom:8px;max-height:200px;overflow-y:auto;display:block;white-space:pre-wrap;line-height:1.4"></div>
   <div class="results-label" id="resultsLabel"></div>
   <div class="grid" id="cardGrid"></div>
 </div>
@@ -356,7 +357,11 @@
 
 <script>
   const DZ = true;
-  function dz(msg) { if (DZ) console.log(`[${performance.now().toFixed(0).padStart(5)}ms]`, msg); }
+  function dz(msg) {
+    const t = `[${performance.now().toFixed(0).padStart(5)}ms] ${msg}`;
+    if (DZ) console.log(t);
+    try { const p = document.getElementById('debugPanel'); if (p) { p.textContent += t + '\n'; p.scrollTop = p.scrollHeight; } } catch(e) {}
+  }
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_CREATORS = 'swipeardy_creators_v1';
