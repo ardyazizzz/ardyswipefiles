@@ -451,7 +451,12 @@
   function showSaveViewPrompt() {
     savingView = true;
     renderFilterBar();
-    setTimeout(() => { const inp = document.getElementById('viewNameInput'); if (inp) inp.focus(); }, 50);
+    setTimeout(() => {
+      const menu = document.getElementById('menu-views');
+      if (menu) menu.classList.add('open');
+      const inp = document.getElementById('viewNameInput');
+      if (inp) inp.focus();
+    }, 20);
   }
 
   function saveCurrentView() {
