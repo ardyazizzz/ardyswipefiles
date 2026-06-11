@@ -143,6 +143,9 @@
     .card-post-link { font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); text-decoration: none; background: var(--bg); border: 1.5px solid var(--border); box-shadow: 0 0 0 0 rgba(79,70,229,0); transition: all 0.2s var(--ease); flex-shrink: 0; }
     .card-post-link:hover { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 14px rgba(79,70,229,0.18), 0 2px 8px rgba(79,70,229,0.08); }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
+    .card-snippet-body { padding: 20px 16px; flex: 1; display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
+    .card-snippet-body:hover .card-snippet-text { color: var(--text-primary); }
+    .card-snippet-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.68; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); white-space: pre-wrap; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--bg-secondary); }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; background: #000; }
     .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 600; transition: filter 0.18s var(--ease); }
@@ -238,6 +241,7 @@
         <button class="mode-segment active" onclick="setMode('posts')">Posts</button>
         <button class="mode-segment" onclick="setMode('creators')">Creators</button>
         <button class="mode-segment" onclick="setMode('websites')">Websites</button>
+        <button class="mode-segment" onclick="setMode('snippets')">Snippets</button>
       </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
@@ -360,6 +364,7 @@
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_CREATORS = 'swipeardy_creators_v1';
   const LS_WEBSITES = 'swipeardy_websites_v1';
+  const LS_SNIPPETS = 'swipeardy_snippets_v1';
   const LS_MODE = 'swipeardy_mode_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
@@ -370,6 +375,9 @@
   const LS_WEBSITE_FILTERS = 'swipeardy_website_filters_v1';
   const LS_WEBSITE_FILTER_COLORS = 'swipeardy_website_filter_colors_v1';
   const LS_WEBSITE_FILTER_STATE = 'swipeardy_website_filter_state_v1';
+  const LS_SNIPPET_FILTERS = 'swipeardy_snippet_filters_v1';
+  const LS_SNIPPET_FILTER_COLORS = 'swipeardy_snippet_filter_colors_v1';
+  const LS_SNIPPET_FILTER_STATE = 'swipeardy_snippet_filter_state_v1';
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
@@ -431,6 +439,20 @@
   };
   const DEFAULT_WEBSITES = [];
 
+  const DEFAULT_SNIPPET_FILTERS = {
+    Category: ['Writing Hook','Framework','AI Prompt','Template','Quote','Idea','Storytelling'],
+  };
+  const DEFAULT_SNIPPET_FILTER_COLORS = {
+    Category: {'Writing Hook':'#E74C3C',Framework:'#3498DB','AI Prompt':'#9B59B6',Template:'#2ECC71',Quote:'#F39C12',Idea:'#1ABC9C',Storytelling:'#E67E22'},
+  };
+  const DEFAULT_SNIPPETS = [
+    {id:2001,author:'',date:'',platform:'',filters:{Category:'Writing Hook'},text:"The one thing every viral post has in common isn't the topic — it's the first line. Here are 7 proven hook structures that work every time.",reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2002,author:'',date:'',platform:'',filters:{Category:'Framework'},text:'AIDA Framework:\nAttention — grab them with the hook\nInterest — build curiosity with specifics\nDesire — show them what they could have\nAction — tell them exactly what to do next',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2003,author:'',date:'',platform:'',filters:{Category:'AI Prompt'},text:'You are a senior copywriter specializing in LinkedIn content. Analyze this post and rewrite it using the PAS (Problem-Agitate-Solution) framework. Make the hook sharp, the agitation visceral, and the solution concrete. Keep it under 1,500 characters.',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2004,author:'',date:'',platform:'',filters:{Category:'Quote'},text:'"People don\'t buy products. They buy better versions of themselves." — Samuel Hulick',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2005,author:'',date:'',platform:'',filters:{Category:'Template'},text:'LinkedIn Carousel Structure:\nSlide 1 — Bold claim + number (e.g. 7 frameworks)\nSlides 2-8 — One framework per slide with 1-2 line explanation\nSlide 9 — Summary table\nSlide 10 — CTA + follow',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+  ];
+
   const DEFAULT_CREATORS = [
     {id:1001,author:'Justin Welsh',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Solo business builder. $5M+ revenue writing about LinkedIn growth, lifestyle businesses, and content strategy.',image:'',postUrl:'https://linkedin.com/in/justinwelsh',followers:250000},
     {id:1002,author:'Alex Hormozi',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Founder of Acquisition.com. Scaling businesses through content, offers, and value-driven marketing.',image:'',postUrl:'https://linkedin.com/in/alexhormozi',followers:3000000},
@@ -439,7 +461,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); localStorage.setItem(LS_SNIPPETS, JSON.stringify(snippets)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); localStorage.setItem(LS_SNIPPET_FILTERS, JSON.stringify(snippetFilters)); localStorage.setItem(LS_SNIPPET_FILTER_COLORS, JSON.stringify(snippetFilterColors)); localStorage.setItem(LS_SNIPPET_FILTER_STATE, JSON.stringify(snippetActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -453,11 +475,14 @@
   let creatorFilterColors = load(LS_CREATOR_FILTER_COLORS, DEFAULT_CREATOR_FILTER_COLORS);
   let websiteFilters = load(LS_WEBSITE_FILTERS, DEFAULT_WEBSITE_FILTERS);
   let websiteFilterColors = load(LS_WEBSITE_FILTER_COLORS, DEFAULT_WEBSITE_FILTER_COLORS);
+  let snippetFilters = load(LS_SNIPPET_FILTERS, DEFAULT_SNIPPET_FILTERS);
+  let snippetFilterColors = load(LS_SNIPPET_FILTER_COLORS, DEFAULT_SNIPPET_FILTER_COLORS);
   let swipes = [];
   let creators = [];
   let websites = [];
+  let snippets = [];
   let activeMode = load(LS_MODE, 'posts');
-  if (activeMode !== 'posts' && activeMode !== 'creators' && activeMode !== 'websites') activeMode = 'posts';
+  if (activeMode !== 'posts' && activeMode !== 'creators' && activeMode !== 'websites' && activeMode !== 'snippets') activeMode = 'posts';
   let dataReady = false;
 
   async function loadSwipes() {
@@ -474,6 +499,9 @@
   function loadWebsites() {
     websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES;
   }
+  function loadSnippets() {
+    snippets = load(LS_SNIPPETS, null) || DEFAULT_SNIPPETS;
+  }
 
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
@@ -484,7 +512,7 @@
     }
     document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
     document.querySelector(`.mode-segment[onclick="setMode('${mode}')"]`).classList.add('active');
-    const noun = mode === 'posts' ? 'swipe' : mode === 'creators' ? 'creator' : 'website';
+    const noun = mode === 'posts' ? 'swipe' : mode === 'creators' ? 'creator' : mode === 'websites' ? 'website' : 'snippet';
     document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${noun}`;
     document.getElementById('searchInput').placeholder = `Search ${noun}s...`;
     if (!skipRender) {
@@ -497,13 +525,15 @@
   let activeFilters = load(LS_FILTER_STATE, {});
   let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
   let websiteActiveFilters = load(LS_WEBSITE_FILTER_STATE, {});
+  let snippetActiveFilters = load(LS_SNIPPET_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   Object.keys(creatorActiveFilters).forEach(k => { if (!Array.isArray(creatorActiveFilters[k])) creatorActiveFilters[k] = [creatorActiveFilters[k]]; });
   Object.keys(websiteActiveFilters).forEach(k => { if (!Array.isArray(websiteActiveFilters[k])) websiteActiveFilters[k] = [websiteActiveFilters[k]]; });
+  Object.keys(snippetActiveFilters).forEach(k => { if (!Array.isArray(snippetActiveFilters[k])) snippetActiveFilters[k] = [snippetActiveFilters[k]]; });
 
-  const getF  = () => activeMode === 'posts' ? filters : activeMode === 'creators' ? creatorFilters : websiteFilters;
-  const getFC = () => activeMode === 'posts' ? filterColors : activeMode === 'creators' ? creatorFilterColors : websiteFilterColors;
-  const getAF = () => activeMode === 'posts' ? activeFilters : activeMode === 'creators' ? creatorActiveFilters : websiteActiveFilters;
+  const getF  = () => activeMode === 'posts' ? filters : activeMode === 'creators' ? creatorFilters : activeMode === 'websites' ? websiteFilters : snippetFilters;
+  const getFC = () => activeMode === 'posts' ? filterColors : activeMode === 'creators' ? creatorFilterColors : activeMode === 'websites' ? websiteFilterColors : snippetFilterColors;
+  const getAF = () => activeMode === 'posts' ? activeFilters : activeMode === 'creators' ? creatorActiveFilters : activeMode === 'websites' ? websiteActiveFilters : snippetActiveFilters;
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
   if (gridDensity > 1) gridDensity = 1;
   let views = load(LS_VIEWS, []);
@@ -563,11 +593,11 @@
     const v = views[index];
     if (v.mode) setMode(v.mode, true);
     if (v.filters) {
-      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
+      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else if (activeMode === 'websites') websiteActiveFilters = {}; else snippetActiveFilters = {};
       const af = getAF();
       Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) af[k] = arr; });
     } else {
-      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
+      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else if (activeMode === 'websites') websiteActiveFilters = {}; else snippetActiveFilters = {};
     }
     if (v.sort) currentSort = v.sort; else currentSort = 'newest';
     applySort(currentSort);
@@ -660,7 +690,7 @@
     if (!hash) return;
     const params = new URLSearchParams(hash);
     const hashMode = params.get('mode');
-    if (hashMode && (hashMode === 'posts' || hashMode === 'creators' || hashMode === 'websites')) {
+    if (hashMode && (hashMode === 'posts' || hashMode === 'creators' || hashMode === 'websites' || hashMode === 'snippets')) {
       setMode(hashMode, true);
     }
     const newFilters = {};
@@ -679,7 +709,7 @@
         }
       }
     });
-    if (activeMode === 'posts') activeFilters = newFilters; else if (activeMode === 'creators') creatorActiveFilters = newFilters; else websiteActiveFilters = newFilters;
+    if (activeMode === 'posts') activeFilters = newFilters; else if (activeMode === 'creators') creatorActiveFilters = newFilters; else if (activeMode === 'websites') websiteActiveFilters = newFilters; else snippetActiveFilters = newFilters;
     if (searchVal) document.getElementById('searchInput').value = searchVal;
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
@@ -775,9 +805,12 @@
       <option value="least-followers"${currentSort==='least-followers'?' selected':''}>Least followers</option>
       <option value="az"${currentSort==='az'?' selected':''}>A-Z</option>
       <option value="za"${currentSort==='za'?' selected':''}>Z-A</option>
-      ` : `
+      ` : activeMode === 'websites' ? `
       <option value="az"${currentSort==='az'?' selected':''}>A-Z</option>
       <option value="za"${currentSort==='za'?' selected':''}>Z-A</option>
+      ` : `
+      <option value="longest"${currentSort==='longest'?' selected':''}>Longest</option>
+      <option value="shortest"${currentSort==='shortest'?' selected':''}>Shortest</option>
       `}
     </select>`;
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-grid-fill" style="font-size:13px"></i></button>`;
@@ -814,13 +847,13 @@
   }
 
   function clearAllFilters() {
-    if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
+    if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else if (activeMode === 'websites') websiteActiveFilters = {}; else snippetActiveFilters = {};
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function applySort(val) {
-    const arr = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
+    const arr = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     if (val === 'newest') arr.sort((a,b) => b.id - a.id);
     if (val === 'oldest') arr.sort((a,b) => a.id - b.id);
     if (val === 'most-engaged') arr.sort((a,b) => ((b.reactions||0)+(b.comments||0)+(b.reposts||0)) - ((a.reactions||0)+(a.comments||0)+(a.reposts||0)));
@@ -848,13 +881,15 @@
 
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const data = source.filter(s => {
       const searchFields = activeMode === 'posts'
         ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl]
         : activeMode === 'creators'
         ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')]
-        : [s.text, s.author, ...Object.values(s.filters || {}), s.postUrl];
+        : activeMode === 'websites'
+        ? [s.text, s.author, ...Object.values(s.filters || {}), s.postUrl]
+        : [s.text, ...Object.values(s.filters || {})];
       const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
       if (q && !searchStr.includes(q)) return false;
       for (const key of Object.keys(getAF())) {
@@ -862,8 +897,8 @@
       }
       return true;
     });
-    const totalCount = activeMode === 'posts' ? swipes.length : activeMode === 'creators' ? creators.length : websites.length;
-    const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
+    const totalCount = activeMode === 'posts' ? swipes.length : activeMode === 'creators' ? creators.length : activeMode === 'websites' ? websites.length : snippets.length;
+    const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     renderCards(data);
@@ -871,7 +906,7 @@
 
   function renderCards(data) {
     const grid = document.getElementById('cardGrid');
-    const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
+    const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     const noResultsLabel = `No ${noun}s match your filters`;
     if (!data.length) {
       grid.innerHTML = `<div class="empty-state">
@@ -885,6 +920,18 @@
       const av = getAv(s.author);
       const tags = Object.entries(s.filters || {}).filter(([,v]) => v);
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
+      if (activeMode === 'snippets') {
+        return `<div class="card">
+          <div class="card-body card-snippet-body" onclick="openEditModal(${s.id})">
+            <p class="card-snippet-text">${s.text}</p>
+            <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
+          </div>
+          <div class="card-engagement-bar" style="justify-content:flex-end"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>
+        </div>`;
+      }
       if (activeMode === 'websites') {
         return `<div class="card">
           <div class="card-body" onclick="openEditModal(${s.id})">
@@ -970,14 +1017,16 @@
   }
 
   function deleteSwipe(id) {
-    const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
+    const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     if (!confirm('Delete this ' + label + '?')) return;
     if (activeMode === 'posts') {
       swipes = swipes.filter(x => x.id !== id);
     } else if (activeMode === 'creators') {
       creators = creators.filter(x => x.id !== id);
-    } else {
+    } else if (activeMode === 'websites') {
       websites = websites.filter(x => x.id !== id);
+    } else {
+      snippets = snippets.filter(x => x.id !== id);
     }
     persist(); applyFilters();
     sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
@@ -987,13 +1036,18 @@
   function openAddModal() {
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
-    document.getElementById('addOverlay').querySelector('.modal-title').textContent = isWebsite ? 'Add website' : isCreator ? 'Add creator' : 'Add new swipe';
-    document.getElementById('saveBtn').textContent = isWebsite ? 'Save website' : isCreator ? 'Save creator' : 'Save swipe';
+    const isSnippet = activeMode === 'snippets';
+    document.getElementById('addOverlay').querySelector('.modal-title').textContent = isSnippet ? 'Add snippet' : isWebsite ? 'Add website' : isCreator ? 'Add creator' : 'Add new swipe';
+    document.getElementById('saveBtn').textContent = isSnippet ? 'Save snippet' : isWebsite ? 'Save website' : isCreator ? 'Save creator' : 'Save swipe';
+    document.getElementById('f-author').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
-    document.getElementById('f-label-text').textContent = isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('f-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('f-image').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
-    document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite) ? 'none' : 'flex';
+    document.getElementById('f-platform').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
@@ -1002,7 +1056,7 @@
         ${getF()[key].map(o => `<option>${o}</option>`).join('')}
       </select></div>`).join('');
     document.getElementById('addOverlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('f-author').focus(), 50);
+    setTimeout(() => { const el = isSnippet ? document.getElementById('f-text') : document.getElementById('f-author'); el.focus(); }, 50);
   }
 
   function closeAddModal() {
@@ -1013,9 +1067,12 @@
   function saveSwipe() {
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
+    const isSnippet = activeMode === 'snippets';
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
-    if (isWebsite) {
+    if (isSnippet) {
+      if (!text) { showToast('Content is required'); return; }
+    } else if (isWebsite) {
       const postUrl = document.getElementById('f-post').value.trim();
       if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
     } else if (isCreator) {
@@ -1026,7 +1083,7 @@
     }
     const image    = document.getElementById('f-image').value.trim();
     const postUrl  = document.getElementById('f-post').value.trim();
-    const platform = isWebsite ? 'Web' : document.getElementById('f-platform').value;
+    const platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
     const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -1045,6 +1102,11 @@
       persist(); closeAddModal(); applyFilters();
       sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
       showToast('Creator saved ✓');
+    } else if (isSnippet) {
+      snippets.unshift(item);
+      persist(); closeAddModal(); applyFilters();
+      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
       persist(); closeAddModal(); applyFilters();
@@ -1062,12 +1124,18 @@
     editingId = id;
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
-    document.getElementById('editOverlay').querySelector('.modal-title').textContent = isWebsite ? 'Edit website' : isCreator ? 'Edit creator' : 'Edit swipe';
+    const isSnippet = activeMode === 'snippets';
+    document.getElementById('editOverlay').querySelector('.modal-title').textContent = isSnippet ? 'Edit snippet' : isWebsite ? 'Edit website' : isCreator ? 'Edit creator' : 'Edit swipe';
+    document.getElementById('e-author').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
-    document.getElementById('e-label-text').textContent = isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('e-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('e-image').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
-    document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite) ? 'none' : 'flex';
+    document.getElementById('e-platform').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('e-date').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('e-author').value  = s.author;
     document.getElementById('e-text').value    = s.text;
@@ -1086,7 +1154,7 @@
         ${getF()[key].map(o => `<option ${(s.filters&&s.filters[key])===o?'selected':''}>${o}</option>`).join('')}
       </select></div>`).join('');
     document.getElementById('editOverlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('e-author').focus(), 50);
+    setTimeout(() => { const el = isSnippet ? document.getElementById('e-text') : document.getElementById('e-author'); el.focus(); }, 50);
   }
 
   function closeEditModal() {
@@ -1095,14 +1163,17 @@
   }
 
   function updateSwipe() {
-    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === editingId);
     if (!s) return;
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
+    const isSnippet = activeMode === 'snippets';
     const author = document.getElementById('e-author').value.trim();
     const text   = document.getElementById('e-text').value.trim();
-    if (isWebsite) {
+    if (isSnippet) {
+      if (!text) { showToast('Content is required'); return; }
+    } else if (isWebsite) {
       const postUrl = document.getElementById('e-post').value.trim();
       if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
     } else if (isCreator) {
@@ -1116,7 +1187,7 @@
     s.image    = document.getElementById('e-image').value.trim();
     s.postUrl  = document.getElementById('e-post').value.trim();
     s.date     = document.getElementById('e-date').value.trim();
-    s.platform = isWebsite ? 'Web' : document.getElementById('e-platform').value;
+    s.platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
@@ -1127,7 +1198,7 @@
     });
     persist(); closeEditModal(); applyFilters();
     sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s) }).catch(()=>{});
-    showToast(isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
+    showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
   function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
@@ -1175,7 +1246,7 @@
     const keys = Object.keys(f);
     const newF = {};
     keys.forEach(k => { newF[k === oldKey ? newKey : k] = f[k]; });
-    if (activeMode === 'posts') filters = newF; else if (activeMode === 'creators') creatorFilters = newF; else websiteFilters = newF;
+    if (activeMode === 'posts') filters = newF; else if (activeMode === 'creators') creatorFilters = newF; else if (activeMode === 'websites') websiteFilters = newF; else snippetFilters = newF;
     const fc = getFC();
     if (fc[oldKey]) { fc[newKey] = fc[oldKey]; delete fc[oldKey]; }
     const af = getAF();
@@ -1246,6 +1317,7 @@
     await loadSwipes();
     loadCreators();
     loadWebsites();
+    loadSnippets();
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
