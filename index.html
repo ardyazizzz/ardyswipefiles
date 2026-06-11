@@ -143,9 +143,6 @@
     .card-post-link { font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); text-decoration: none; background: var(--bg); border: 1.5px solid var(--border); box-shadow: 0 0 0 0 rgba(79,70,229,0); transition: all 0.2s var(--ease); flex-shrink: 0; }
     .card-post-link:hover { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 14px rgba(79,70,229,0.18), 0 2px 8px rgba(79,70,229,0.08); }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
-    .card-snippet-body { padding: 20px 16px; flex: 1; display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
-    .card-snippet-body:hover .card-snippet-text { color: var(--text-primary); }
-    .card-snippet-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.68; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); white-space: pre-wrap; }
     .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--bg-secondary); }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; background: #000; }
     .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 600; transition: filter 0.18s var(--ease); }
@@ -446,11 +443,11 @@
     Category: {'Writing Hook':'#E74C3C',Framework:'#3498DB','AI Prompt':'#9B59B6',Template:'#2ECC71',Quote:'#F39C12',Idea:'#1ABC9C',Storytelling:'#E67E22'},
   };
   const DEFAULT_SNIPPETS = [
-    {id:2001,author:'',date:'',platform:'',filters:{Category:'Writing Hook'},text:"The one thing every viral post has in common isn't the topic — it's the first line. Here are 7 proven hook structures that work every time.",reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
-    {id:2002,author:'',date:'',platform:'',filters:{Category:'Framework'},text:'AIDA Framework:\nAttention — grab them with the hook\nInterest — build curiosity with specifics\nDesire — show them what they could have\nAction — tell them exactly what to do next',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
-    {id:2003,author:'',date:'',platform:'',filters:{Category:'AI Prompt'},text:'You are a senior copywriter specializing in LinkedIn content. Analyze this post and rewrite it using the PAS (Problem-Agitate-Solution) framework. Make the hook sharp, the agitation visceral, and the solution concrete. Keep it under 1,500 characters.',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
-    {id:2004,author:'',date:'',platform:'',filters:{Category:'Quote'},text:'"People don\'t buy products. They buy better versions of themselves." — Samuel Hulick',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
-    {id:2005,author:'',date:'',platform:'',filters:{Category:'Template'},text:'LinkedIn Carousel Structure:\nSlide 1 — Bold claim + number (e.g. 7 frameworks)\nSlides 2-8 — One framework per slide with 1-2 line explanation\nSlide 9 — Summary table\nSlide 10 — CTA + follow',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2001,author:'7 Proven Hook Structures',date:'',platform:'',filters:{Category:'Writing Hook'},text:"The one thing every viral post has in common isn't the topic — it's the first line. Here are 7 proven hook structures that work every time.",reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2002,author:'AIDA Framework',date:'',platform:'',filters:{Category:'Framework'},text:'Attention — grab them with the hook\nInterest — build curiosity with specifics\nDesire — show them what they could have\nAction — tell them exactly what to do next',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2003,author:'LinkedIn Copywriter Prompt',date:'',platform:'',filters:{Category:'AI Prompt'},text:'You are a senior copywriter specializing in LinkedIn content. Analyze this post and rewrite it using the PAS (Problem-Agitate-Solution) framework. Make the hook sharp, the agitation visceral, and the solution concrete. Keep it under 1,500 characters.',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2004,author:'Samuel Hulick on Buying',date:'',platform:'',filters:{Category:'Quote'},text:'"People don\'t buy products. They buy better versions of themselves."',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
+    {id:2005,author:'LinkedIn Carousel Structure',date:'',platform:'',filters:{Category:'Template'},text:'Slide 1 — Bold claim + number (e.g. 7 frameworks)\nSlides 2-8 — One framework per slide with 1-2 line explanation\nSlide 9 — Summary table\nSlide 10 — CTA + follow',reactions:0,comments:0,reposts:0,followers:0,image:'',postUrl:''},
   ];
 
   const DEFAULT_CREATORS = [
@@ -922,8 +919,15 @@
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
       if (activeMode === 'snippets') {
         return `<div class="card">
-          <div class="card-body card-snippet-body" onclick="openEditModal(${s.id})">
-            <p class="card-snippet-text">${s.text}</p>
+          <div class="card-body" onclick="openEditModal(${s.id})">
+            <div class="card-top">
+              <div class="card-author">
+                <div>
+                  <div class="author-name">${s.author}</div>
+                </div>
+              </div>
+            </div>
+            <p class="card-text">${s.text}</p>
             <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
           </div>
           <div class="card-footer">
@@ -1039,9 +1043,11 @@
     const isSnippet = activeMode === 'snippets';
     document.getElementById('addOverlay').querySelector('.modal-title').textContent = isSnippet ? 'Add snippet' : isWebsite ? 'Add website' : isCreator ? 'Add creator' : 'Add new swipe';
     document.getElementById('saveBtn').textContent = isSnippet ? 'Save snippet' : isWebsite ? 'Save website' : isCreator ? 'Save creator' : 'Save swipe';
-    document.getElementById('f-author').parentElement.style.display = isSnippet ? 'none' : '';
-    document.getElementById('f-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('f-author').parentElement.style.display = '';
+    document.getElementById('f-label-author').textContent = isSnippet ? 'Title *' : isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('f-author').placeholder = isSnippet ? 'e.g. AIDA Framework' : isWebsite ? '' : isCreator ? '' : 'e.g. Justin Welsh';
     document.getElementById('f-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('f-text').rows = isSnippet ? 8 : 4;
     document.getElementById('f-image').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
@@ -1071,7 +1077,7 @@
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
     if (isSnippet) {
-      if (!text) { showToast('Content is required'); return; }
+      if (!author || !text) { showToast('Title and content are required'); return; }
     } else if (isWebsite) {
       const postUrl = document.getElementById('f-post').value.trim();
       if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
@@ -1118,7 +1124,7 @@
   let editingId = null;
 
   function openEditModal(id) {
-    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === id);
     if (!s) return;
     editingId = id;
@@ -1126,8 +1132,9 @@
     const isWebsite = activeMode === 'websites';
     const isSnippet = activeMode === 'snippets';
     document.getElementById('editOverlay').querySelector('.modal-title').textContent = isSnippet ? 'Edit snippet' : isWebsite ? 'Edit website' : isCreator ? 'Edit creator' : 'Edit swipe';
-    document.getElementById('e-author').parentElement.style.display = isSnippet ? 'none' : '';
-    document.getElementById('e-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('e-author').parentElement.style.display = '';
+    document.getElementById('e-label-author').textContent = isSnippet ? 'Title *' : isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('e-text').rows = isSnippet ? 8 : 4;
     document.getElementById('e-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
     document.getElementById('e-image').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
@@ -1172,7 +1179,7 @@
     const author = document.getElementById('e-author').value.trim();
     const text   = document.getElementById('e-text').value.trim();
     if (isSnippet) {
-      if (!text) { showToast('Content is required'); return; }
+      if (!author || !text) { showToast('Title and content are required'); return; }
     } else if (isWebsite) {
       const postUrl = document.getElementById('e-post').value.trim();
       if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
