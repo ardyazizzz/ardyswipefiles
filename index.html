@@ -237,6 +237,7 @@
       <div class="mode-toggle" id="modeToggle">
         <button class="mode-segment active" onclick="setMode('posts')">Posts</button>
         <button class="mode-segment" onclick="setMode('creators')">Creators</button>
+        <button class="mode-segment" onclick="setMode('websites')">Websites</button>
       </div>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
@@ -358,6 +359,7 @@
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
   const LS_CREATORS = 'swipeardy_creators_v1';
+  const LS_WEBSITES = 'swipeardy_websites_v1';
   const LS_MODE = 'swipeardy_mode_v1';
   const LS_FILTERS = 'swipeardy_filters_v2';
   const LS_FILTER_COLORS = 'swipeardy_filter_colors_v1';
@@ -365,6 +367,9 @@
   const LS_CREATOR_FILTERS = 'swipeardy_creator_filters_v1';
   const LS_CREATOR_FILTER_COLORS = 'swipeardy_creator_filter_colors_v1';
   const LS_CREATOR_FILTER_STATE = 'swipeardy_creator_filter_state_v1';
+  const LS_WEBSITE_FILTERS = 'swipeardy_website_filters_v1';
+  const LS_WEBSITE_FILTER_COLORS = 'swipeardy_website_filter_colors_v1';
+  const LS_WEBSITE_FILTER_STATE = 'swipeardy_website_filter_state_v1';
   const LS_GRID_DENSITY = 'swipeardy_grid_density_v1';
   const LS_VIEWS = 'swipeardy_views_v1';
 
@@ -418,6 +423,14 @@
     {id:12,author:'Ana Canha',date:'Jan 2, 2026',platform:'LinkedIn',filters:{Category:'Design',Format:'Carousel'},text:"A good infographic doesn't show everything — it shows the one thing that matters. I redesigned 50 posts using this principle. Engagement doubled.",image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'},
   ];
 
+  const DEFAULT_WEBSITE_FILTERS = {
+    Category: ['Design Tool','Resource','Inspiration','Reference','Platform','Utility'],
+  };
+  const DEFAULT_WEBSITE_FILTER_COLORS = {
+    Category: {'Design Tool':'#3498DB',Resource:'#2ECC71',Inspiration:'#9B59B6',Reference:'#F39C12',Platform:'#E74C3C',Utility:'#1ABC9C'},
+  };
+  const DEFAULT_WEBSITES = [];
+
   const DEFAULT_CREATORS = [
     {id:1001,author:'Justin Welsh',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Solo business builder. $5M+ revenue writing about LinkedIn growth, lifestyle businesses, and content strategy.',image:'',postUrl:'https://linkedin.com/in/justinwelsh',followers:250000},
     {id:1002,author:'Alex Hormozi',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Business'},text:'Founder of Acquisition.com. Scaling businesses through content, offers, and value-driven marketing.',image:'',postUrl:'https://linkedin.com/in/alexhormozi',followers:3000000},
@@ -426,7 +439,7 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -438,10 +451,13 @@
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
   let creatorFilters = load(LS_CREATOR_FILTERS, DEFAULT_CREATOR_FILTERS);
   let creatorFilterColors = load(LS_CREATOR_FILTER_COLORS, DEFAULT_CREATOR_FILTER_COLORS);
+  let websiteFilters = load(LS_WEBSITE_FILTERS, DEFAULT_WEBSITE_FILTERS);
+  let websiteFilterColors = load(LS_WEBSITE_FILTER_COLORS, DEFAULT_WEBSITE_FILTER_COLORS);
   let swipes = [];
   let creators = [];
+  let websites = [];
   let activeMode = load(LS_MODE, 'posts');
-  if (activeMode !== 'posts' && activeMode !== 'creators') activeMode = 'posts';
+  if (activeMode !== 'posts' && activeMode !== 'creators' && activeMode !== 'websites') activeMode = 'posts';
   let dataReady = false;
 
   async function loadSwipes() {
@@ -455,6 +471,9 @@
   function loadCreators() {
     creators = load(LS_CREATORS, null) || DEFAULT_CREATORS;
   }
+  function loadWebsites() {
+    websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES;
+  }
 
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
@@ -465,8 +484,9 @@
     }
     document.querySelectorAll('.mode-segment').forEach(b => b.classList.remove('active'));
     document.querySelector(`.mode-segment[onclick="setMode('${mode}')"]`).classList.add('active');
-    document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${mode === 'posts' ? 'swipe' : 'creator'}`;
-    document.getElementById('searchInput').placeholder = mode === 'posts' ? 'Search swipes...' : 'Search creators...';
+    const noun = mode === 'posts' ? 'swipe' : mode === 'creators' ? 'creator' : 'website';
+    document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${noun}`;
+    document.getElementById('searchInput').placeholder = `Search ${noun}s...`;
     if (!skipRender) {
       persist();
       renderFilterBar();
@@ -476,12 +496,14 @@
   }
   let activeFilters = load(LS_FILTER_STATE, {});
   let creatorActiveFilters = load(LS_CREATOR_FILTER_STATE, {});
+  let websiteActiveFilters = load(LS_WEBSITE_FILTER_STATE, {});
   Object.keys(activeFilters).forEach(k => { if (!Array.isArray(activeFilters[k])) activeFilters[k] = [activeFilters[k]]; });
   Object.keys(creatorActiveFilters).forEach(k => { if (!Array.isArray(creatorActiveFilters[k])) creatorActiveFilters[k] = [creatorActiveFilters[k]]; });
+  Object.keys(websiteActiveFilters).forEach(k => { if (!Array.isArray(websiteActiveFilters[k])) websiteActiveFilters[k] = [websiteActiveFilters[k]]; });
 
-  const getF  = () => activeMode === 'posts' ? filters : creatorFilters;
-  const getFC = () => activeMode === 'posts' ? filterColors : creatorFilterColors;
-  const getAF = () => activeMode === 'posts' ? activeFilters : creatorActiveFilters;
+  const getF  = () => activeMode === 'posts' ? filters : activeMode === 'creators' ? creatorFilters : websiteFilters;
+  const getFC = () => activeMode === 'posts' ? filterColors : activeMode === 'creators' ? creatorFilterColors : websiteFilterColors;
+  const getAF = () => activeMode === 'posts' ? activeFilters : activeMode === 'creators' ? creatorActiveFilters : websiteActiveFilters;
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
   if (gridDensity > 1) gridDensity = 1;
   let views = load(LS_VIEWS, []);
@@ -541,11 +563,11 @@
     const v = views[index];
     if (v.mode) setMode(v.mode, true);
     if (v.filters) {
-      if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
+      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
       const af = getAF();
       Object.entries(v.filters).forEach(([k,arr]) => { if (arr.length) af[k] = arr; });
     } else {
-      if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
+      if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
     }
     if (v.sort) currentSort = v.sort; else currentSort = 'newest';
     applySort(currentSort);
@@ -638,7 +660,7 @@
     if (!hash) return;
     const params = new URLSearchParams(hash);
     const hashMode = params.get('mode');
-    if (hashMode && (hashMode === 'posts' || hashMode === 'creators')) {
+    if (hashMode && (hashMode === 'posts' || hashMode === 'creators' || hashMode === 'websites')) {
       setMode(hashMode, true);
     }
     const newFilters = {};
@@ -657,7 +679,7 @@
         }
       }
     });
-    if (activeMode === 'posts') activeFilters = newFilters; else creatorActiveFilters = newFilters;
+    if (activeMode === 'posts') activeFilters = newFilters; else if (activeMode === 'creators') creatorActiveFilters = newFilters; else websiteActiveFilters = newFilters;
     if (searchVal) document.getElementById('searchInput').value = searchVal;
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
@@ -748,9 +770,12 @@
       <option value="longest"${currentSort==='longest'?' selected':''}>Longest read</option>
       <option value="shortest"${currentSort==='shortest'?' selected':''}>Quickest read</option>
       <option value="media-first"${currentSort==='media-first'?' selected':''}>Has media first</option>
-      ` : `
+      ` : activeMode === 'creators' ? `
       <option value="most-followers"${currentSort==='most-followers'?' selected':''}>Most followers</option>
       <option value="least-followers"${currentSort==='least-followers'?' selected':''}>Least followers</option>
+      <option value="az"${currentSort==='az'?' selected':''}>A-Z</option>
+      <option value="za"${currentSort==='za'?' selected':''}>Z-A</option>
+      ` : `
       <option value="az"${currentSort==='az'?' selected':''}>A-Z</option>
       <option value="za"${currentSort==='za'?' selected':''}>Z-A</option>
       `}
@@ -789,13 +814,13 @@
   }
 
   function clearAllFilters() {
-    if (activeMode === 'posts') activeFilters = {}; else creatorActiveFilters = {};
+    if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else websiteActiveFilters = {};
     currentViewName = null;
     persist(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function applySort(val) {
-    const arr = activeMode === 'posts' ? swipes : creators;
+    const arr = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
     if (val === 'newest') arr.sort((a,b) => b.id - a.id);
     if (val === 'oldest') arr.sort((a,b) => a.id - b.id);
     if (val === 'most-engaged') arr.sort((a,b) => ((b.reactions||0)+(b.comments||0)+(b.reposts||0)) - ((a.reactions||0)+(a.comments||0)+(a.reposts||0)));
@@ -823,11 +848,13 @@
 
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const source = activeMode === 'posts' ? swipes : creators;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
     const data = source.filter(s => {
       const searchFields = activeMode === 'posts'
         ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl]
-        : [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')];
+        : activeMode === 'creators'
+        ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')]
+        : [s.text, s.author, ...Object.values(s.filters || {}), s.postUrl];
       const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
       if (q && !searchStr.includes(q)) return false;
       for (const key of Object.keys(getAF())) {
@@ -835,8 +862,8 @@
       }
       return true;
     });
-    const totalCount = activeMode === 'posts' ? swipes.length : creators.length;
-    const totalLabel = activeMode === 'posts' ? 'swipe' : 'creator';
+    const totalCount = activeMode === 'posts' ? swipes.length : activeMode === 'creators' ? creators.length : websites.length;
+    const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     renderCards(data);
@@ -844,12 +871,13 @@
 
   function renderCards(data) {
     const grid = document.getElementById('cardGrid');
-    const noResultsLabel = activeMode === 'posts' ? 'No swipes match your filters' : 'No creators match your filters';
+    const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
+    const noResultsLabel = `No ${noun}s match your filters`;
     if (!data.length) {
       grid.innerHTML = `<div class="empty-state">
         <i class="ri-file-search-line"></i>
         <p>${noResultsLabel}</p>
-        <small>Try adjusting your filters or add a new ${activeMode === 'posts' ? 'swipe' : 'creator'}</small>
+        <small>Try adjusting your filters or add a new ${noun}</small>
       </div>`;
       return;
     }
@@ -857,6 +885,32 @@
       const av = getAv(s.author);
       const tags = Object.entries(s.filters || {}).filter(([,v]) => v);
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
+      if (activeMode === 'websites') {
+        return `<div class="card">
+          <div class="card-body" onclick="openEditModal(${s.id})">
+            <div class="card-top">
+              <div class="card-author">
+                ${s.image
+                  ? `<img src="${s.image}" class="avatar" style="width:32px;height:32px;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="" />
+                     <div class="avatar" style="background:${av.bg};color:${av.color};display:none">${getInitials(s.author)}</div>`
+                  : `<div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>`
+                }
+                <div>
+                  <div class="author-name">${s.author}</div>
+                  <div class="author-date">${s.postUrl ? s.postUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/,'') : ''}</div>
+                </div>
+              </div>
+              ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="Visit website"><i class="ri-external-link-line"></i></a>` : ''}
+            </div>
+            ${s.text ? `<p class="card-text">${s.text}</p>` : ''}
+            <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
+          </div>
+          <div class="card-engagement-bar" style="justify-content:flex-end"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>
+        </div>`;
+      }
       if (activeMode === 'creators') {
         return `<div class="card">
           <div class="card-body" onclick="openEditModal(${s.id})">
@@ -916,12 +970,14 @@
   }
 
   function deleteSwipe(id) {
-    const label = activeMode === 'posts' ? 'swipe' : 'creator';
+    const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : 'website';
     if (!confirm('Delete this ' + label + '?')) return;
     if (activeMode === 'posts') {
       swipes = swipes.filter(x => x.id !== id);
-    } else {
+    } else if (activeMode === 'creators') {
       creators = creators.filter(x => x.id !== id);
+    } else {
+      websites = websites.filter(x => x.id !== id);
     }
     persist(); applyFilters();
     sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
@@ -930,13 +986,14 @@
 
   function openAddModal() {
     const isCreator = activeMode === 'creators';
-    document.getElementById('addOverlay').querySelector('.modal-title').textContent = isCreator ? 'Add creator' : 'Add new swipe';
-    document.getElementById('saveBtn').textContent = isCreator ? 'Save creator' : 'Save swipe';
-    document.getElementById('f-label-author').textContent = isCreator ? 'Creator name *' : 'Author name *';
-    document.getElementById('f-label-text').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
-    document.getElementById('f-label-image').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
-    document.getElementById('f-label-post').textContent = isCreator ? 'Profile URL *' : 'Post URL (optional)';
-    document.getElementById('f-engagement-row').style.display = isCreator ? 'none' : 'flex';
+    const isWebsite = activeMode === 'websites';
+    document.getElementById('addOverlay').querySelector('.modal-title').textContent = isWebsite ? 'Add website' : isCreator ? 'Add creator' : 'Add new swipe';
+    document.getElementById('saveBtn').textContent = isWebsite ? 'Save website' : isCreator ? 'Save creator' : 'Save swipe';
+    document.getElementById('f-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('f-label-text').textContent = isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
+    document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite) ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
@@ -955,9 +1012,13 @@
 
   function saveSwipe() {
     const isCreator = activeMode === 'creators';
+    const isWebsite = activeMode === 'websites';
     const author = document.getElementById('f-author').value.trim();
     const text   = document.getElementById('f-text').value.trim();
-    if (isCreator) {
+    if (isWebsite) {
+      const postUrl = document.getElementById('f-post').value.trim();
+      if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
+    } else if (isCreator) {
       const postUrl = document.getElementById('f-post').value.trim();
       if (!author || !postUrl) { showToast('Creator name and profile URL are required'); return; }
     } else {
@@ -965,7 +1026,7 @@
     }
     const image    = document.getElementById('f-image').value.trim();
     const postUrl  = document.getElementById('f-post').value.trim();
-    const platform = document.getElementById('f-platform').value;
+    const platform = isWebsite ? 'Web' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
     const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -974,7 +1035,12 @@
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     const followers = parseInt(document.getElementById('f-followers').value) || 0;
     const item = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
-    if (isCreator) {
+    if (isWebsite) {
+      websites.unshift(item);
+      persist(); closeAddModal(); applyFilters();
+      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      showToast('Website saved ✓');
+    } else if (isCreator) {
       creators.unshift(item);
       persist(); closeAddModal(); applyFilters();
       sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
@@ -990,17 +1056,18 @@
   let editingId = null;
 
   function openEditModal(id) {
-    const source = activeMode === 'posts' ? swipes : creators;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
     const s = source.find(x => x.id === id);
     if (!s) return;
     editingId = id;
     const isCreator = activeMode === 'creators';
-    document.getElementById('editOverlay').querySelector('.modal-title').textContent = isCreator ? 'Edit creator' : 'Edit swipe';
-    document.getElementById('e-label-author').textContent = isCreator ? 'Creator name *' : 'Author name *';
-    document.getElementById('e-label-text').textContent = isCreator ? 'Bio / Notes' : 'Post text *';
-    document.getElementById('e-label-image').textContent = isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
-    document.getElementById('e-label-post').textContent = isCreator ? 'Profile URL' : 'Post URL (optional)';
-    document.getElementById('e-engagement-row').style.display = isCreator ? 'none' : 'flex';
+    const isWebsite = activeMode === 'websites';
+    document.getElementById('editOverlay').querySelector('.modal-title').textContent = isWebsite ? 'Edit website' : isCreator ? 'Edit creator' : 'Edit swipe';
+    document.getElementById('e-label-author').textContent = isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
+    document.getElementById('e-label-text').textContent = isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
+    document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
+    document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
+    document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite) ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('e-author').value  = s.author;
     document.getElementById('e-text').value    = s.text;
@@ -1028,13 +1095,17 @@
   }
 
   function updateSwipe() {
-    const source = activeMode === 'posts' ? swipes : creators;
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : websites;
     const s = source.find(x => x.id === editingId);
     if (!s) return;
     const isCreator = activeMode === 'creators';
+    const isWebsite = activeMode === 'websites';
     const author = document.getElementById('e-author').value.trim();
     const text   = document.getElementById('e-text').value.trim();
-    if (isCreator) {
+    if (isWebsite) {
+      const postUrl = document.getElementById('e-post').value.trim();
+      if (!author || !postUrl) { showToast('Website name and URL are required'); return; }
+    } else if (isCreator) {
       const postUrl = document.getElementById('e-post').value.trim();
       if (!author || !postUrl) { showToast('Creator name and profile URL are required'); return; }
     } else {
@@ -1045,7 +1116,7 @@
     s.image    = document.getElementById('e-image').value.trim();
     s.postUrl  = document.getElementById('e-post').value.trim();
     s.date     = document.getElementById('e-date').value.trim();
-    s.platform = document.getElementById('e-platform').value;
+    s.platform = isWebsite ? 'Web' : document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
@@ -1056,7 +1127,7 @@
     });
     persist(); closeEditModal(); applyFilters();
     sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s) }).catch(()=>{});
-    showToast(isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
+    showToast(isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
   function openSettings() { renderSettingsPanel(); document.getElementById('settingsOverlay').style.display = 'flex'; }
@@ -1104,7 +1175,7 @@
     const keys = Object.keys(f);
     const newF = {};
     keys.forEach(k => { newF[k === oldKey ? newKey : k] = f[k]; });
-    if (activeMode === 'posts') filters = newF; else creatorFilters = newF;
+    if (activeMode === 'posts') filters = newF; else if (activeMode === 'creators') creatorFilters = newF; else websiteFilters = newF;
     const fc = getFC();
     if (fc[oldKey]) { fc[newKey] = fc[oldKey]; delete fc[oldKey]; }
     const af = getAF();
@@ -1174,6 +1245,7 @@
   (async function init() {
     await loadSwipes();
     loadCreators();
+    loadWebsites();
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
