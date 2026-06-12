@@ -1341,6 +1341,7 @@
     skipSync = false;
     let _cloudCount = 0;
     setInterval(async () => {
+      if (document.hidden) return;
       try {
         const r = await fetch(SB_URL + '/swipes?limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, Prefer: 'count=exact' } });
         if (r.ok) {
