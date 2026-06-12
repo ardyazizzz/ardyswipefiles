@@ -283,11 +283,6 @@
     <div class="field"><label id="e-label-image">Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
     <div class="field"><label id="e-label-post">Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
     <div class="field"><label id="e-label-date">Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
-    <div class="field"><label>Platform</label>
-      <select id="e-platform">
-        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option><option>Pinterest</option>
-      </select>
-    </div>
     <div class="field" style="display:flex;gap:8px" id="e-engagement-row">
       <div style="flex:1"><label>Reactions</label><input type="number" id="e-reactions" placeholder="0" /></div>
       <div style="flex:1"><label>Comments</label><input type="number" id="e-comments" placeholder="0" /></div>
@@ -316,11 +311,6 @@
     <div class="field"><label id="f-label-image">Media URL (optional)</label><input type="text" id="f-image" placeholder="Image, video, YouTube, etc..." /></div>
     <div class="field"><label id="f-label-post">Post URL (optional)</label><input type="text" id="f-post" placeholder="Link to original post..." /></div>
     <div class="field"><label id="f-label-date">Published date</label><input type="text" id="f-date" placeholder="Jan 21, 2026" /></div>
-    <div class="field"><label>Platform</label>
-      <select id="f-platform">
-        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option><option>Pinterest</option>
-      </select>
-    </div>
     <div class="field" style="display:flex;gap:8px" id="f-engagement-row">
       <div style="flex:1"><label>Reactions</label><input type="number" id="f-reactions" placeholder="0" /></div>
       <div style="flex:1"><label>Comments</label><input type="number" id="f-comments" placeholder="0" /></div>
@@ -1170,7 +1160,6 @@
     document.getElementById('f-post').placeholder = isWebsite ? 'https://...' : isCreator ? 'https://...' : 'Link to original post...';
     document.getElementById('f-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
     document.getElementById('f-label-date').textContent = 'Published date';
-    document.getElementById('f-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
@@ -1209,9 +1198,9 @@
     const image    = document.getElementById('f-image').value.trim();
     let postUrl  = document.getElementById('f-post').value.trim();
     if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
-    const platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
+    const platform = isWebsite ? 'Web' : isSnippet ? '' : (sf['Platform'] || '');
     const date = (isSnippet || isCreator || isWebsite) ? '' : (document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}));
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
@@ -1263,7 +1252,6 @@
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
     document.getElementById('e-post').placeholder = isWebsite ? 'https://...' : isCreator ? 'https://...' : 'Link to original post...';
-    document.getElementById('e-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('e-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
     document.getElementById('e-label-date').textContent = 'Published date';
     document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
@@ -1273,7 +1261,6 @@
     document.getElementById('e-image').value   = s.image || '';
     document.getElementById('e-post').value    = s.postUrl || '';
     document.getElementById('e-date').value    = s.date || '';
-    document.getElementById('e-platform').value = s.platform;
     document.getElementById('e-reactions').value = s.reactions || '';
     document.getElementById('e-comments').value  = s.comments || '';
     document.getElementById('e-reposts').value   = s.reposts || '';
@@ -1321,16 +1308,17 @@
     if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
     s.postUrl  = postUrl;
     s.date     = document.getElementById('e-date').value.trim();
-    s.platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
     s.type = s.type || activeMode;
     s.followers = parseInt(document.getElementById('e-followers').value) || 0;
+    s.filters = s.filters || {};
     Object.keys(getF()).forEach(key => {
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
+    s.platform = isWebsite ? 'Web' : isSnippet ? '' : (s.filters && s.filters['Platform'] ? s.filters['Platform'] : '');
     const id = editingId;
     const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts });
     persist(); closeEditModal(); applyFilters();
