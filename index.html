@@ -581,8 +581,9 @@
     const f = getF(); const c = getFC();
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
-      await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
-    } catch(e) {}
+      const r = await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
+      console.log('FILTER SYNC status:', r.status, 'mode:', activeMode, 'keys:', Object.keys(f).join(','));
+    } catch(e) { console.log('FILTER SYNC error:', e); }
   }
 
   function setMode(mode, skipRender) {
