@@ -1113,25 +1113,26 @@
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     const followers = parseInt(document.getElementById('f-followers').value) || 0;
     const item = { id: Date.now(), type: activeMode, author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
+    const sbBody = JSON.stringify(item, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']);
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Website saved ✓');
     } else if (isCreator) {
       creators.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Creator saved ✓');
     } else if (isSnippet) {
       snippets.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: JSON.stringify(item) }).catch(()=>{});
+      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Swipe saved ✓');
     }
   }
@@ -1213,13 +1214,14 @@
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
     s.comments  = parseInt(document.getElementById('e-comments').value) || 0;
     s.reposts   = parseInt(document.getElementById('e-reposts').value) || 0;
+    s.type = s.type || activeMode;
     s.followers = parseInt(document.getElementById('e-followers').value) || 0;
     Object.keys(getF()).forEach(key => {
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     persist(); closeEditModal(); applyFilters();
-    sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s) }).catch(()=>{});
+    sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
