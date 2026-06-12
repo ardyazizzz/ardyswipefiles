@@ -1335,7 +1335,7 @@
     });
     const id = editingId;
     persist(); closeEditModal(); applyFilters();
-    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
+    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).then(r => console.log('PATCH status:', r.status, r.ok)).catch(e => console.log('PATCH error:', e));
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
