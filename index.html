@@ -1040,7 +1040,7 @@
             </div>
             ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View original post"><i class="ri-external-link-line"></i></a>` : ''}
           </div>
-          <p class="card-text">${s.text}</p>
+          <p class="card-text" style="-webkit-line-clamp:3">${s.text}</p>
           <div class="card-edit-hint"><i class="ri-edit-line" style="font-size:12px"></i> Click to edit</div>
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
