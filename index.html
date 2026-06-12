@@ -539,7 +539,7 @@
     websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES;
     snippets = load(LS_SNIPPETS, null) || DEFAULT_SNIPPETS;
     try {
-      const r = await sbFetch('/swipes?order=id.desc');
+      const r = await fetch(SB_URL + '/swipes?order=id.desc', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
         swipes = []; creators = []; websites = []; snippets = [];
         data.forEach(item => {
@@ -564,7 +564,7 @@
 
   async function loadFilterConfigs() {
     try {
-      const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+      const r = await fetch(SB_URL + '/filter_configs?select=*', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
         data.forEach(row => {
           if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); filterColors = Object.assign({}, filterColors, row.colors); }
