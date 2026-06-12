@@ -130,6 +130,7 @@
 
     .grid.masonry { display: block; column-count: 4; column-gap: 16px; }
     .grid.masonry .card { break-inside: avoid; margin-bottom: 16px; }
+    .grid.masonry .card-img { max-height: 300px; }
     .grid.masonry .empty-state { column-span: all; }
     .grid.masonry.comfortable { column-count: 3; }
     .grid.masonry.dense { column-count: 5; }
@@ -963,6 +964,7 @@
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     const grid = document.getElementById('cardGrid');
+    grid.classList.toggle('masonry', activeMode === 'posts' && layoutMode === 'masonry');
     if (activeMode === 'posts' && layoutMode === 'masonry') {
       var w = window.innerWidth;
       var cols = w > 1000 ? (gridDensity === 1 ? '4' : '5') : w > 600 ? '3' : '2';
