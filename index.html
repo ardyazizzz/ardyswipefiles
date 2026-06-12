@@ -272,7 +272,7 @@
     <div class="field"><label id="e-label-text">Post text *</label><textarea id="e-text"></textarea></div>
     <div class="field"><label id="e-label-image">Media URL (optional)</label><input type="text" id="e-image" placeholder="https://..." /></div>
     <div class="field"><label id="e-label-post">Post URL (optional)</label><input type="text" id="e-post" placeholder="Link to original post..." /></div>
-    <div class="field"><label>Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
+    <div class="field"><label id="e-label-date">Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -822,8 +822,8 @@
     });
     html += `<div class="divider"></div>
     <select class="sort-select" onchange="sortSwipes(this.value)">
-      <option value="newest"${currentSort==='newest'?' selected':''}>Newest</option>
-      <option value="oldest"${currentSort==='oldest'?' selected':''}>Oldest</option>
+      <option value="newest"${currentSort==='newest'?' selected':''}>Newest added</option>
+      <option value="oldest"${currentSort==='oldest'?' selected':''}>Oldest added</option>
       ${activeMode === 'posts' ? `
       <option value="most-engaged"${currentSort==='most-engaged'?' selected':''}>Most engagements</option>
       <option value="least-engaged"${currentSort==='least-engaged'?' selected':''}>Least engagements</option>
@@ -1013,7 +1013,7 @@
                 }
                 <div>
                   <div class="author-name">${s.author}</div>
-                  <div class="author-date">${s.platform} · ${s.date}</div>
+                  <div class="author-date">${s.platform}</div>
                 </div>
               </div>
               ${s.postUrl ? `<a href="${s.postUrl}" target="_blank" class="card-post-link" onclick="event.stopPropagation()" title="View profile"><i class="ri-user-line"></i></a>` : ''}
@@ -1182,7 +1182,8 @@
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
     document.getElementById('e-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
-    document.getElementById('e-date').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('e-date').parentElement.style.display = (isSnippet || isCreator) ? 'none' : '';
+    document.getElementById('e-label-date').textContent = 'Published date';
     document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('e-author').value  = s.author;
