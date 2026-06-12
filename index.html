@@ -305,6 +305,7 @@
     <div class="field"><label id="f-label-text">Post text *</label><textarea id="f-text" placeholder="Paste the post content here..."></textarea></div>
     <div class="field"><label id="f-label-image">Media URL (optional)</label><input type="text" id="f-image" placeholder="Image, video, YouTube, etc..." /></div>
     <div class="field"><label id="f-label-post">Post URL (optional)</label><input type="text" id="f-post" placeholder="Link to original post..." /></div>
+    <div class="field"><label id="f-label-date">Published date</label><input type="text" id="f-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="f-platform">
         <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
@@ -1091,6 +1092,8 @@
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
+    document.getElementById('f-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
+    document.getElementById('f-label-date').textContent = 'Published date';
     document.getElementById('f-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
@@ -1106,7 +1109,7 @@
 
   function closeAddModal() {
     document.getElementById('addOverlay').style.display = 'none';
-    ['f-author','f-text','f-image','f-post','f-reactions','f-comments','f-reposts','f-followers'].forEach(id => document.getElementById(id).value = '');
+    ['f-author','f-text','f-image','f-post','f-date','f-reactions','f-comments','f-reposts','f-followers'].forEach(id => document.getElementById(id).value = '');
   }
 
   function saveSwipe() {
@@ -1132,7 +1135,7 @@
     const platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
-    const date = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const date = document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
