@@ -386,8 +386,17 @@
       if (w < 100 || h < 100) continue;
       var cls = (img.className || '').toLowerCase();
       if (cls.indexOf('actor') !== -1 || cls.indexOf('avatar') !== -1 || cls.indexOf('ghost') !== -1 || cls.indexOf('presence') !== -1) continue;
+      var srcset = img.srcset || '';
+      if (srcset) {
+        var bestSrc = '', bestW = 0;
+        srcset.split(',').forEach(function(c) {
+          var p = c.trim().split(' ');
+          var w = parseInt(p[p.length - 1].replace('w', ''));
+          if (w > bestW) { bestW = w; bestSrc = p[0]; }
+        });
+        if (bestSrc) return bestSrc;
+      }
       var src = img.src || '';
-      if (src && /shrink_\d+/.test(src)) { src = src.replace(/shrink_\d+/, 'shrink_800'); }
       if (!src || src.indexOf('data:') === 0) continue;
       if (/\/ghost\//i.test(src)) continue;
       if (/profile-displayphoto/i.test(src)) continue;
