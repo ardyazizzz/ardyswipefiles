@@ -946,7 +946,14 @@
     const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
-    document.getElementById('cardGrid').classList.toggle('masonry', activeMode === 'posts');
+    const grid = document.getElementById('cardGrid');
+    if (activeMode === 'posts') {
+      grid.style.display = 'block';
+      grid.style.columnCount = gridDensity === 1 ? '3' : '4';
+      grid.style.columnGap = '16px';
+    } else {
+      grid.style.cssText = '';
+    }
     renderCards(data);
   }
 
