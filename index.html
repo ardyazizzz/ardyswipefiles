@@ -1334,6 +1334,7 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     const id = editingId;
+    console.log('UPDATE about to PATCH, id:', id, 'filters:', JSON.stringify(s.filters));
     persist(); closeEditModal(); applyFilters();
     sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).then(r => console.log('PATCH status:', r.status, r.ok)).catch(e => console.log('PATCH error:', e));
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
