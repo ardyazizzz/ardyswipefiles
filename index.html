@@ -401,10 +401,8 @@
 
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
-  let _localChange = 0;
 
   function handleRealtimeChange(payload) {
-    if (Date.now() - _localChange < 1000) return;
     const { eventType, new: newRow, old: oldRow } = payload;
     const id = (oldRow && oldRow.id) || (newRow && newRow.id);
     if (!id) return;
@@ -1192,7 +1190,6 @@
   }
 
   function saveSwipe() {
-    _localChange = Date.now();
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
     const isSnippet = activeMode === 'snippets';
@@ -1296,7 +1293,6 @@
   }
 
   function updateSwipe() {
-    _localChange = Date.now();
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === editingId);
     if (!s) return;
@@ -1334,9 +1330,8 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     const id = editingId;
-    console.log('UPDATE about to PATCH, id:', id, 'filters:', JSON.stringify(s.filters));
     persist(); closeEditModal(); applyFilters();
-    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).then(r => console.log('PATCH status:', r.status, r.ok)).catch(e => console.log('PATCH error:', e));
+    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
