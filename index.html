@@ -485,19 +485,28 @@
   async function loadSwipes() {
     try {
       const r = await sbFetch('/swipes?order=id.desc');
-      if (r.ok) { const data = await r.json(); if (data && data.length) { swipes = data; dataReady = true; return; } }
+      if (r.ok) { const data = await r.json(); if (data && data.length) {
+        swipes = []; creators = []; websites = []; snippets = [];
+        data.forEach(item => {
+          if (item.type === 'creators') creators.push(item);
+          else if (item.type === 'websites') websites.push(item);
+          else if (item.type === 'snippets') snippets.push(item);
+          else swipes.push(item);
+        });
+        dataReady = true; return;
+      }}
     } catch(e) {}
     swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
     dataReady = true;
   }
   function loadCreators() {
-    creators = load(LS_CREATORS, null) || DEFAULT_CREATORS;
+    if (!creators.length) { creators = load(LS_CREATORS, null) || DEFAULT_CREATORS; }
   }
   function loadWebsites() {
-    websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES;
+    if (!websites.length) { websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES; }
   }
   function loadSnippets() {
-    snippets = load(LS_SNIPPETS, null) || DEFAULT_SNIPPETS;
+    if (!snippets.length) { snippets = load(LS_SNIPPETS, null) || DEFAULT_SNIPPETS; }
   }
 
   function setMode(mode, skipRender) {
@@ -1097,7 +1106,7 @@
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     const followers = parseInt(document.getElementById('f-followers').value) || 0;
-    const item = { id: Date.now(), author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
+    const item = { id: Date.now(), type: activeMode, author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
