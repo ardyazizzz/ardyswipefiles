@@ -591,8 +591,10 @@
     grid.classList.remove('dense', 'comfortable');
     if (gridDensity === 1) grid.classList.add('comfortable');
     if (activeMode === 'posts') {
+      var w = window.innerWidth;
+      var cols = w > 1000 ? (gridDensity === 1 ? '4' : '5') : w > 600 ? '3' : '2';
       grid.style.display = 'block';
-      grid.style.columnCount = gridDensity === 1 ? '4' : '5';
+      grid.style.columnCount = cols;
       grid.style.columnGap = '16px';
     }
   }
@@ -953,8 +955,10 @@
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     const grid = document.getElementById('cardGrid');
     if (activeMode === 'posts') {
+      var w = window.innerWidth;
+      var cols = w > 1000 ? (gridDensity === 1 ? '4' : '5') : w > 600 ? '3' : '2';
       grid.style.display = 'block';
-      grid.style.columnCount = gridDensity === 1 ? '4' : '5';
+      grid.style.columnCount = cols;
       grid.style.columnGap = '16px';
     } else {
       grid.style.cssText = '';
@@ -1387,6 +1391,7 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); }
   });
+  window.addEventListener('resize', () => { if (activeMode === 'posts') applyDensity(); });
 
   renderFilterBar();
   applyDensity();
