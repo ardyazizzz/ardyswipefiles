@@ -1339,7 +1339,17 @@
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
-    setInterval(async () => { await loadSwipes(); persist(); applyFilters(); }, 3000);
+    let _cloudCount = 0;
+    setInterval(async () => {
+      try {
+        const r = await fetch(SB_URL + '/swipes?limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, Prefer: 'count=exact' } });
+        if (r.ok) {
+          const range = r.headers.get('content-range');
+          const total = range ? parseInt(range.split('/')[1]) : 0;
+          if (total !== _cloudCount) { _cloudCount = total; await loadSwipes(); persist(); applyFilters(); }
+        }
+      } catch(e) {}
+    }, 4000);
   })();
 </script>
 </body>
