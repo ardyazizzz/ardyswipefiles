@@ -931,14 +931,6 @@
     applyFilters(); syncHash();
   }
 
-  function columnize(data, cols) {
-    var r = [], rows = Math.ceil(data.length / cols);
-    for (var i = 0; i < rows; i++)
-      for (var j = 0; j < cols; j++)
-        { var idx = j * rows + i; if (idx < data.length) r.push(data[idx]); }
-    return r;
-  }
-
   function applyFilters() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
@@ -962,17 +954,15 @@
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
     const grid = document.getElementById('cardGrid');
-    var cols = 0;
     if (activeMode === 'posts') {
       var w = window.innerWidth;
-      cols = w > 1000 ? (gridDensity === 1 ? '4' : '5') : w > 600 ? '3' : '2';
+      var cols = w > 1000 ? (gridDensity === 1 ? '4' : '5') : w > 600 ? '3' : '2';
       grid.style.display = 'block';
       grid.style.columnCount = cols;
       grid.style.columnGap = '16px';
     } else {
       grid.style.cssText = '';
     }
-    if (cols > 0) data = columnize(data, cols);
     renderCards(data);
   }
 
