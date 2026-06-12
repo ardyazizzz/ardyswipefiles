@@ -497,7 +497,7 @@
     {id:1004,author:'Katelyn Bourgoin',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Marketing'},text:'The Buyer Psychologist. Helping marketers understand why people buy.',image:'',postUrl:'https://linkedin.com/in/katelynbourgoin',followers:85000},
   ];
 
-  function load(key, def) { try { const v = localStorage.getItem(key); const result = v ? JSON.parse(v) : def; if (key === LS_FILTERS) { console.log('LOAD FILTERS OK, keys:', Object.keys(result).join(',')); if (result.Format) console.log('FORMAT OPTIONS:', result.Format); } return result; } catch(e) { console.log('LOAD FILTERS ERROR:', e); return def; } }
+  function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
   function persist() {
     try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); } catch(e) {}
     try { localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); } catch(e) {}
@@ -573,9 +573,7 @@
   }
 
   async function loadFilterConfigs() {
-    console.log('FILTER CONFIG GUARD: LS exists?', !!localStorage.getItem(LS_FILTERS));
     if (localStorage.getItem(LS_FILTERS)) return;
-    console.log('FILTER CONFIG: FETCHING from Supabase...');
     try {
       const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
@@ -1331,8 +1329,9 @@
       const v = document.getElementById(`ef-${key}`)?.value;
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
+    const id = editingId;
     persist(); closeEditModal(); applyFilters();
-    sbFetch('/swipes?id=eq.' + editingId, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
+    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
