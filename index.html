@@ -356,6 +356,7 @@
   </div>
 </div>
 
+<script src="supabase.js"></script>
 <script>
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
@@ -383,6 +384,38 @@
 
   function sbFetch(path, opts = {}) {
     return fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', ...opts.headers }, ...opts });
+  }
+
+  const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
+  const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
+  let _rtConnected = false;
+
+  function handleRealtimeChange(payload) {
+    console.log('[RT] event:', payload.eventType, 'id:', (payload.old || payload.new || {}).id);
+    const { eventType, new: newRow, old: oldRow } = payload;
+    const id = (oldRow && oldRow.id) || (newRow && newRow.id);
+    if (!id) return;
+    [swipes, creators, websites, snippets].forEach(arr => {
+      const i = arr.findIndex(x => x.id === id);
+      if (i !== -1) arr.splice(i, 1);
+    });
+    if (eventType !== 'DELETE' && newRow) {
+      if (newRow.type === 'creators') creators.push(newRow);
+      else if (newRow.type === 'websites') websites.push(newRow);
+      else if (newRow.type === 'snippets') snippets.push(newRow);
+      else swipes.push(newRow);
+    }
+    persist(); applyFilters();
+  }
+
+  function subscribeRealtime() {
+    sbRTC.channel('swipes-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'swipes' }, handleRealtimeChange)
+      .subscribe((status) => {
+        console.log('[RT] status:', status);
+        if (status === 'SUBSCRIBED') { _rtConnected = true; showToast('Connected ✓'); }
+        if (status === 'CLOSED' || status === 'CHANNEL_ERROR') _rtConnected = false;
+      });
   }
 
   const AVATAR_COLORS = [
@@ -1341,17 +1374,7 @@
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
-    setInterval(async () => {
-      if (document.hidden) return;
-      try {
-        const r = await fetch(SB_URL + '/swipes?limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, Prefer: 'count=exact' } });
-        if (r.ok) {
-          const range = r.headers.get('content-range');
-          const total = range ? parseInt(range.split('/')[1]) : 0;
-          if (total !== _cloudCount) { _cloudCount = total; await loadSwipes(); persist(); applyFilters(); }
-        }
-      } catch(e) {}
-    }, 4000);
+    subscribeRealtime();
   })();
 </script>
 </body>
