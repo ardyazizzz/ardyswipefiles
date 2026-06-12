@@ -385,6 +385,32 @@
     return fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', ...opts.headers }, ...opts });
   }
 
+  const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
+  const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
+
+  function handleRealtimeChange(payload) {
+    const { eventType, new: newRow, old: oldRow } = payload;
+    const id = (oldRow && oldRow.id) || (newRow && newRow.id);
+    if (!id) return;
+    [swipes, creators, websites, snippets].forEach(arr => {
+      const i = arr.findIndex(x => x.id === id);
+      if (i !== -1) arr.splice(i, 1);
+    });
+    if (eventType !== 'DELETE' && newRow) {
+      if (newRow.type === 'creators') creators.push(newRow);
+      else if (newRow.type === 'websites') websites.push(newRow);
+      else if (newRow.type === 'snippets') snippets.push(newRow);
+      else swipes.push(newRow);
+    }
+    persist(); applyFilters();
+  }
+
+  function subscribeRealtime() {
+    sbRTC.channel('swipes-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'swipes' }, handleRealtimeChange)
+      .subscribe();
+  }
+
   const AVATAR_COLORS = [
     {bg:'#E6F1FB',color:'#185FA5'},{bg:'#E1F5EE',color:'#0F6E56'},
     {bg:'#FAECE7',color:'#993C1D'},{bg:'#FBEAF0',color:'#993556'},
@@ -1347,7 +1373,9 @@
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
+    subscribeRealtime();
   })();
 </script>
+<script src="supabase.js"></script>
 </body>
 </html>
