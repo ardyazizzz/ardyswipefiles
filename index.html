@@ -128,6 +128,14 @@
     .grid.dense { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
     .grid.comfortable { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
 
+    .grid.masonry { column-count: 4; column-gap: 16px; }
+    .grid.masonry .card { break-inside: avoid; margin-bottom: 16px; }
+    .grid.masonry .empty-state { column-span: all; }
+    .grid.masonry.comfortable { column-count: 3; }
+    .grid.masonry.dense { column-count: 5; }
+    @media (max-width: 800px) { .grid.masonry { column-count: 3; } }
+    @media (max-width: 500px) { .grid.masonry { column-count: 2; } }
+
     .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow); }
     .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
@@ -938,6 +946,7 @@
     const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
+    document.getElementById('cardGrid').classList.toggle('masonry', activeMode === 'posts');
     renderCards(data);
   }
 
