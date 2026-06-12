@@ -285,7 +285,7 @@
     <div class="field"><label id="e-label-date">Date</label><input type="text" id="e-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="e-platform">
-        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
+        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option><option>Pinterest</option>
       </select>
     </div>
     <div class="field" style="display:flex;gap:8px" id="e-engagement-row">
@@ -318,7 +318,7 @@
     <div class="field"><label id="f-label-date">Published date</label><input type="text" id="f-date" placeholder="Jan 21, 2026" /></div>
     <div class="field"><label>Platform</label>
       <select id="f-platform">
-        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option>
+        <option>LinkedIn</option><option>Twitter</option><option>Instagram</option><option>Pinterest</option>
       </select>
     </div>
     <div class="field" style="display:flex;gap:8px" id="f-engagement-row">
@@ -435,22 +435,22 @@
   const DEFAULT_FILTERS = {
     Category: ['Hooks','Copywriting','Design','Strategy','Carousel','Personal','Storytelling'],
     Format: ['Text only','Single image','Human image','Multiple images','Carousel','Video','Static infographic','GIF infographic','Screenshot','Quote card'],
-    Platform: ['LinkedIn','Twitter','Instagram'],
+    Platform: ['LinkedIn','Twitter','Instagram','Pinterest'],
   };
 
   const DEFAULT_FILTER_COLORS = {
     Category: {Hooks:'#E74C3C',Copywriting:'#3498DB',Design:'#9B59B6',Strategy:'#2ECC71',Carousel:'#F39C12',Personal:'#1ABC9C',Storytelling:'#E67E22'},
     Format: {Textonly:'#6B7280',Singleimage:'#3B82F6',Humanimage:'#10B981',Multipleimages:'#6366F1',Carousel:'#F59E0B',Video:'#EF4444',Staticinfographic:'#8B5CF6',GIFinfographic:'#EC4899',Screenshot:'#64748B',Quotecard:'#F97316'},
-    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F'},
+    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F',Pinterest:'#E60023'},
   };
 
   const DEFAULT_CREATOR_FILTERS = {
     Niche: ['Business','Marketing','Personal Growth','Design','Tech','Writing'],
-    Platform: ['LinkedIn','Twitter','Instagram'],
+    Platform: ['LinkedIn','Twitter','Instagram','Pinterest'],
   };
   const DEFAULT_CREATOR_FILTER_COLORS = {
     Niche: {Business:'#3498DB',Marketing:'#E74C3C','Personal Growth':'#2ECC71',Design:'#9B59B6',Tech:'#F39C12',Writing:'#1ABC9C'},
-    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F'},
+    Platform: {LinkedIn:'#0077B5',Twitter:'#1DA1F2',Instagram:'#E4405F',Pinterest:'#E60023'},
   };
 
   const DEFAULT_SWIPES = [
@@ -552,6 +552,7 @@
   }
 
   async function loadFilterConfigs() {
+    if (localStorage.getItem(LS_FILTERS)) return;
     try {
       const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
