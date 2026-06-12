@@ -551,6 +551,29 @@
     snippets = load(LS_SNIPPETS, null) || DEFAULT_SNIPPETS;
   }
 
+  async function loadFilterConfigs() {
+    try {
+      const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+      if (r.ok) { const data = await r.json(); if (data && data.length) {
+        data.forEach(row => {
+          if (row.mode === 'posts') { filters = row.filters; filterColors = row.colors; }
+          else if (row.mode === 'creators') { creatorFilters = row.filters; creatorFilterColors = row.colors; }
+          else if (row.mode === 'websites') { websiteFilters = row.filters; websiteFilterColors = row.colors; }
+          else if (row.mode === 'snippets') { snippetFilters = row.filters; snippetFilterColors = row.colors; }
+        });
+        return;
+      }}
+    } catch(e) {}
+  }
+
+  async function saveFilterConfig() {
+    const f = getF(); const c = getFC();
+    const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
+    try {
+      await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
+    } catch(e) {}
+  }
+
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
       activeMode = mode;
@@ -1339,13 +1362,14 @@
     if (fc[oldKey]) { fc[newKey] = fc[oldKey]; delete fc[oldKey]; }
     const af = getAF();
     if (af[oldKey]) { af[newKey] = af[oldKey]; delete af[oldKey]; }
+    persist(); saveFilterConfig();
     renderSettingsPanel();
   }
 
   function deleteFilterGroup(key) {
     if (!confirm(`Delete the "${key}" filter?`)) return;
     delete getF()[key]; delete getAF()[key]; delete getFC()[key];
-    persist();
+    persist(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -1359,6 +1383,7 @@
     if (!getFC()[key]) getFC()[key] = {};
     getFC()[key][val] = COLOR_PALETTE[getF()[key].length % COLOR_PALETTE.length];
     input.value = '';
+    persist(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -1367,14 +1392,14 @@
     f[key] = f[key].filter(o => o !== opt);
     if (fc[key]) delete fc[key][opt];
     if (af[key]) { af[key] = af[key].filter(v => v !== opt); if (!af[key].length) delete af[key]; }
-    persist();
+    persist(); saveFilterConfig();
     renderSettingsPanel();
   }
 
   function setOptionColor(key, opt, color) {
     if (!getFC()[key]) getFC()[key] = {};
     getFC()[key][opt] = color;
-    persist();
+    persist(); saveFilterConfig();
   }
 
   function addFilterGroup() {
@@ -1382,6 +1407,7 @@
     const name = input.value.trim();
     if (!name || getF()[name]) return;
     getF()[name] = []; input.value = '';
+    persist(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -1404,6 +1430,7 @@
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
   (async function init() {
     await loadSwipes();
+    await loadFilterConfigs();
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
