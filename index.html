@@ -497,7 +497,7 @@
     {id:1004,author:'Katelyn Bourgoin',date:'Jun 2026',platform:'LinkedIn',filters:{Niche:'Marketing'},text:'The Buyer Psychologist. Helping marketers understand why people buy.',image:'',postUrl:'https://linkedin.com/in/katelynbourgoin',followers:85000},
   ];
 
-  function load(key, def) { try { const v = localStorage.getItem(key); const result = v ? JSON.parse(v) : def; if (key === LS_FILTERS) console.log('LOAD FILTERS OK, keys:', Object.keys(result).join(',')); return result; } catch(e) { console.log('LOAD FILTERS ERROR:', e); return def; } }
+  function load(key, def) { try { const v = localStorage.getItem(key); const result = v ? JSON.parse(v) : def; if (key === LS_FILTERS) { console.log('LOAD FILTERS OK, keys:', Object.keys(result).join(',')); if (result.Format) console.log('FORMAT OPTIONS:', result.Format); } return result; } catch(e) { console.log('LOAD FILTERS ERROR:', e); return def; } }
   function persist() {
     try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); } catch(e) {}
     try { localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); } catch(e) {}
