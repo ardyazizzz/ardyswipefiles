@@ -401,8 +401,10 @@
 
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
+  let _localChange = 0;
 
   function handleRealtimeChange(payload) {
+    if (Date.now() - _localChange < 1500) return;
     const { eventType, new: newRow, old: oldRow } = payload;
     const id = (oldRow && oldRow.id) || (newRow && newRow.id);
     if (!id) return;
@@ -1189,6 +1191,7 @@
   }
 
   function saveSwipe() {
+    _localChange = Date.now();
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
     const isSnippet = activeMode === 'snippets';
@@ -1293,6 +1296,7 @@
   }
 
   function updateSwipe() {
+    _localChange = Date.now();
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === editingId);
     if (!s) return;
