@@ -591,7 +591,9 @@
     grid.classList.remove('dense', 'comfortable');
     if (gridDensity === 1) grid.classList.add('comfortable');
     if (activeMode === 'posts') {
+      grid.style.display = 'block';
       grid.style.columnCount = gridDensity === 1 ? '4' : '5';
+      grid.style.columnGap = '16px';
     }
   }
 
