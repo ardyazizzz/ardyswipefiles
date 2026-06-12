@@ -1090,7 +1090,7 @@
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
-    document.getElementById('f-platform').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('f-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('f-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
@@ -1126,7 +1126,8 @@
       if (!author || !text) { showToast('Author and text are required'); return; }
     }
     const image    = document.getElementById('f-image').value.trim();
-    const postUrl  = document.getElementById('f-post').value.trim();
+    let postUrl  = document.getElementById('f-post').value.trim();
+    if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
     const platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
@@ -1179,7 +1180,7 @@
     document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
-    document.getElementById('e-platform').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('e-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('e-date').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
@@ -1231,7 +1232,9 @@
     s.author   = author;
     s.text     = text;
     s.image    = document.getElementById('e-image').value.trim();
-    s.postUrl  = document.getElementById('e-post').value.trim();
+    let postUrl = document.getElementById('e-post').value.trim();
+    if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
+    s.postUrl  = postUrl;
     s.date     = document.getElementById('e-date').value.trim();
     s.platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('e-platform').value;
     s.reactions = parseInt(document.getElementById('e-reactions').value) || 0;
