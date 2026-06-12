@@ -498,7 +498,28 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() { try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); localStorage.setItem(LS_SNIPPETS, JSON.stringify(snippets)); localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); localStorage.setItem(LS_SNIPPET_FILTERS, JSON.stringify(snippetFilters)); localStorage.setItem(LS_SNIPPET_FILTER_COLORS, JSON.stringify(snippetFilterColors)); localStorage.setItem(LS_SNIPPET_FILTER_STATE, JSON.stringify(snippetActiveFilters)); localStorage.setItem(LS_GRID_DENSITY, gridDensity); localStorage.setItem(LS_LAYOUT, JSON.stringify(layoutMode)); localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {} }
+  function persist() {
+    try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPETS, JSON.stringify(snippets)); } catch(e) {}
+    try { localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); } catch(e) {}
+    try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {}
+    try { localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPET_FILTERS, JSON.stringify(snippetFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPET_FILTER_COLORS, JSON.stringify(snippetFilterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPET_FILTER_STATE, JSON.stringify(snippetActiveFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_GRID_DENSITY, gridDensity); } catch(e) {}
+    try { localStorage.setItem(LS_LAYOUT, JSON.stringify(layoutMode)); } catch(e) {}
+    try { localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {}
+  }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
