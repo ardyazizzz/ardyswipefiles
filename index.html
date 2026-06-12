@@ -566,9 +566,8 @@
     try {
       const r = await fetch(SB_URL + '/filter_configs?select=*', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
-        console.log('FILTER LOAD from Supabase, rows:', data.length, JSON.stringify(data.map(r => ({m:r.mode, fk:Object.keys(r.filters||{}).join(',')}))));
         data.forEach(row => {
-          if (row.mode === 'posts') { console.log('BEFORE merge:', JSON.stringify(filters.Format?.length)); filters = Object.assign({}, filters, row.filters); filterColors = Object.assign({}, filterColors, row.colors); console.log('AFTER merge:', JSON.stringify(filters.Format?.length)); }
+          if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); filterColors = Object.assign({}, filterColors, row.colors); }
           else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); }
           else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); }
           else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); }
@@ -580,6 +579,7 @@
 
   async function saveFilterConfig() {
     const f = getF(); const c = getFC();
+    console.log('SAVE FILTER Format items:', f.Format?.length);
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
       await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
