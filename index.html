@@ -1135,7 +1135,7 @@
     const platform = isWebsite ? 'Web' : isSnippet ? '' : document.getElementById('f-platform').value;
     const sf = {};
     Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
-    const date = document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const date = (isSnippet || isCreator || isWebsite) ? '' : (document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}));
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
     const comments  = parseInt(document.getElementById('f-comments').value) || 0;
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
