@@ -1334,8 +1334,10 @@
       if (v) s.filters[key] = v; else delete s.filters[key];
     });
     const id = editingId;
+    const body = JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']);
+    console.log('PATCH id:', id, 'filters:', JSON.stringify(s.filters), 'body preview:', body.slice(0,200));
     persist(); closeEditModal(); applyFilters();
-    fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
+    fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).then(r => console.log('PATCH response:', r.status)).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
