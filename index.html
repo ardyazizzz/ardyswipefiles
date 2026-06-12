@@ -388,10 +388,8 @@
 
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
-  let _rtConnected = false;
 
   function handleRealtimeChange(payload) {
-    console.log('[RT] event:', payload.eventType, 'id:', (payload.old || payload.new || {}).id);
     const { eventType, new: newRow, old: oldRow } = payload;
     const id = (oldRow && oldRow.id) || (newRow && newRow.id);
     if (!id) return;
@@ -411,11 +409,7 @@
   function subscribeRealtime() {
     sbRTC.channel('swipes-rt')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'swipes' }, handleRealtimeChange)
-      .subscribe((status) => {
-        console.log('[RT] status:', status);
-        if (status === 'SUBSCRIBED') { _rtConnected = true; showToast('Connected ✓'); }
-        if (status === 'CLOSED' || status === 'CHANNEL_ERROR') _rtConnected = false;
-      });
+      .subscribe();
   }
 
   const AVATAR_COLORS = [
@@ -1366,10 +1360,8 @@
   renderFilterBar();
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
-  let _cloudCount = 0;
   (async function init() {
     await loadSwipes();
-    _cloudCount = swipes.length + creators.length + websites.length + snippets.length;
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
