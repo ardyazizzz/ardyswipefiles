@@ -1182,7 +1182,7 @@
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
     document.getElementById('e-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
-    document.getElementById('e-date').parentElement.style.display = (isSnippet || isCreator) ? 'none' : '';
+    document.getElementById('e-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
     document.getElementById('e-label-date').textContent = 'Published date';
     document.getElementById('e-engagement-row').style.display = (isCreator || isWebsite || isSnippet) ? 'none' : 'flex';
     document.getElementById('e-followers-row').style.display = isCreator ? '' : 'none';
