@@ -1018,11 +1018,6 @@
           <div class="card-body" onclick="openEditModal(${s.id})">
             <div class="card-top">
               <div class="card-author">
-                ${s.image
-                  ? `<img src="${s.image}" class="avatar" style="width:32px;height:32px;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="" />
-                     <div class="avatar" style="background:${av.bg};color:${av.color};display:none">${getInitials(s.author)}</div>`
-                  : `<div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>`
-                }
                 <div>
                   <div class="author-name">${s.author}</div>
                   <div class="author-date">${s.postUrl ? s.postUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/,'') : ''}</div>
@@ -1125,7 +1120,7 @@
     document.getElementById('f-author').placeholder = isSnippet ? 'e.g. AIDA Framework' : isWebsite ? '' : isCreator ? '' : 'e.g. Justin Welsh';
     document.getElementById('f-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
     document.getElementById('f-text').rows = isSnippet ? 8 : 4;
-    document.getElementById('f-image').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('f-image').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
@@ -1218,7 +1213,7 @@
     document.getElementById('e-label-author').textContent = isSnippet ? 'Title *' : isWebsite ? 'Website name *' : isCreator ? 'Creator name *' : 'Author name *';
     document.getElementById('e-text').rows = isSnippet ? 8 : 4;
     document.getElementById('e-label-text').textContent = isSnippet ? 'Content *' : isWebsite ? 'Description / Notes' : isCreator ? 'Bio / Notes' : 'Post text *';
-    document.getElementById('e-image').parentElement.style.display = isSnippet ? 'none' : '';
+    document.getElementById('e-image').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
