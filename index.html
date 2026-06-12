@@ -400,10 +400,10 @@
       if (i !== -1) arr.splice(i, 1);
     });
     if (eventType !== 'DELETE' && newRow) {
-      if (newRow.type === 'creators') creators.push(newRow);
-      else if (newRow.type === 'websites') websites.push(newRow);
-      else if (newRow.type === 'snippets') snippets.push(newRow);
-      else swipes.push(newRow);
+      if (newRow.type === 'creators') creators.unshift(newRow);
+      else if (newRow.type === 'websites') websites.unshift(newRow);
+      else if (newRow.type === 'snippets') snippets.unshift(newRow);
+      else swipes.unshift(newRow);
     }
     persist(); applyFilters();
   }
@@ -1092,6 +1092,7 @@
     document.getElementById('f-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('f-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('f-label-post').textContent = isWebsite ? 'URL *' : isCreator ? 'Profile URL *' : 'Post URL (optional)';
+    document.getElementById('f-post').placeholder = isWebsite ? 'https://...' : isCreator ? 'https://...' : 'Link to original post...';
     document.getElementById('f-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
     document.getElementById('f-label-date').textContent = 'Published date';
     document.getElementById('f-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
@@ -1184,6 +1185,7 @@
     document.getElementById('e-label-image').textContent = isWebsite ? 'Image URL (optional)' : isCreator ? 'Avatar URL (optional)' : 'Media URL (optional)';
     document.getElementById('e-post').parentElement.style.display = isSnippet ? 'none' : '';
     document.getElementById('e-label-post').textContent = isWebsite ? 'URL' : isCreator ? 'Profile URL' : 'Post URL (optional)';
+    document.getElementById('e-post').placeholder = isWebsite ? 'https://...' : isCreator ? 'https://...' : 'Link to original post...';
     document.getElementById('e-platform').parentElement.style.display = (isSnippet || isWebsite) ? 'none' : '';
     document.getElementById('e-date').parentElement.style.display = (isSnippet || isCreator || isWebsite) ? 'none' : '';
     document.getElementById('e-label-date').textContent = 'Published date';
