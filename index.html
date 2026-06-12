@@ -573,7 +573,6 @@
   }
 
   async function loadFilterConfigs() {
-    if (localStorage.getItem(LS_FILTERS)) return;
     try {
       const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
@@ -1340,7 +1339,7 @@
 
   function closeSettings() {
     document.getElementById('settingsOverlay').style.display = 'none';
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persist(); saveFilterConfig(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function renderSettingsPanel() {
