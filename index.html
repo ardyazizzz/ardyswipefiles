@@ -590,6 +590,9 @@
     const grid = document.getElementById('cardGrid');
     grid.classList.remove('dense', 'comfortable');
     if (gridDensity === 1) grid.classList.add('comfortable');
+    if (activeMode === 'posts') {
+      grid.style.columnCount = gridDensity === 1 ? '4' : '5';
+    }
   }
 
   function cycleDensity() {
