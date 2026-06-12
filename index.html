@@ -1222,22 +1222,23 @@
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Website saved ✓');
     } else if (isCreator) {
       creators.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Creator saved ✓');
     } else if (isSnippet) {
       snippets.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetch('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      showToast('Swipe saved ✓');
       showToast('Swipe saved ✓');
     }
   }
@@ -1331,7 +1332,7 @@
     });
     const id = editingId;
     persist(); closeEditModal(); applyFilters();
-    sbFetch('/swipes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
+    fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(s, ['id','type','author','date','platform','filters','text','image','postUrl','reactions','comments','reposts']) }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
