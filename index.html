@@ -577,10 +577,10 @@
       const r = await fetch(SB_URL + '/filter_configs?select=*', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
         data.forEach(row => {
-          if (row.mode === 'posts') { filters = row.filters; filterColors = row.colors; }
-          else if (row.mode === 'creators') { creatorFilters = row.filters; creatorFilterColors = row.colors; }
-          else if (row.mode === 'websites') { websiteFilters = row.filters; websiteFilterColors = row.colors; }
-          else if (row.mode === 'snippets') { snippetFilters = row.filters; snippetFilterColors = row.colors; }
+          if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); filterColors = Object.assign({}, filterColors, row.colors); }
+          else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); }
+          else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); }
+          else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); }
         });
         return;
       }}
