@@ -567,10 +567,10 @@
       const r = await fetch(SB_URL + '/filter_configs?select=*', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
         data.forEach(row => {
-          if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); filterColors = Object.assign({}, filterColors, row.colors); }
-          else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); }
-          else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); }
-          else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); }
+          if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); Object.keys(filters).forEach(k => { if (!row.filters[k]) delete filters[k]; }); filterColors = Object.assign({}, filterColors, row.colors); Object.keys(filterColors).forEach(k => { if (!row.colors[k]) delete filterColors[k]; }); }
+          else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); Object.keys(creatorFilters).forEach(k => { if (!row.filters[k]) delete creatorFilters[k]; }); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); Object.keys(creatorFilterColors).forEach(k => { if (!row.colors[k]) delete creatorFilterColors[k]; }); }
+          else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); Object.keys(websiteFilters).forEach(k => { if (!row.filters[k]) delete websiteFilters[k]; }); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); Object.keys(websiteFilterColors).forEach(k => { if (!row.colors[k]) delete websiteFilterColors[k]; }); }
+          else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); Object.keys(snippetFilters).forEach(k => { if (!row.filters[k]) delete snippetFilters[k]; }); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); Object.keys(snippetFilterColors).forEach(k => { if (!row.colors[k]) delete snippetFilterColors[k]; }); }
         });
         return;
       }}
@@ -579,7 +579,6 @@
 
   async function saveFilterConfig() {
     const f = getF(); const c = getFC();
-    console.log('SAVE FILTER Format items:', f.Format?.length);
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
       await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
