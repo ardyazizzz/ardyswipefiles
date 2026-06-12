@@ -517,11 +517,7 @@
     try {
       const r = await sbFetch('/swipes?order=id.desc');
       if (r.ok) { const data = await r.json(); if (data && data.length) {
-        const cloudIds = new Set(data.map(x => x.id));
-        swipes = swipes.filter(x => !cloudIds.has(x.id));
-        creators = creators.filter(x => !cloudIds.has(x.id));
-        websites = websites.filter(x => !cloudIds.has(x.id));
-        snippets = snippets.filter(x => !cloudIds.has(x.id));
+        swipes = []; creators = []; websites = []; snippets = [];
         data.forEach(item => {
           if (item.type === 'creators') creators.push(item);
           else if (item.type === 'websites') websites.push(item);
