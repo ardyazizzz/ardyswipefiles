@@ -1333,13 +1333,14 @@
   renderFilterBar();
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
+  let _cloudCount = 0;
   (async function init() {
     await loadSwipes();
+    _cloudCount = swipes.length + creators.length + websites.length + snippets.length;
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
-    let _cloudCount = 0;
     setInterval(async () => {
       if (document.hidden) return;
       try {
