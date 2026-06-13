@@ -1382,7 +1382,7 @@
             const color = (getFC()[key] && getFC()[key][opt]) || '#6B7280';
             return `<span class="filter-option-pill">
               <input type="color" class="option-color" value="${color}" onchange="setOptionColor('${safeKey}','${safeOpt}',this.value)" title="Pick color" />
-              ${opt}
+              <span onclick="renameOptionInline(this,'${safeKey}','${safeOpt}')" style="cursor:text" title="Click to rename">${opt}</span>
               <button onclick="removeOption('${safeKey}','${safeOpt}')" title="Remove">
                 <i class="ri-close-line"></i>
               </button>
@@ -1395,6 +1395,31 @@
         </div>
       </div>`;
     }).join('');
+  }
+
+  function renameOptionInline(el, key, opt) {
+    var input = document.createElement('input');
+    input.value = opt;
+    input.style.cssText = 'font-size:12px;font-family:inherit;border:1px solid var(--accent);border-radius:6px;padding:2px 6px;width:120px;background:var(--bg);color:var(--text-primary);outline:none';
+    input.onblur = function() { renameOption(key, opt, this.value); };
+    input.onkeydown = function(e) { if (e.key === 'Enter') this.blur(); };
+    el.replaceWith(input);
+    input.focus();
+    input.select();
+  }
+
+  function renameOption(key, oldOpt, newOpt) {
+    newOpt = newOpt.trim();
+    if (!newOpt || newOpt === oldOpt) return;
+    const f = getF();
+    const i = f[key].indexOf(oldOpt);
+    if (i !== -1) f[key][i] = newOpt;
+    const fc = getFC();
+    if (fc[key] && fc[key][oldOpt] !== undefined) { fc[key][newOpt] = fc[key][oldOpt]; delete fc[key][oldOpt]; }
+    const af = getAF();
+    if (af[key]) { af[key] = af[key].map(function(v) { return v === oldOpt ? newOpt : v; }); }
+    persist(); saveFilterConfig();
+    renderSettingsPanel();
   }
 
   function renameFilter(oldKey, newKey) {
