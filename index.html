@@ -411,9 +411,22 @@
     persist(); applyFilters();
   }
 
+  function handleFilterConfigChange(payload) {
+    if (!payload.new) return;
+    var row = payload.new;
+    if (row.mode === 'posts') { filters = Object.assign({}, filters, row.filters); Object.keys(filters).forEach(k => { if (!row.filters[k]) delete filters[k]; }); filterColors = Object.assign({}, filterColors, row.colors); Object.keys(filterColors).forEach(k => { if (!row.colors[k]) delete filterColors[k]; }); }
+    else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); Object.keys(creatorFilters).forEach(k => { if (!row.filters[k]) delete creatorFilters[k]; }); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); Object.keys(creatorFilterColors).forEach(k => { if (!row.colors[k]) delete creatorFilterColors[k]; }); }
+    else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); Object.keys(websiteFilters).forEach(k => { if (!row.filters[k]) delete websiteFilters[k]; }); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); Object.keys(websiteFilterColors).forEach(k => { if (!row.colors[k]) delete websiteFilterColors[k]; }); }
+    else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); Object.keys(snippetFilters).forEach(k => { if (!row.filters[k]) delete snippetFilters[k]; }); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); Object.keys(snippetFilterColors).forEach(k => { if (!row.colors[k]) delete snippetFilterColors[k]; }); }
+    persist(); renderFilterBar(); applyFilters();
+  }
+
   function subscribeRealtime() {
     sbRTC.channel('swipes-rt')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'swipes' }, handleRealtimeChange)
+      .subscribe();
+    sbRTC.channel('filter-configs-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'filter_configs' }, handleFilterConfigChange)
       .subscribe();
   }
 
