@@ -421,12 +421,21 @@
     persist(); renderFilterBar(); applyFilters();
   }
 
+  function handleViewsChange(payload) {
+    if (!payload.new) return;
+    views = payload.new.data;
+    persist(); renderFilterBar();
+  }
+
   function subscribeRealtime() {
     sbRTC.channel('swipes-rt')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'swipes' }, handleRealtimeChange)
       .subscribe();
     sbRTC.channel('filter-configs-rt')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'filter_configs' }, handleFilterConfigChange)
+      .subscribe();
+    sbRTC.channel('views-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'views_config' }, handleViewsChange)
       .subscribe();
   }
 
@@ -598,6 +607,17 @@
     } catch(e) {}
   }
 
+  async function loadViewsConfig() {
+    try {
+      const r = await fetch(SB_URL + '/views_config?select=data&id=eq.1', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+      if (r.ok) { const d = await r.json(); if (d && d.length) { views = d[0].data; } }
+    } catch(e) {}
+  }
+
+  function saveViewsConfig() {
+    fetch(SB_URL + '/views_config', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
+  }
+
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
       activeMode = mode;
@@ -744,7 +764,7 @@
     views.push(preset);
     currentViewName = name;
     savingView = false;
-    persist(); renderFilterBar();
+    persist(); saveViewsConfig(); renderFilterBar();
     showToast('View saved ✓');
   }
 
@@ -784,14 +804,14 @@
     if (!newName || newName === views[index].name) { renderViewsEditor(); return; }
     if (currentViewName === views[index].name) currentViewName = newName;
     views[index].name = newName;
-    persist(); renderViewsEditor(); renderFilterBar();
+    persist(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
   }
 
   function deleteView(index) {
     if (!confirm('Delete "' + views[index].name + '"?')) return;
     if (currentViewName === views[index].name) currentViewName = null;
     views.splice(index, 1);
-    persist(); renderViewsEditor(); renderFilterBar();
+    persist(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
   }
 
   function loadFromHash() {
@@ -1458,6 +1478,7 @@
   (async function init() {
     await loadSwipes();
     await loadFilterConfigs();
+    await loadViewsConfig();
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
