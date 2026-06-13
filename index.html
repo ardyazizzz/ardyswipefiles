@@ -1240,7 +1240,7 @@
     const reposts   = parseInt(document.getElementById('f-reposts').value) || 0;
     const followers = parseInt(document.getElementById('f-followers').value) || 0;
     const item = { id: Date.now(), type: activeMode, author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
-    const sbBody = JSON.stringify({ id: item.id, type: item.type, author: item.author, date: item.date, platform: item.platform, filters: item.filters, text: item.text, image: item.image, postUrl: item.postUrl, reactions: item.reactions, comments: item.comments, reposts: item.reposts });
+    const sbBody = JSON.stringify({ id: item.id, type: item.type, author: item.author, date: item.date, platform: item.platform, filters: item.filters, text: item.text, image: item.image, postUrl: item.postUrl, reactions: item.reactions, comments: item.comments, reposts: item.reposts, followers: item.followers });
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
@@ -1353,7 +1353,7 @@
     });
     s.platform = isWebsite ? 'Web' : isSnippet ? '' : (s.filters && s.filters['Platform'] ? s.filters['Platform'] : '');
     const id = editingId;
-    const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts });
+    const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts, followers: s.followers });
     persist(); closeEditModal(); applyFilters();
     fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
