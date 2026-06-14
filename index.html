@@ -1014,17 +1014,22 @@
     const q = document.getElementById('searchInput').value.toLowerCase();
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const data = source.filter(s => {
+      const filterVals = []; Object.values(s.filters || {}).forEach(v => { if (Array.isArray(v)) filterVals.push(...v); else if (v) filterVals.push(v); });
       const searchFields = activeMode === 'posts'
-        ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl]
+        ? [s.text, s.author, s.platform, ...filterVals, s.postUrl]
         : activeMode === 'creators'
-        ? [s.text, s.author, s.platform, ...Object.values(s.filters || {}), s.postUrl, String(s.followers || '')]
+        ? [s.text, s.author, s.platform, ...filterVals, s.postUrl, String(s.followers || '')]
         : activeMode === 'websites'
-        ? [s.text, s.author, ...Object.values(s.filters || {}), s.postUrl]
-        : [s.text, ...Object.values(s.filters || {})];
+        ? [s.text, s.author, ...filterVals, s.postUrl]
+        : [s.text, ...filterVals];
       const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
       if (q && !searchStr.includes(q)) return false;
       for (const key of Object.keys(getAF())) {
-        if (getAF()[key] && getAF()[key].length && !getAF()[key].includes(s.filters[key])) return false;
+        if (getAF()[key] && getAF()[key].length) {
+          const itemVal = s.filters[key];
+          const itemVals = Array.isArray(itemVal) ? itemVal : (itemVal ? [itemVal] : []);
+          if (!itemVals.some(v => getAF()[key].includes(v))) return false;
+        }
       }
       return true;
     });
@@ -1060,7 +1065,7 @@
     }
     grid.innerHTML = data.map(s => {
       const av = getAv(s.author);
-      const tags = Object.entries(s.filters || {}).filter(([,v]) => v);
+      const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { if (Array.isArray(v)) v.forEach(x => { if (x) tags.push([k,x]); }); else if (v) tags.push([k,v]); });
       const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
       if (activeMode === 'snippets') {
         return `<div class="card">
@@ -1198,8 +1203,7 @@
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
-      <select id="ff-${key}">
-        <option value="">— Select ${key} —</option>
+      <select id="ff-${key}" multiple style="min-height:100px">
         ${getF()[key].map(o => `<option>${o}</option>`).join('')}
       </select></div>`).join('');
     document.getElementById('addOverlay').style.display = 'flex';
@@ -1233,7 +1237,7 @@
     let postUrl  = document.getElementById('f-post').value.trim();
     if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
     const sf = {};
-    Object.keys(getF()).forEach(key => { const v = document.getElementById(`ff-${key}`)?.value; if (v) sf[key] = v; });
+    Object.keys(getF()).forEach(key => { const sel = document.getElementById(`ff-${key}`); if (sel) { const vals = [...sel.selectedOptions].map(o => o.value).filter(Boolean); if (vals.length) sf[key] = vals.length === 1 ? vals[0] : vals; } });
     const platform = isWebsite ? 'Web' : isSnippet ? '' : (sf['Platform'] || '');
     const date = (isSnippet || isCreator || isWebsite) ? '' : (document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}));
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
@@ -1299,12 +1303,14 @@
     document.getElementById('e-comments').value  = s.comments || '';
     document.getElementById('e-reposts').value   = s.reposts || '';
     document.getElementById('e-followers').value = s.followers || '';
-    document.getElementById('editDynamicFields').innerHTML = Object.keys(getF()).map(key => `
-      <div class="field"><label>${key}</label>
-      <select id="ef-${key}">
-        <option value="">— Select ${key} —</option>
-        ${getF()[key].map(o => `<option ${(s.filters&&s.filters[key])===o?'selected':''}>${o}</option>`).join('')}
-      </select></div>`).join('');
+    document.getElementById('editDynamicFields').innerHTML = Object.keys(getF()).map(key => {
+      const itemVal = s.filters && s.filters[key] ? s.filters[key] : '';
+      const itemVals = Array.isArray(itemVal) ? itemVal : (itemVal ? [itemVal] : []);
+      return `<div class="field"><label>${key}</label>
+      <select id="ef-${key}" multiple style="min-height:100px">
+        ${getF()[key].map(o => `<option ${itemVals.includes(o)?'selected':''}>${o}</option>`).join('')}
+      </select></div>`;
+    }).join('');
     document.getElementById('editOverlay').style.display = 'flex';
     setTimeout(() => { const el = isSnippet ? document.getElementById('e-text') : document.getElementById('e-author'); el.focus(); }, 50);
   }
@@ -1349,8 +1355,11 @@
     s.followers = parseInt(document.getElementById('e-followers').value) || 0;
     s.filters = s.filters || {};
     Object.keys(getF()).forEach(key => {
-      const v = document.getElementById(`ef-${key}`)?.value;
-      if (v) s.filters[key] = v; else delete s.filters[key];
+      const sel = document.getElementById(`ef-${key}`);
+      if (!sel) return;
+      const vals = [...sel.selectedOptions].map(o => o.value).filter(Boolean);
+      if (vals.length) s.filters[key] = vals.length === 1 ? vals[0] : vals;
+      else delete s.filters[key];
     });
     s.platform = isWebsite ? 'Web' : isSnippet ? '' : (s.filters && s.filters['Platform'] ? s.filters['Platform'] : '');
     const id = editingId;
