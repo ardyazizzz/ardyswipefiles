@@ -153,19 +153,19 @@
     .platform-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; background: var(--info-bg); color: var(--info-text); white-space: nowrap; flex-shrink: 0; }
     .card-post-link { font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); text-decoration: none; background: var(--bg); border: 1.5px solid var(--border); box-shadow: 0 0 0 0 rgba(79,70,229,0); transition: all 0.2s var(--ease); flex-shrink: 0; }
     .card-post-link:hover { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 14px rgba(79,70,229,0.18), 0 2px 8px rgba(79,70,229,0.08); }
-    .filter-cb { position: relative; padding-left: 12px; cursor: pointer; font-size: 12px; color: var(--text-secondary); display: inline-block; }
+    .filter-cb { position: relative; padding-left: 22px; cursor: pointer; font-size: 12px; color: var(--text-secondary); display: block; line-height: 1.4; }
     .filter-cb:hover { color: var(--text-primary); }
-    .filter-cb input[type="checkbox"] {
-      -webkit-appearance: none; appearance: none;
-      position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-      width: 1px; height: 1px; box-sizing: border-box;
-      border: 1px solid red; border-radius: 0px;
-      background: var(--bg); transition: all 0.15s var(--ease); margin: 0;
+    .filter-cb::before {
+      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px; box-sizing: border-box;
+      border: 1.5px solid var(--border-strong); border-radius: 3px;
+      background: var(--bg); transition: all 0.15s var(--ease);
     }
-    .filter-cb input[type="checkbox"]:checked {
+    .filter-cb input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+    .filter-cb:has(input:checked)::before {
       background: var(--accent); border-color: var(--accent);
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M13.3 4.2a1 1 0 0 1 0 1.4l-6.4 6.4a1 1 0 0 1-1.4 0l-3.2-3.2a1 1 0 1 1 1.4-1.4l2.5 2.5 5.7-5.7a1 1 0 0 1 1.4 1.4z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: center; background-size: 9px;
+      background-repeat: no-repeat; background-position: center; background-size: 10px;
     }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
     .card-text.text-3 { -webkit-line-clamp: 3; max-height: calc(3 * 12.5px * 1.62); }
