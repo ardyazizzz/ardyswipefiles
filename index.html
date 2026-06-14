@@ -1203,9 +1203,9 @@
     document.getElementById('f-followers-row').style.display = isCreator ? '' : 'none';
     document.getElementById('dynamicFields').innerHTML = Object.keys(getF()).map(key => `
       <div class="field"><label>${key}</label>
-      <select id="ff-${key}" multiple style="min-height:100px">
-        ${getF()[key].map(o => `<option>${o}</option>`).join('')}
-      </select></div>`).join('');
+      <div style="max-height:120px;overflow-y:auto;border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:6px 10px;background:var(--bg)">
+        ${getF()[key].map(o => `<label style="display:block;font-size:13px;padding:3px 0;cursor:pointer"><input type="checkbox" value="${o}" onchange="toggleFormFilter(this,'${key}')" style="margin-right:6px" />${o}</label>`).join('')}
+      </div></div>`).join('');
     document.getElementById('addOverlay').style.display = 'flex';
     setTimeout(() => { const el = isSnippet ? document.getElementById('f-text') : document.getElementById('f-author'); el.focus(); }, 50);
   }
@@ -1237,7 +1237,7 @@
     let postUrl  = document.getElementById('f-post').value.trim();
     if (postUrl && !/^https?:\/\//i.test(postUrl)) postUrl = 'https://' + postUrl;
     const sf = {};
-    Object.keys(getF()).forEach(key => { const sel = document.getElementById(`ff-${key}`); if (sel) { const vals = [...sel.selectedOptions].map(o => o.value).filter(Boolean); if (vals.length) sf[key] = vals.length === 1 ? vals[0] : vals; } });
+    Object.keys(getF()).forEach(key => { const cbs = document.querySelectorAll(`input[type=checkbox][value][onchange*="${key}"]`); const vals = [...cbs].filter(c => c.checked).map(c => c.value); if (vals.length) sf[key] = vals.length === 1 ? vals[0] : vals; });
     const platform = isWebsite ? 'Web' : isSnippet ? '' : (sf['Platform'] || '');
     const date = (isSnippet || isCreator || isWebsite) ? '' : (document.getElementById('f-date').value.trim() || new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}));
     const reactions = parseInt(document.getElementById('f-reactions').value) || 0;
@@ -1307,9 +1307,9 @@
       const itemVal = s.filters && s.filters[key] ? s.filters[key] : '';
       const itemVals = Array.isArray(itemVal) ? itemVal : (itemVal ? [itemVal] : []);
       return `<div class="field"><label>${key}</label>
-      <select id="ef-${key}" multiple style="min-height:100px">
-        ${getF()[key].map(o => `<option ${itemVals.includes(o)?'selected':''}>${o}</option>`).join('')}
-      </select></div>`;
+      <div style="max-height:120px;overflow-y:auto;border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:6px 10px;background:var(--bg)">
+        ${getF()[key].map(o => `<label style="display:block;font-size:13px;padding:3px 0;cursor:pointer"><input type="checkbox" value="${o}" ${itemVals.includes(o)?'checked':''} onchange="toggleFormFilter(this,'${key}')" style="margin-right:6px" />${o}</label>`).join('')}
+      </div></div>`;
     }).join('');
     document.getElementById('editOverlay').style.display = 'flex';
     setTimeout(() => { const el = isSnippet ? document.getElementById('e-text') : document.getElementById('e-author'); el.focus(); }, 50);
@@ -1355,9 +1355,8 @@
     s.followers = parseInt(document.getElementById('e-followers').value) || 0;
     s.filters = s.filters || {};
     Object.keys(getF()).forEach(key => {
-      const sel = document.getElementById(`ef-${key}`);
-      if (!sel) return;
-      const vals = [...sel.selectedOptions].map(o => o.value).filter(Boolean);
+      const cbs = document.querySelectorAll(`#editDynamicFields input[type=checkbox][value][onchange*="${key}"]`);
+      const vals = [...cbs].filter(c => c.checked).map(c => c.value);
       if (vals.length) s.filters[key] = vals.length === 1 ? vals[0] : vals;
       else delete s.filters[key];
     });
@@ -1406,6 +1405,8 @@
       </div>`;
     }).join('');
   }
+
+  function toggleFormFilter(cb, key) {} // no-op: checkbox state stored on element, read on save
 
   function renameFilter(oldKey, newKey) {
     newKey = newKey.trim();
