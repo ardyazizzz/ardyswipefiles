@@ -182,13 +182,14 @@
     .card-footer { padding: 8px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-tags { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; min-width: 0; }
     .card-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--bg-tertiary); color: var(--text-secondary); white-space: nowrap; letter-spacing: 0.1px; }
-    .num-filter { display: inline-flex; align-items: center; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 5px 9px; box-shadow: var(--shadow-sm); }
-    .num-input { width: 52px; font-size: 12px; font-family: inherit; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 2px 0; -moz-appearance: textfield; }
-    .num-input::-webkit-outer-spin-button, .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .num-filter { display: inline-flex; align-items: center; gap: 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 10px; box-shadow: var(--shadow-sm); }
+    .num-filter i { font-size: 14px; color: var(--accent); flex-shrink: 0; margin-right: 6px; }
+    .num-filter .num-label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-right: 10px; white-space: nowrap; }
+    .num-filter .num-sep { width: 1px; height: 20px; background: var(--border-strong); margin-right: 10px; flex-shrink: 0; }
+    .num-filter .num-dash { color: var(--text-tertiary); font-size: 12px; margin: 0 8px; }
+    .num-input { width: 58px; font-size: 12px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-primary); outline: none; padding: 5px 8px; text-align: center; }
     .num-input::placeholder { color: var(--text-tertiary); }
-    .num-input:focus { color: var(--accent); }
-    .num-filter i { font-size: 13px; color: var(--text-tertiary); flex-shrink: 0; }
-    .num-filter .num-dash { color: var(--text-tertiary); font-size: 11px; }
+    .num-input:focus { border-color: var(--accent); box-shadow: var(--ring); }
     .card-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 5px; font-size: 16px; transition: all 0.15s var(--ease); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .card-btn:hover { color: var(--danger); background: var(--danger-soft); }
     .empty-state { grid-column: 1/-1; text-align: center; padding: 5rem 1rem; color: var(--text-tertiary); }
@@ -950,9 +951,9 @@
       </div>`;
     });
     if (activeMode === 'posts') {
-      html += `<div class="num-filter"><i class="ri-bar-chart-line"></i><input type="number" class="num-input" placeholder="Min" value="${numericFilters.engMin}" oninput="setNumericFilter('engMin',this)" /><span class="num-dash">—</span><input type="number" class="num-input" placeholder="Max" value="${numericFilters.engMax}" oninput="setNumericFilter('engMax',this)" /></div>`;
+      html += `<div class="num-filter"><i class="ri-bar-chart-fill"></i><span class="num-label">Engagement</span><div class="num-sep"></div><input type="number" class="num-input" placeholder="Min" value="${numericFilters.engMin}" oninput="setNumericFilter('engMin',this)" /><span class="num-dash">—</span><input type="number" class="num-input" placeholder="Max" value="${numericFilters.engMax}" oninput="setNumericFilter('engMax',this)" /></div>`;
     } else if (activeMode === 'creators') {
-      html += `<div class="num-filter"><i class="ri-user-follow-line"></i><input type="number" class="num-input" placeholder="Min" value="${numericFilters.folMin}" oninput="setNumericFilter('folMin',this)" /><span class="num-dash">—</span><input type="number" class="num-input" placeholder="Max" value="${numericFilters.folMax}" oninput="setNumericFilter('folMax',this)" /></div>`;
+      html += `<div class="num-filter"><i class="ri-user-follow-fill"></i><span class="num-label">Followers</span><div class="num-sep"></div><input type="number" class="num-input" placeholder="Min" value="${numericFilters.folMin}" oninput="setNumericFilter('folMin',this)" /><span class="num-dash">—</span><input type="number" class="num-input" placeholder="Max" value="${numericFilters.folMax}" oninput="setNumericFilter('folMax',this)" /></div>`;
     }
     html += `<div class="divider"></div>
     <select class="sort-select" onchange="sortSwipes(this.value)">
