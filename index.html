@@ -186,7 +186,8 @@
     .num-filter .num-label { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); margin-right: 10px; white-space: nowrap; }
     .num-filter .num-sep { width: 1px; height: 22px; background: var(--border-strong); margin-right: 10px; flex-shrink: 0; }
     .num-filter .num-dash { color: var(--text-tertiary); font-size: 12px; margin: 0 6px; }
-    .num-input { width: 56px; font-size: 12.5px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text-primary); outline: none; padding: 5px 7px; text-align: center; transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease); }
+    .num-input { width: 56px; font-size: 12.5px; font-family: inherit; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text-primary); outline: none; padding: 5px 7px; text-align: center; transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease); -moz-appearance: textfield; }
+    .num-input::-webkit-outer-spin-button, .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .num-input::placeholder { color: var(--text-tertiary); }
     .num-input:focus { border-color: var(--accent); box-shadow: var(--ring); }
     .card-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 5px; font-size: 16px; transition: all 0.15s var(--ease); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
