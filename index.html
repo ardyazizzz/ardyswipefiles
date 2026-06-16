@@ -183,6 +183,7 @@
     .card-engagement-bar { padding: 8px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .card-engagement-badge { display: inline-flex; align-items: center; gap: 3px; background: var(--danger-soft); color: var(--danger); padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid rgba(224,72,63,0.16); white-space: nowrap; }
     .card-placeholder { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .card-placeholder svg { width: 38px; height: 38px; opacity: 0.35; display: block; }
     .card-footer { padding: 8px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-tags { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; min-width: 0; }
     .card-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--bg-tertiary); color: var(--text-secondary); white-space: nowrap; letter-spacing: 0.1px; }
@@ -1141,7 +1142,7 @@
     grid.innerHTML = data.map(s => {
       const av = getAv(s.author);
       const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { if (Array.isArray(v)) v.forEach(x => { if (x) tags.push([k,x]); }); else if (v) tags.push([k,v]); });
-      const icon = '<i class="ri-t-box-line"></i>';
+      const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M1.75024 0H22.2502v8.25h-2.5V2.5h-6.5v19H19V24H5v-2.5h5.7502v-19H4.25024v5.75h-2.5V0Z" clip-rule="evenodd"/></svg>`;
       if (activeMode === 'snippets') {
         return `<div class="card">
           <div class="card-body" onclick="openEditModal(${s.id})">
