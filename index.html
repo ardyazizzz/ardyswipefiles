@@ -38,6 +38,33 @@
       --shadow: 0 8px 24px rgba(16,24,40,0.10);
       --shadow-lg: 0 20px 48px rgba(16,24,40,0.18);
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --overlay: rgba(16,24,40,0.45);
+    }
+
+    [data-theme="dark"] {
+      --bg: #171a1f;
+      --bg-secondary: #1e2128;
+      --bg-tertiary: #252830;
+      --bg-canvas: #0f1115;
+      --text-primary: #e4e6ea;
+      --text-secondary: #9aa3b2;
+      --text-tertiary: #5b6472;
+      --border: #2a2d35;
+      --border-strong: #353840;
+      --border-hover: #454851;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --accent-soft: rgba(99,102,241,0.15);
+      --accent-text: #ffffff;
+      --info-bg: rgba(59,130,246,0.18);
+      --info-text: #60a5fa;
+      --danger: #f87171;
+      --danger-soft: rgba(248,113,113,0.13);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.3);
+      --shadow: 0 8px 24px rgba(0,0,0,0.35);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+      --ring: 0 0 0 3px rgba(99,102,241,0.25);
+      --overlay: rgba(0,0,0,0.65);
     }
 
     html { -webkit-text-size-adjust: 100%; }
@@ -45,7 +72,7 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-canvas);
-      background-image: radial-gradient(circle at 50% -20%, #f3f4f8 0%, var(--bg-canvas) 55%);
+      background-image: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-canvas) 55%);
       background-attachment: fixed;
       color: var(--text-primary);
       min-height: 100vh;
@@ -206,7 +233,7 @@
     .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--text-primary); color: #fff; padding: 11px 22px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.22s var(--ease), transform 0.22s var(--ease); pointer-events: none; z-index: 9999; white-space: nowrap; box-shadow: var(--shadow-lg); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .overlay { position: fixed; inset: 0; background: rgba(16,24,40,0.45); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 1rem; animation: fadeIn 0.18s var(--ease); }
+    .overlay { position: fixed; inset: 0; background: var(--overlay); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 1rem; animation: fadeIn 0.18s var(--ease); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal { background: var(--bg); border-radius: var(--radius-xl); border: 1px solid var(--border); padding: 1.75rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn 0.22s var(--ease); }
     @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -280,6 +307,7 @@
         <button class="mode-segment" onclick="setMode('websites')">Websites</button>
         <button class="mode-segment" onclick="setMode('snippets')">Snippets</button>
       </div>
+      <button class="btn-ghost" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode" style="padding:8px 11px"><i class="ri-moon-line"></i></button>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
@@ -1043,6 +1071,14 @@
     persist(); applyFilters(); syncHash();
   }
 
+  function toggleDark() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('darkToggle').innerHTML = isDark ? '<i class="ri-moon-line"></i>' : '<i class="ri-sun-line"></i>';
+    try { localStorage.setItem('swipeardy_dark_v1', isDark ? '0' : '1'); } catch(e) {}
+  }
+
   function clearAllFilters() {
     if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else if (activeMode === 'websites') websiteActiveFilters = {}; else snippetActiveFilters = {};
     numericFilters = { engMin: '', engMax: '', folMin: '', folMax: '' };
@@ -1563,6 +1599,16 @@
   renderFilterBar();
   applyDensity();
   document.getElementById('cardGrid').innerHTML = '<div class="empty-state"><p style="color:var(--text-secondary)">Loading swipes...</p></div>';
+
+  // Dark mode init
+  (function initDark() {
+    const saved = load('swipeardy_dark_v1', null);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = saved !== null ? saved === '1' : prefersDark;
+    if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('darkToggle').innerHTML = isDark ? '<i class="ri-sun-line"></i>' : '<i class="ri-moon-line"></i>';
+  })();
+
   (async function init() {
     await loadSwipes();
     await loadFilterConfigs();
