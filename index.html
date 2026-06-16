@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -478,7 +478,6 @@
     {bg:'#FAECE7',color:'#993C1D'},{bg:'#FBEAF0',color:'#993556'},
     {bg:'#EEEDFE',color:'#534AB7'},{bg:'#FAEEDA',color:'#854F0B'},
   ];
-  const EMOJIS = {Design:'🎨',Copywriting:'✍️',Strategy:'♟️',Hooks:'🪝',Carousel:'📊',Personal:'💡',Storytelling:'📖',Branding:'🏷️'};
 
   const DEFAULT_FILTERS = {
     Category: ['Hooks','Copywriting','Design','Strategy','Carousel','Personal','Storytelling'],
@@ -1142,7 +1141,7 @@
     grid.innerHTML = data.map(s => {
       const av = getAv(s.author);
       const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { if (Array.isArray(v)) v.forEach(x => { if (x) tags.push([k,x]); }); else if (v) tags.push([k,v]); });
-      const emoji = EMOJIS[s.filters && s.filters.Category] || '📌';
+      const icon = '<i class="ri-t-box-line"></i>';
       if (activeMode === 'snippets') {
         return `<div class="card">
           <div class="card-body" onclick="openEditModal(${s.id})">
@@ -1225,9 +1224,9 @@
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
           `<div class="card-media-wrap">
-            ${s.image ? getMedia(s.image) : `<div class="card-placeholder">${emoji}</div>`}
+            ${s.image ? getMedia(s.image) : `<div class="card-placeholder">${icon}</div>`}
           </div>` :
-          (s.image ? getMedia(s.image) : `<div class="card-placeholder">${emoji}</div>`)
+          (s.image ? getMedia(s.image) : `<div class="card-placeholder">${icon}</div>`)
         }
         <div class="card-footer">
           <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
