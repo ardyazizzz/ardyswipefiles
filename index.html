@@ -940,7 +940,7 @@
     if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
     if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
-    if (/\.(mp4|webm|mov)$/i.test(url)) return `<video class="card-video" controls src="${url}"></video>`;
+    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" autoplay loop muted playsinline src="${url}"></video>`;
     return `<img src="${url}" alt="" class="card-img" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
   }
 
@@ -1178,7 +1178,7 @@
     }
     grid.innerHTML = data.map(s => {
       const av = getAv(s.author);
-      const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { if (Array.isArray(v)) v.forEach(x => { if (x) tags.push([k,x]); }); else if (v) tags.push([k,v]); });
+      const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { const seen = new Set(); if (Array.isArray(v)) v.forEach(x => { if (x && !seen.has(x)) { seen.add(x); tags.push([k,x]); } }); else if (v) tags.push([k,v]); });
       const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M1.75024 0H22.2502v8.25h-2.5V2.5h-6.5v19H19V24H5v-2.5h5.7502v-19H4.25024v5.75h-2.5V0Z" clip-rule="evenodd"/></svg>`;
       if (activeMode === 'snippets') {
         return `<div class="card">
@@ -1469,7 +1469,7 @@
     s.filters = s.filters || {};
     Object.keys(getF()).forEach(key => {
       const cbs = document.querySelectorAll(`#editDynamicFields input[type=checkbox][value][onchange*="${key}"]`);
-      const vals = [...cbs].filter(c => c.checked).map(c => c.value);
+      const vals = [...new Set([...cbs].filter(c => c.checked).map(c => c.value))];
       if (vals.length) s.filters[key] = vals.length === 1 ? vals[0] : vals;
       else delete s.filters[key];
     });
