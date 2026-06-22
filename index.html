@@ -936,9 +936,9 @@
 
   function getMedia(url, postUrl) {
     if (!url) return '';
-    if (postUrl && /video\.twimg\.com/.test(url)) {
-      var fx = postUrl.replace(/^https?:\/\/(www\.)?(x|twitter)\.com/, 'https://d.fxtwitter.com');
-      return `<video class="card-video" autoplay loop muted playsinline controls src="${fx}"></video>`;
+    if (/video\.twimg\.com/.test(url)) {
+      var proxy = 'https://swipe-proxy.ardyazizrw.workers.dev/?url=' + encodeURIComponent(url);
+      return `<video class="card-video" autoplay loop muted playsinline controls src="${proxy}"></video>`;
     }
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
