@@ -1189,7 +1189,6 @@
         var author = scanLinkedInAuthor(root);
         var counts = extractLinkedInCounts(root, '');
         var images = scanLinkedInImage(root);
-        console.log('[DEBUG carousel scan]', getLinkedInLabel(root), 'found:', images.length, images.slice(0,3));
         var image = images.length > 0 ? images[0] : extractLinkedInImage(root);
 
         var docContainer = root.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
@@ -1198,8 +1197,6 @@
           var docLink = docContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
           if (docLink) documentUrl = docLink.href;
         }
-        console.log('[DEBUG document scan]', documentUrl || 'no PDF URL found');
-
         var timeInfo = scanLinkedInTime(root);
         var date = timeInfo.display || '';
 
