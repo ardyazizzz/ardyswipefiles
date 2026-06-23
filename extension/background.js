@@ -57,8 +57,9 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     handleBulkImport(message.posts).then(sendResponse);
     return true;
   }
-  if ((message.type === 'EXTRACT' || message.type === 'SWIPEAR:DY_SCAN_PAGE') && lastTabId != null) {
-    chrome.tabs.sendMessage(lastTabId, message, function (resp) {
+  var targetTabId = lastTabId || (sender.tab && sender.tab.id);
+  if ((message.type === 'EXTRACT' || message.type === 'SWIPEAR:DY_SCAN_PAGE') && targetTabId) {
+    chrome.tabs.sendMessage(targetTabId, message, function (resp) {
       if (resp) { sendResponse(resp); }
       else { sendResponse({ ok: false, error: 'No response from page' }); }
     });
