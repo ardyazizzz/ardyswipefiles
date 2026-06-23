@@ -1,4 +1,4 @@
-var SB_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/rest/v1';
+﻿var SB_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/rest/v1';
 var SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
 var SB_HEADERS = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
       .then(function (res) {
         res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + body);
+          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
           sendResponse({ ok: true, status: res.status, body: body });
         });
       })
@@ -108,7 +108,7 @@ function trySaveBookmark(item, tweetId, opts) {
     return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
       .then(function (res) {
         return res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + body);
+          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
           return Promise.resolve().then(function () {
             if (tweetId) return markSeen([tweetId]);
           }).then(function () {
@@ -163,7 +163,7 @@ function syncBookmarkToSupabase(b, forceOpt) {
     return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
       .then(function (res) {
         return res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + body);
+          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
           return { ok: true, duplicate: false };
         });
       });
