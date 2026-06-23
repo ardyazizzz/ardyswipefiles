@@ -24,7 +24,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       platform: message.data.platform,
       text: message.data.text,
       image: message.data.image || '',
-      images: message.data.images || [],
       postUrl: message.data.postUrl,
       reactions: message.data.reactions || 0,
       comments: message.data.comments || 0,
