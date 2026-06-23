@@ -1508,7 +1508,7 @@
             const color = (getFC()[key] && getFC()[key][opt]) || '#6B7280';
             return `<span class="filter-option-pill">
               <input type="color" class="option-color" value="${color}" onchange="setOptionColor('${safeKey}','${safeOpt}',this.value)" title="Pick color" />
-              ${opt}
+              <input class="rename-input" value="${opt}" style="width:auto;min-width:40px;max-width:130px" onblur="renameOption('${safeKey}','${safeOpt}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" />
               <button onclick="removeOption('${safeKey}','${safeOpt}')" title="Remove">
                 <i class="ri-close-line"></i>
               </button>
@@ -1537,7 +1537,62 @@
     if (fc[oldKey]) { fc[newKey] = fc[oldKey]; delete fc[oldKey]; }
     const af = getAF();
     if (af[oldKey]) { af[newKey] = af[oldKey]; delete af[oldKey]; }
+    const items = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
+    const affected = [];
+    items.forEach(item => {
+      if (item.filters && item.filters[oldKey] !== undefined) {
+        item.filters[newKey] = item.filters[oldKey];
+        delete item.filters[oldKey];
+        affected.push(item);
+      }
+    });
+    views.forEach(view => {
+      if (view.filters && view.filters[oldKey] !== undefined) {
+        view.filters[newKey] = view.filters[oldKey];
+        delete view.filters[oldKey];
+      }
+    });
     persist(); saveFilterConfig();
+    affected.forEach(item => {
+      const body = JSON.stringify({ filters: item.filters });
+      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
+    });
+    renderSettingsPanel();
+  }
+
+  function renameOption(key, oldOpt, newOpt) {
+    newOpt = newOpt.trim();
+    if (!newOpt || newOpt === oldOpt) return;
+    const f = getF(); const fc = getFC(); const af = getAF();
+    if (f[key].includes(newOpt)) { showToast('Option already exists'); renderSettingsPanel(); return; }
+    const idx = f[key].indexOf(oldOpt);
+    if (idx === -1) return;
+    f[key][idx] = newOpt;
+    if (fc[key]) { fc[key][newOpt] = fc[key][oldOpt]; delete fc[key][oldOpt]; }
+    if (af[key]) { af[key] = af[key].map(v => v === oldOpt ? newOpt : v); }
+    const items = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
+    const affected = [];
+    items.forEach(item => {
+      if (!item.filters || item.filters[key] === undefined) return;
+      if (Array.isArray(item.filters[key])) {
+        let changed = false;
+        item.filters[key] = item.filters[key].map(v => { if (v === oldOpt) { changed = true; return newOpt; } return v; });
+        if (changed) affected.push(item);
+      } else if (item.filters[key] === oldOpt) {
+        item.filters[key] = newOpt;
+        affected.push(item);
+      }
+    });
+    views.forEach(view => {
+      if (view.filters && view.filters[key]) {
+        view.filters[key] = view.filters[key].map(v => v === oldOpt ? newOpt : v);
+      }
+    });
+    persist(); saveFilterConfig();
+    affected.forEach(item => {
+      const body = JSON.stringify({ filters: item.filters });
+      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
+    });
     renderSettingsPanel();
   }
 
