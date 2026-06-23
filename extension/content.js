@@ -2,10 +2,124 @@
   if (window.__swipeardyInjected) return;
   window.__swipeardyInjected = true;
 
+  // ─── LinkedIn Save button watcher ───
+  document.addEventListener('click', function (e) {
+    if (location.hostname.indexOf('linkedin.com') === -1) return;
+    var btn = findLinkedInSaveButton(e.target);
+    if (!btn) return;
+    if (!isLinkedInSaveAddAction(btn)) return;
+    var card = findLinkedInPostCard(btn);
+    if (!card) return;
+    try {
+      var data = extractLinkedInFromCard(card);
+      if (!data || !data.author) return;
+      data.platform = 'LinkedIn';
+      data.filters = { Platform: 'LinkedIn' };
+      chrome.runtime.sendMessage({ type: 'SAVE_SWIPE', data: data }, function (resp) {
+        if (resp && resp.ok) { /* saved silently */ }
+      });
+    } catch (e) { /* silent */ }
+  }, true);
+
+  function findLinkedInSaveButton(target) {
+    var el = target;
+    while (el && el !== document.body) {
+      var label = (el.getAttribute('aria-label') || '').toLowerCase();
+      if (label && label.indexOf('save') !== -1 && label.indexOf('unsave') === -1 && label.indexOf('saved') === -1) return el;
+      if (el.getAttribute && el.getAttribute('data-control-name') === 'save') return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function isLinkedInSaveAddAction(button) {
+    var label = (button.getAttribute('aria-label') || '').toLowerCase();
+    if (label.indexOf('unsave') !== -1) return false;
+    if (label.indexOf('saved') !== -1 && label.indexOf('save') === -1) return false;
+    return true;
+  }
+
+  function findLinkedInPostCard(button) {
+    var el = button.parentElement;
+    for (var i = 0; i < 20; i++) {
+      if (!el || el === document.body) break;
+      var classes = (el.className || '').toLowerCase();
+      if (classes.indexOf('feed-shared') !== -1 || classes.indexOf('occludable') !== -1) return el;
+      if (el.tagName === 'ARTICLE') return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function extractLinkedInFromCard(card) {
+    var author = extractLinkedInAuthor(card);
+    var text = extractLinkedInSnippet(card);
+    var counts = extractLinkedInCounts(card, '');
+    var postUrl = extractLinkedInPostUrl(card);
+    var btnCarouselImages = scanLinkedInImage(card);
+    console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
+    var image = btnCarouselImages.length > 0 ? btnCarouselImages[0] : extractLinkedInImage(card);
+
+    var btnDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
+    var btnDocUrl = '';
+    if (btnDocContainer) {
+      var btnDocLink = btnDocContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
+      if (btnDocLink) btnDocUrl = btnDocLink.href;
+    }
+    console.log('[DEBUG document btn]', btnDocUrl || 'no PDF URL found');
+
+    var date = '';
+    var timeEl = card.querySelector('time[datetime]');
+    if (timeEl) {
+      var dt = timeEl.getAttribute('datetime');
+      if (dt) {
+        var d = new Date(dt);
+        if (!isNaN(d.getTime())) date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    }
+    return {
+      author: author,
+      text: text,
+      reactions: counts.reactions,
+      comments: counts.comments,
+      reposts: counts.reposts,
+      postUrl: postUrl,
+      image: image,
+      images: btnCarouselImages || [],
+      documentUrl: btnDocUrl,
+      date: date
+    };
+  }
+
+  // ─── Pinterest Relay interceptor (captures full pin data during SPA) ───
+  var __swipeardyRelayData = null;
+  if (location.hostname.indexOf('pinterest.com') !== -1) {
+    var __origRelay = window.__PWS_RELAY_REGISTER_COMPLETED_REQUEST__;
+    if (typeof __origRelay === 'function') {
+      window.__PWS_RELAY_REGISTER_COMPLETED_REQUEST__ = function () {
+        try {
+          var args = arguments[0];
+          if (args && args.data) {
+            var keys = Object.keys(args.data);
+            for (var ri = 0; ri < keys.length; ri++) {
+              var query = args.data[keys[ri]];
+              if (query && query.data && query.data.closeupUnifiedDescription) {
+                __swipeardyRelayData = query.data;
+                break;
+              }
+            }
+          }
+        } catch(e) {}
+        return __origRelay.apply(this, arguments);
+      };
+    }
+  }
+
   function detectPlatform() {
     var h = location.hostname;
     if (/linkedin\.com/.test(h)) return 'LinkedIn';
     if (/x\.com|twitter\.com/.test(h)) return 'Twitter';
+    if (/pinterest\.com/.test(h)) return 'Pinterest';
     return null;
   }
 
@@ -17,6 +131,9 @@
     }
     if (p === 'Twitter') {
       return /\/status\/\d+/.test(location.pathname);
+    }
+    if (p === 'Pinterest') {
+      return /\/pin\//.test(location.pathname);
     }
     return false;
   }
@@ -96,6 +213,7 @@
         if (line.indexOf('\u2022') === 0 || line.indexOf('•') === 0) continue;
         if (/^\d+[hmdw]/.test(line)) continue;
         if (line.toLowerCase().indexOf('view') === 0) continue;
+        if (line.toLowerCase().indexOf('reposted') !== -1) continue;
         return dedupeName(line);
       }
       console.log('[Swipe.ardy cs] Author from post text: all lines were filtered');
@@ -219,7 +337,7 @@
         var lower = txt.toLowerCase();
         if (blacklist.filter(function (w) { return lower.indexOf(w) !== -1; }).length >= 3) continue;
         console.log('[Swipe.ardy cs] Snippet selector hit:', selectors[i], '->', txt.slice(0, 150));
-        return txt;
+        return cleanSnippet(txt);
       }
     }
     console.log('[Swipe.ardy cs] Snippet: NO selectors matched — tried', selectors);
@@ -541,7 +659,23 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
-    var image = extractLinkedInImage(card);
+    var carouselImages = scanLinkedInImage(card);
+    // Fallback: if card is MAIN and no carousel found, search page for document container
+    if (carouselImages.length === 0) {
+      var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
+      if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
+    }
+    console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
+    var image = carouselImages.length > 0 ? carouselImages[0] : extractLinkedInImage(card);
+
+    var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
+                     || document.querySelector('.feed-shared-document__container, .update-components-document__container');
+    var sDocUrl = '';
+    if (sDocContainer) {
+      var sDocLink = sDocContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
+      if (sDocLink) sDocUrl = sDocLink.href;
+    }
+    console.log('[DEBUG document single]', sDocUrl || 'no PDF URL found');
 
     return {
       author: author,
@@ -552,6 +686,8 @@
       postUrl: postUrl,
       platform: 'LinkedIn',
       image: image,
+      images: carouselImages || [],
+      documentUrl: sDocUrl,
       date: date
     };
   }
@@ -637,7 +773,7 @@
       console.log('[Swipe.ardy cs] Twitter stats from aria-label search:', { reactions: reactions, comments: comments, reposts: reposts });
     }
 
-    var imgEl = article.querySelector('img[src*="media"], [data-testid="tweetPhoto"] img');
+    var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
     var image = imgEl ? (imgEl.src || '') : '';
 
     return {
@@ -648,6 +784,155 @@
       reposts: reposts,
       postUrl: location.href,
       platform: 'Twitter',
+      image: image,
+      date: date
+    };
+  }
+
+  // ─── Pinterest Extraction ───
+
+  function getPinterestImage() {
+    var allImgs = document.querySelectorAll('img[src*="pinimg.com"]');
+    var best = '';
+    var bestArea = 0;
+    for (var i = 0; i < allImgs.length; i++) {
+      var img = allImgs[i];
+      var src = img.src || '';
+      var cls = (img.className || '').toLowerCase();
+      if (!src || src.indexOf('data:') === 0) continue;
+      if (cls.indexOf('avatar') !== -1 || cls.indexOf('profile') !== -1 || cls.indexOf('ghost') !== -1) continue;
+      if (/\/75x75_RS\//.test(src) || /\/30x30\//.test(src) || /\/50x50\//.test(src)) continue;
+      var w = img.naturalWidth || img.width || 0;
+      var h = img.naturalHeight || img.height || 0;
+      if (w < 100 || h < 100) continue;
+      var area = w * h;
+      if (area > bestArea) { bestArea = area; best = src; }
+    }
+    if (best) {
+      return best.replace(/\/\d+x\d+([_a-zA-Z]*)\//, '/originals/');
+    }
+    return '';
+  }
+
+  function extractPinterest() {
+    var author = '';
+    var pinTitle = document.title || '';
+    var pinDesc = '';
+    var image = getPinterestImage();
+    var reactions = 0;
+    var date = '';
+
+    // ─── Relay data (SPA-updated, has both title + description) ───
+    if (__swipeardyRelayData) {
+      var rd = __swipeardyRelayData;
+      if (!author && rd.closeupAttribution && rd.closeupAttribution.fullName) author = rd.closeupAttribution.fullName;
+      else if (!author && rd.pinner && rd.pinner.fullName) author = rd.pinner.fullName;
+      if (!pinDesc && rd.closeupUnifiedDescription) pinDesc = rd.closeupUnifiedDescription;
+      else if (!pinDesc && rd.description) pinDesc = rd.description;
+      if (!image && rd.images && rd.images.orig && rd.images.orig.url) image = rd.images.orig.url;
+      if (!date && rd.createdAt) {
+        var dr = new Date(rd.createdAt);
+        if (!isNaN(dr.getTime())) date = dr.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+      if (!reactions && rd.repinCount) reactions = rd.repinCount;
+    }
+
+    // ─── DOM structured-description (React-updated) ───
+    if (!pinDesc) {
+      var descEl = document.querySelector('[data-test-id="structured-description"] span');
+      if (descEl) pinDesc = visibleText(descEl);
+    }
+
+    // ─── Leaf-snippet (fresh page only) ───
+    if (!pinDesc || !author || !date) {
+      var leafEl = document.querySelector('[data-test-id="leaf-snippet"]');
+      if (leafEl) {
+        try {
+          var ld = JSON.parse(leafEl.textContent);
+          if (ld) {
+            if (!author && ld.author && ld.author.name) author = ld.author.name;
+            if (!pinDesc && ld.articleBody) pinDesc = ld.articleBody;
+            if (!date && ld.datePublished) {
+              var d1 = new Date(ld.datePublished);
+              if (!isNaN(d1.getTime())) date = d1.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            if (!reactions && ld.interactionStatistic && ld.interactionStatistic.length) {
+              ld.interactionStatistic.forEach(function (s) {
+                if (s.interactionType && s.interactionType.indexOf('Like') !== -1)
+                  reactions = s.userInteractionCount || 0;
+              });
+            }
+          }
+        } catch(e) {}
+      }
+    }
+
+    // ─── Redux state (fresh page, last resort) ───
+    if (!pinDesc || !author || !date) {
+      var propsEl = document.getElementById('__PWS_INITIAL_PROPS__') || document.getElementById('__PWS_DATA__');
+      if (propsEl) {
+        try {
+          var json = JSON.parse(propsEl.textContent);
+          var pins = (json.initialReduxState && json.initialReduxState.pins) || (json.props && json.props.initialReduxState && json.props.initialReduxState.pins);
+          if (pins) {
+            var pinKeys = Object.keys(pins);
+            for (var pi = 0; pi < pinKeys.length; pi++) {
+              var pin = pins[pinKeys[pi]];
+              if (!pin.images) continue;
+              if (!image && pin.images.orig && pin.images.orig.url) image = pin.images.orig.url;
+              if (!pinDesc && pin.closeupUnifiedDescription) pinDesc = pin.closeupUnifiedDescription;
+              else if (!pinDesc && pin.description) pinDesc = pin.description;
+              if (!author && pin.closeupAttribution && pin.closeupAttribution.fullName) author = pin.closeupAttribution.fullName;
+              else if (!author && pin.pinner && pin.pinner.fullName) author = pin.pinner.fullName;
+              if (!date && pin.createdAt) {
+                var d3 = new Date(pin.createdAt);
+                if (!isNaN(d3.getTime())) date = d3.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              }
+              if (!reactions && pin.repinCount) reactions = pin.repinCount;
+              if (image && pinDesc && author && date) break;
+            }
+          }
+        } catch(e) {}
+      }
+    }
+
+    // ─── DOM fill-ins ───
+    if (!author) {
+      var authorEl = document.querySelector('[data-test-id="creator-profile-name"] div');
+      if (authorEl) author = visibleText(authorEl);
+    }
+    if (!image) {
+      var imageEl = document.querySelector('meta[property="og:image"]');
+      if (imageEl) image = imageEl.getAttribute('content');
+    }
+    if (!reactions) {
+      var repinsEl = document.querySelector('meta[name="pinterestapp:repins"]');
+      if (repinsEl) reactions = parseInt(repinsEl.getAttribute('content')) || 0;
+    }
+
+    // ─── Combine title + description ───
+    var text = '';
+    pinTitle = (pinTitle || '').trim();
+    pinDesc = (pinDesc || '').trim();
+    // Remove duplicate: if description already starts with title, don't repeat it
+    if (pinTitle && pinDesc && pinDesc.indexOf(pinTitle) === 0) {
+      text = pinDesc;
+    } else if (pinTitle && pinDesc) {
+      text = pinTitle + '\n\n' + pinDesc;
+    } else {
+      text = pinTitle || pinDesc || '';
+    }
+
+    console.log('[Swipe.ardy cs] Pinterest final:', { author: author, text: (text||'').slice(0, 100), image: image.slice(0, 100), reactions: reactions, date: date });
+
+    return {
+      author: author,
+      text: text,
+      reactions: reactions || 0,
+      comments: 0,
+      reposts: 0,
+      postUrl: location.href,
+      platform: 'Pinterest',
       image: image,
       date: date
     };
@@ -668,12 +953,12 @@
       var platform = detectPlatform();
       if (!platform) {
         console.log('[Swipe.ardy cs] EXTRACT -> unsupported platform');
-        sendResponse({ ok: false, error: 'This page is not LinkedIn or Twitter/X.' });
+        sendResponse({ ok: false, error: 'This page is not LinkedIn, Twitter/X, or Pinterest.' });
         return;
       }
       try {
         console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
-        var data = platform === 'LinkedIn' ? extractLinkedIn() : extractTwitter();
+        var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
         console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
       } catch (e) {
@@ -682,5 +967,471 @@
       }
       return;
     }
+
+    if (message.type === 'SWIPEAR:DY_SCAN_PAGE') {
+      var platform = detectPlatform();
+      if (!platform) {
+        sendResponse({ ok: false, error: 'Unsupported page' });
+        return;
+      }
+      try {
+        if (platform === 'Twitter') { scanTwitterFromCache(sendResponse); return; }
+        var posts = [];
+        if (platform === 'LinkedIn') { posts = scanLinkedInPage(); }
+        else if (platform === 'Pinterest') { posts = scanPinterestPage(); }
+        sendResponse({ ok: true, posts: posts, count: posts.length });
+      } catch (e) {
+        sendResponse({ ok: false, error: e.message });
+      }
+      return;
+    }
   });
+
+  function decodeLinkedInActivityTimestamp(idStr) {
+    try {
+      if (!idStr) return null;
+      var clean = String(idStr).replace(/[^\d]/g, '');
+      if (!clean) return null;
+      var n = BigInt(clean);
+      var bin = n.toString(2);
+      if (bin.length < 41) return null;
+      var tsBits = bin.slice(0, 41);
+      var ms = parseInt(tsBits, 2);
+      if (!Number.isFinite(ms) || ms <= 0) return null;
+      var d = new Date(ms);
+      if (Number.isNaN(d.getTime())) return null;
+      return d;
+    } catch (e) { return null; }
+  }
+
+  function buildLinkedInPostUrl(activityId) {
+    try {
+      if (!activityId) return '';
+      var clean = String(activityId).replace(/[^\d]/g, '');
+      if (!clean) return '';
+      return 'https://www.linkedin.com/feed/update/urn:li:activity:' + clean + '/';
+    } catch (e) { return ''; }
+  }
+
+  function scanLinkedInAuthor(card) {
+    var selectors = [
+      '[data-anonymize="person-name"]',
+      '.update-components-actor__title span[dir="ltr"]',
+      '.update-components-actor__name span[dir="ltr"]',
+      '.feed-shared-actor__name span[dir="ltr"]',
+      '.feed-shared-actor__title span[dir="ltr"]',
+      'span.update-components-actor__name',
+      'span.feed-shared-actor__name',
+      'a[href*="/in/"]'
+    ];
+    for (var s = 0; s < selectors.length; s++) {
+      var nodes = card.querySelectorAll(selectors[s]);
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        var txt = dedupeName(visibleText(el).replace(/\s+/g, ' ').trim());
+        if (!txt) continue;
+        var lower = txt.toLowerCase();
+        if (lower === 'post' || lower === 'promoted') continue;
+        if (txt.length > 80) continue;
+        return txt;
+      }
+    }
+    return 'Unknown Author';
+  }
+
+  function scanLinkedInSnippet(card) {
+    var selectors = [
+      '.update-components-text .break-words',
+      '.update-components-text',
+      '.feed-shared-update-v2__description-wrapper',
+      '.feed-shared-inline-show-more-text',
+      '.feed-shared-text',
+      '.update-components-update-v2__commentary'
+    ];
+    var blacklist = ['following', 'premium', 'promoted', 'reposted this', 'visit my website', 'follow', 'message', 'subscribe'];
+    for (var s = 0; s < selectors.length; s++) {
+      var nodes = card.querySelectorAll(selectors[s]);
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        var txt = visibleText(el);
+        if (!txt || txt.length < 20) continue;
+        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\s+/g, ' ').trim();
+        var lower = txt.toLowerCase();
+        var polluted = true;
+        var hitCount = 0;
+        for (var b = 0; b < blacklist.length; b++) {
+          if (lower.indexOf(blacklist[b]) !== -1) hitCount++;
+        }
+        polluted = hitCount >= 3;
+        if (polluted) continue;
+        return txt;
+      }
+    }
+    return '';
+  }
+
+  function scanLinkedInTime(card) {
+    var result = { display: '' };
+    var timeEl = card.querySelector('time');
+    if (timeEl) {
+      var dt = timeEl.getAttribute('datetime') || '';
+      if (dt) {
+        var date = new Date(dt);
+        if (!Number.isNaN(date.getTime())) {
+          result.display = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          return result;
+        }
+      }
+      var visible = visibleText(timeEl).trim();
+      if (visible) { result.display = visible; return result; }
+    }
+    var activityId = extractLinkedInActivityId(card);
+    if (activityId) {
+      var decoded = decodeLinkedInActivityTimestamp(activityId);
+      if (decoded) {
+        result.display = decoded.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return result;
+      }
+    }
+    var relativeSelectors = [
+      '.feed-shared-actor__sub-description',
+      '.update-components-actor__sub-description',
+      '.feed-shared-actor__meta',
+      '.update-components-actor__meta'
+    ];
+    var relativeRe = /\b\d+\s*(?:s|sec|secs|second|seconds|m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days|w|wk|wks|week|weeks|mo|mos|month|months|y|yr|yrs|year|years)\b(?:\s*ago)?/i;
+    for (var sr = 0; sr < relativeSelectors.length; sr++) {
+      var relNodes = card.querySelectorAll(relativeSelectors[sr]);
+      for (var ri = 0; ri < relNodes.length; ri++) {
+        var raw = visibleText(relNodes[ri]) || '';
+        if (!raw) continue;
+        var clean = raw.replace(/\s+/g, ' ').replace(/[\u2022\u00b7|]/g, ' ').trim();
+        var match = clean.match(relativeRe);
+        if (match) { result.display = match[0].trim(); return result; }
+      }
+    }
+    return result;
+  }
+
+  function scanLinkedInImage(card) {
+    var results = [];
+    var seen = {};
+    var selectors = [
+      'img.update-components-image__image',
+      'img.ivm-view-attr__img--centered',
+      'img.feed-shared-image__image',
+      'img[data-delayed-url]',
+      '.update-components-image img',
+      '.feed-shared-image img',
+      '.feed-shared-carousel img'
+    ];
+    for (var s = 0; s < selectors.length; s++) {
+      var nodes = card.querySelectorAll(selectors[s]);
+      for (var i = 0; i < nodes.length; i++) {
+        var img = nodes[i];
+        var w = img.naturalWidth || img.width || 0;
+        var h = img.naturalHeight || img.height || 0;
+        if (w < 100 || h < 100) continue;
+        var cls = (img.className || '').toLowerCase();
+        var src = img.src || img.getAttribute('data-delayed-url') || '';
+        if (!src || src.indexOf('data:') === 0) continue;
+        if (cls.indexOf('actor') !== -1 || cls.indexOf('avatar') !== -1 || cls.indexOf('ghost') !== -1 || cls.indexOf('presence') !== -1) continue;
+        if (/\/ghost\//i.test(src) || /profile-displayphoto/i.test(src)) continue;
+        if (seen.hasOwnProperty(src)) continue;
+        seen[src] = true;
+        results.push(src);
+      }
+    }
+    return results;
+  }
+
+  function getLinkedInLabel(card) {
+    if (card.querySelector('.feed-shared-carousel__container, .update-components-carousel__container, [class*="carousel"]'))
+      return 'Carousel';
+    if (card.querySelector('.update-components-linkedin-video, video, .vjs-tech, [data-vjs-player], .media-player__player'))
+      return 'Video';
+    if (card.querySelector('.feed-shared-poll, .feed-shared-poll__container, [aria-label*="poll" i], [aria-label*="vote" i]'))
+      return 'Poll';
+    if (card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]'))
+      return 'Document';
+    var imgs = scanLinkedInImage(card);
+    if (imgs.length > 1) return 'Multiple images';
+    if (imgs.length === 1) return 'Single image';
+    return 'Text only';
+  }
+
+  function scanLinkedInPage() {
+    var posts = [];
+    var selectors = [
+      'div.feed-shared-update-v2',
+      'div.occludable-update',
+      'div[data-urn*="activity"]',
+      'div[data-id^="urn:li:activity"]'
+    ];
+    var seenKeys = {};
+
+    for (var s = 0; s < selectors.length; s++) {
+      var els = document.querySelectorAll(selectors[s]);
+      for (var i = 0; i < els.length; i++) {
+        var root = els[i].closest('div.feed-shared-update-v2') || els[i].closest('div.occludable-update') || els[i];
+        if (!root || typeof root !== 'object') continue;
+        var text = visibleText(root);
+        if (!text || text.length < 40) continue;
+        if (text.toLowerCase().indexOf('reposted this') !== -1) continue;
+
+        var snippet = scanLinkedInSnippet(root);
+        var activityId = extractLinkedInActivityId(root);
+        var postUrl = buildLinkedInPostUrl(activityId) || extractLinkedInPostUrl(root);
+        var dedupKey = (postUrl || '') + '::' + (snippet || '').slice(0, 120);
+        if (seenKeys.hasOwnProperty(dedupKey)) continue;
+        seenKeys[dedupKey] = true;
+
+        var author = scanLinkedInAuthor(root);
+        var counts = extractLinkedInCounts(root, '');
+        var images = scanLinkedInImage(root);
+        console.log('[DEBUG carousel scan]', getLinkedInLabel(root), 'found:', images.length, images.slice(0,3));
+        var image = images.length > 0 ? images[0] : extractLinkedInImage(root);
+
+        var docContainer = root.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
+        var documentUrl = '';
+        if (docContainer) {
+          var docLink = docContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
+          if (docLink) documentUrl = docLink.href;
+        }
+        console.log('[DEBUG document scan]', documentUrl || 'no PDF URL found');
+
+        var timeInfo = scanLinkedInTime(root);
+        var date = timeInfo.display || '';
+
+        if (!snippet && images.length === 0) continue;
+
+        var label = getLinkedInLabel(root);
+
+        posts.push({
+          author: author,
+          date: date,
+          platform: 'LinkedIn',
+          text: snippet,
+          image: image,
+          images: images.length > 0 ? images : (image ? [image] : []),
+          documentUrl: documentUrl,
+          postUrl: postUrl,
+          reactions: counts.reactions,
+          comments: counts.comments,
+          reposts: counts.reposts,
+          filters: { Platform: 'LinkedIn', Category: label }
+        });
+      }
+    }
+    return posts;
+  }
+
+  function scanTwitterPage() {
+    var posts = [];
+    var articles = document.querySelectorAll('article[data-testid="tweet"]');
+    for (var i = 0; i < articles.length; i++) {
+      var article = articles[i];
+      var author = '';
+      var authorEl = article.querySelector('[data-testid="User-Name"]');
+      if (authorEl) {
+        var lines = authorEl.innerText.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+        for (var li = 0; li < lines.length; li++) {
+          if (lines[li].charAt(0) === '@') { author = lines[li].replace('@', ''); break; }
+        }
+        if (!author) author = lines[0] || '';
+      }
+
+      var textEl = article.querySelector('[data-testid="tweetText"]');
+      var text = textEl ? visibleText(textEl) : '';
+
+      var date = '';
+      var timeEl = article.querySelector('time[datetime]');
+      if (timeEl) {
+        var dt = timeEl.getAttribute('datetime');
+        if (dt) {
+          var d = new Date(dt);
+          if (!isNaN(d.getTime())) date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+      }
+
+      var reactions = 0, comments = 0, reposts = 0;
+      var likeBtn = article.querySelector('[data-testid="like"], [data-testid="unlike"]');
+      if (!likeBtn) likeBtn = article.querySelector('button[aria-label*="Like"]');
+      if (likeBtn) reactions = extractCountFromButton(likeBtn);
+      var replyBtn = article.querySelector('[data-testid="reply"]');
+      if (!replyBtn) replyBtn = article.querySelector('button[aria-label*="repl"]');
+      if (replyBtn) comments = extractCountFromButton(replyBtn);
+      var retweetBtn = article.querySelector('[data-testid="retweet"], [data-testid="unretweet"]');
+      if (!retweetBtn) retweetBtn = article.querySelector('button[aria-label*="Repost"], button[aria-label*="Retweet"]');
+      if (retweetBtn) reposts = extractCountFromButton(retweetBtn);
+
+      var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
+      var image = imgEl ? (imgEl.src || '') : '';
+      var vid = article.querySelector('video'); if (vid) { var vsrc = vid.getAttribute('src'); if (!vsrc) { var ss = vid.querySelectorAll('source'); for (var si = 0; si < ss.length; si++) { if (ss[si].getAttribute('type') === 'video/mp4') { vsrc = ss[si].getAttribute('src'); break; } } } if (vsrc) image = vsrc; }
+
+      var postUrl = '';
+      var links = article.querySelectorAll('a[href*="/status/"]');
+      for (var li2 = 0; li2 < links.length; li2++) {
+        var href = links[li2].getAttribute('href') || '';
+        var m = href.match(/^(\/[^/]+\/status\/\d+)(?:[/?#]|$)/);
+        if (m) { postUrl = new URL(m[1], 'https://x.com').href; break; }
+      }
+
+      posts.push({
+        author: author,
+        date: date,
+        platform: 'Twitter',
+        text: text,
+        image: image,
+        postUrl: postUrl || location.href,
+        reactions: reactions,
+        comments: comments,
+        reposts: reposts,
+        filters: { Platform: 'Twitter', Source: 'x:bookmark' }
+      });
+    }
+    return posts;
+  }
+
+  var twitterScannedCache = {};
+  var twitterScannedCount = 0;
+
+  function cacheTweetArticle(article) {
+    var authorEl = article.querySelector('[data-testid="User-Name"]');
+    var author = '';
+    if (authorEl) {
+      var lines = authorEl.innerText.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+      for (var li = 0; li < lines.length; li++) {
+        if (lines[li].charAt(0) === '@') { author = lines[li].replace('@', ''); break; }
+      }
+      if (!author) author = lines[0] || '';
+    }
+    var textEl = article.querySelector('[data-testid="tweetText"]');
+    var text = textEl ? visibleText(textEl) : '';
+    var date = '';
+    var timeEl = article.querySelector('time[datetime]');
+    if (timeEl) {
+      var dt = timeEl.getAttribute('datetime');
+      if (dt) { var d = new Date(dt); if (!isNaN(d.getTime())) date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    }
+    var reactions = 0, comments = 0, reposts = 0;
+    var likeBtn = article.querySelector('[data-testid="like"], [data-testid="unlike"]');
+    if (!likeBtn) likeBtn = article.querySelector('button[aria-label*="Like"]');
+    if (likeBtn) reactions = extractCountFromButton(likeBtn);
+    var replyBtn = article.querySelector('[data-testid="reply"]');
+    if (!replyBtn) replyBtn = article.querySelector('button[aria-label*="repl"]');
+    if (replyBtn) comments = extractCountFromButton(replyBtn);
+    var retweetBtn = article.querySelector('[data-testid="retweet"], [data-testid="unretweet"]');
+    if (!retweetBtn) retweetBtn = article.querySelector('button[aria-label*="Repost"], button[aria-label*="Retweet"]');
+    if (retweetBtn) reposts = extractCountFromButton(retweetBtn);
+    var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
+    var image = imgEl ? (imgEl.src || '') : '';
+    var vid = article.querySelector('video'); if (vid) { var vsrc = vid.getAttribute('src'); if (!vsrc) { var ss = vid.querySelectorAll('source'); for (var si = 0; si < ss.length; si++) { if (ss[si].getAttribute('type') === 'video/mp4') { vsrc = ss[si].getAttribute('src'); break; } } } if (vsrc) image = vsrc; }
+    var postUrl = '';
+    var links = article.querySelectorAll('a[href*="/status/"]');
+    for (var li2 = 0; li2 < links.length; li2++) {
+      var href = links[li2].getAttribute('href') || '';
+      var m = href.match(/^(\/[^/]+\/status\/\d+)(?:[/?#]|$)/);
+      if (m) { postUrl = new URL(m[1], 'https://x.com').href; break; }
+    }
+    if (!postUrl) return; if (twitterScannedCache.hasOwnProperty(postUrl) && twitterScannedCache[postUrl].image) return;
+    twitterScannedCache[postUrl] = {
+      author: author,
+      date: date,
+      platform: 'Twitter',
+      text: text,
+      image: image,
+      postUrl: postUrl,
+      reactions: reactions,
+      comments: comments,
+      reposts: reposts,
+      filters: { Platform: 'Twitter', Source: 'x:bookmark' }
+    };
+    twitterScannedCount++;
+  }
+
+  function setupTwitterScanner() {
+    if (location.hostname !== 'x.com' && location.hostname !== 'twitter.com') return;
+    if (!document.body) { setTimeout(setupTwitterScanner, 200); return; }
+    var obs = new MutationObserver(function (mutations) {
+      for (var m = 0; m < mutations.length; m++) {
+        var added = mutations[m].addedNodes;
+        for (var i = 0; i < added.length; i++) {
+          var node = added[i];
+          if (node.nodeType !== 1) continue;
+          if (node.tagName === 'ARTICLE' && node.getAttribute('data-testid') === 'tweet') { cacheTweetArticle(node); continue; }
+          var articles = node.querySelectorAll ? node.querySelectorAll('article[data-testid="tweet"]') : [];
+          for (var j = 0; j < articles.length; j++) { cacheTweetArticle(articles[j]); }
+        }
+      }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    var existing = document.querySelectorAll('article[data-testid="tweet"]');
+    for (var k = 0; k < existing.length; k++) { cacheTweetArticle(existing[k]); }
+  }
+
+  function scanTwitterFromCache(sendResponse) {
+    if (twitterScannedCount > 0) {
+      var visible = document.querySelectorAll('article[data-testid="tweet"]');
+      for (var c = 0; c < visible.length; c++) { cacheTweetArticle(visible[c]); }
+      var posts = [];
+      var keys = Object.keys(twitterScannedCache);
+      for (var i = 0; i < keys.length; i++) { posts.push(twitterScannedCache[keys[i]]); }
+      fillVideoUrls(posts);
+      sendResponse({ ok: true, posts: posts, count: posts.length });
+    } else {
+      var domPosts = scanTwitterPage();
+      fillVideoUrls(domPosts);
+      sendResponse({ ok: true, posts: domPosts, count: domPosts.length });
+    }
+  }
+
+  function fillVideoUrls(posts) {
+    var el = document.getElementById('swipeardy-video-cache');
+    if (!el) return;
+    try {
+      var vcache = JSON.parse(el.textContent || '{}');
+      for (var i = 0; i < posts.length; i++) {
+        if ((!posts[i].image || /^blob:/i.test(posts[i].image)) && vcache[posts[i].postUrl]) {
+          posts[i].image = vcache[posts[i].postUrl];
+        }
+      }
+    } catch (e) {}
+  }
+
+  function scanPinterestPage() {
+    var posts = [];
+    var allImgs = document.querySelectorAll('img[src*="pinimg.com"]');
+    var seen = {};
+    for (var i = 0; i < allImgs.length; i++) {
+      var img = allImgs[i];
+      var src = img.src || '';
+      if (!src || src.indexOf('data:') === 0) continue;
+      var cls = (img.className || '').toLowerCase();
+      if (cls.indexOf('avatar') !== -1 || cls.indexOf('profile') !== -1) continue;
+      if (/\/75x75/.test(src) || /\/30x30/.test(src)) continue;
+      var w = img.naturalWidth || img.width || 0;
+      var h = img.naturalHeight || img.height || 0;
+      if (w < 200 || h < 200) continue;
+      var best = src.replace(/\/\d+x\d+([_a-zA-Z]*)\//, '/originals/');
+      if (seen.hasOwnProperty(best)) continue;
+      seen[best] = true;
+
+      posts.push({
+        author: '',
+        date: '',
+        platform: 'Pinterest',
+        text: '',
+        image: best,
+        postUrl: location.href,
+        reactions: 0,
+        comments: 0,
+        reposts: 0,
+        filters: { Platform: 'Pinterest' }
+      });
+    }
+    return posts;
+  }
+
+  setupTwitterScanner();
 })();
