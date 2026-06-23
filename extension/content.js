@@ -118,7 +118,7 @@
   function detectPlatform() {
     var h = location.hostname;
     if (/linkedin\.com/.test(h)) return 'LinkedIn';
-    if (/x\.com|twitter\.com/.test(h)) return 'Twitter';
+    if (/x\.com|twitter\.com/.test(h)) return 'X';
     if (/pinterest\.com/.test(h)) return 'Pinterest';
     return null;
   }
@@ -129,7 +129,7 @@
       return /\/feed\/update\/|activity:/.test(location.pathname) ||
              /\/posts\/[^/]+/.test(location.pathname);
     }
-    if (p === 'Twitter') {
+    if (p === 'X') {
       return /\/status\/\d+/.test(location.pathname);
     }
     if (p === 'Pinterest') {
@@ -783,7 +783,7 @@
       comments: comments,
       reposts: reposts,
       postUrl: location.href,
-      platform: 'Twitter',
+      platform: 'X',
       image: image,
       date: date
     };
@@ -959,7 +959,7 @@
       try {
         console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
         var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
-        if (platform === 'Twitter') fillVideoUrls([data]);
+        if (platform === 'X') fillVideoUrls([data]);
         console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
       } catch (e) {
@@ -976,7 +976,7 @@
         return;
       }
       try {
-        if (platform === 'Twitter') { scanTwitterFromCache(sendResponse); return; }
+        if (platform === 'X') { scanTwitterFromCache(sendResponse); return; }
         var posts = [];
         if (platform === 'LinkedIn') { posts = scanLinkedInPage(); }
         else if (platform === 'Pinterest') { posts = scanPinterestPage(); }
@@ -1278,14 +1278,14 @@
       posts.push({
         author: author,
         date: date,
-        platform: 'Twitter',
+        platform: 'X',
         text: text,
         image: image,
         postUrl: postUrl || location.href,
         reactions: reactions,
         comments: comments,
         reposts: reposts,
-        filters: { Platform: 'Twitter', Source: 'x:bookmark' }
+        filters: { Platform: 'X', Source: 'x:bookmark' }
       });
     }
     return posts;
@@ -1336,14 +1336,14 @@
     twitterScannedCache[postUrl] = {
       author: author,
       date: date,
-      platform: 'Twitter',
+      platform: 'X',
       text: text,
       image: image,
       postUrl: postUrl,
       reactions: reactions,
       comments: comments,
       reposts: reposts,
-      filters: { Platform: 'Twitter', Source: 'x:bookmark' }
+      filters: { Platform: 'X', Source: 'x:bookmark' }
     };
     twitterScannedCount++;
   }

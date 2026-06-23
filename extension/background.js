@@ -87,14 +87,14 @@ function buildBookmarkItem(msg) {
     id: Date.now(),
     author: tm.authorName || '',
     date: date,
-    platform: 'Twitter',
+    platform: 'X',
     text: tm.caption || '',
     image: (tm.imageUrls && tm.imageUrls.length > 0 && !/^blob:/i.test(tm.imageUrls[0])) ? tm.imageUrls[0] : (msg.imageUrl || msg.videoUrl || (tm.videoUrl || '')),
     postUrl: msg.pageUrl,
     reactions: typeof tm.reactions === 'number' ? tm.reactions : 0,
     comments: typeof tm.comments === 'number' ? tm.comments : 0,
     reposts: typeof tm.reposts === 'number' ? tm.reposts : 0,
-    filters: { Platform: 'Twitter', Source: 'x:bookmark' }
+    filters: { Platform: 'X', Source: 'x:bookmark' }
   };
 }
 
