@@ -959,6 +959,7 @@
       try {
         console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
         var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
+        if (platform === 'Twitter') fillVideoUrls([data]);
         console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
       } catch (e) {
