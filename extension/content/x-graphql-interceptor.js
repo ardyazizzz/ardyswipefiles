@@ -50,6 +50,14 @@
       type: 'tweet-videos',
       videos: entries
     }, window.location.origin);
+    var el = document.getElementById('swipeardy-video-cache');
+    if (!el) { el = document.createElement('div'); el.id = 'swipeardy-video-cache'; el.style.display = 'none'; document.body.appendChild(el); }
+    var cache = {};
+    try { cache = JSON.parse(el.textContent || '{}'); } catch (e) {}
+    for (var j = 0; j < entries.length; j++) {
+      if (entries[j][0] && entries[j][1].videoUrl) cache[entries[j][0]] = entries[j][1].videoUrl;
+    }
+    el.textContent = JSON.stringify(cache);
   }
 
   function extractBookmarkEntries(json) {

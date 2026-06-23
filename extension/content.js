@@ -1389,8 +1389,10 @@
     try {
       var vcache = JSON.parse(el.textContent || '{}');
       for (var i = 0; i < posts.length; i++) {
-        if ((!posts[i].image || /^blob:/i.test(posts[i].image)) && vcache[posts[i].postUrl]) {
-          posts[i].image = vcache[posts[i].postUrl];
+        var tweetId = (posts[i].postUrl || '').match(/\/status\/(\d+)/) || [];
+        tweetId = tweetId[1] || '';
+        if ((!posts[i].image || /^blob:/i.test(posts[i].image)) && (vcache[posts[i].postUrl] || (tweetId && vcache[tweetId]))) {
+          posts[i].image = vcache[posts[i].postUrl] || vcache[tweetId];
         }
       }
     } catch (e) {}
