@@ -20,6 +20,15 @@
         var pair = data.videos[i];
         if (pair[0] && pair[1] && pair[1].videoUrl) tweetVideoCache[pair[0]] = pair[1];
       }
+      var wEl = document.getElementById('swipeardy-video-cache');
+      if (!wEl) { wEl = document.createElement('div'); wEl.id = 'swipeardy-video-cache'; wEl.style.display = 'none'; document.body.appendChild(wEl); }
+      var wCache = {};
+      try { wCache = JSON.parse(wEl.textContent || '{}'); } catch (e) {}
+      for (var j = 0; j < data.videos.length; j++) {
+        var wPair = data.videos[j];
+        if (wPair[0] && wPair[1] && wPair[1].videoUrl) wCache[wPair[0]] = wPair[1].videoUrl;
+      }
+      wEl.textContent = JSON.stringify(wCache);
     }
     if (data.type === 'thread-cache' && Array.isArray(data.threads)) {
       for (var i = 0; i < data.threads.length; i++) {
