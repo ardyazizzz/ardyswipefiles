@@ -945,7 +945,7 @@
     const vm = url.match(/vimeo\.com\/(\d+)/);
     if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
     if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" autoplay loop muted playsinline controls src="${url}"></video>`;
-    return `<img src="${url}" alt="" class="card-img" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
+    return `<img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
   }
 
   function renderFilterBar() {
