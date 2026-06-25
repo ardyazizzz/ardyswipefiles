@@ -1383,7 +1383,6 @@
       persist(); closeAddModal(); applyFilters();
       fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Swipe saved ✓');
-      showToast('Swipe saved ✓');
     }
   }
 
