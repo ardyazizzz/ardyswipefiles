@@ -71,7 +71,7 @@ openAddModal() → user fills form → saveSwipe()
   3. unshift into correct array (swipes/creators/websites/snippets)
   4. persist() to localStorage
   5. fetch POST /swipes to Supabase (fire-and-forget, .catch(()=>{}))
-  6. closeAddModal() + applyFilters() + syncHash()
+  6. closeAddModal() + applyFilters() + showToast()
 ```
 
 ### Edit (update an item)
@@ -145,6 +145,18 @@ This naturally prevents cross-mode filter contamination.
 
 ---
 
+### Numeric Range Filters
+
+Posts mode and Creators mode have numeric range filter inputs rendered in the filter bar (`renderFilterBar()`):
+- **Posts:** Engagement (reactions + comments + reposts) Min / Max inputs
+- **Creators:** Followers Min / Max inputs
+
+State is stored in `numericFilters` object (`{ engMin, engMax, folMin, folMax }`, localStorage key `swipeardy_numeric_filters_v1`).
+Set via `setNumericFilter(key, inputEl)`. Applied inside `applyFilters()` — items outside the min/max range are excluded.
+Persisted in the URL hash as `engmin`, `engmax`, `folmin`, `folmax`.
+
+---
+
 ## `loadSwipes()` — How One Table Becomes 4 Arrays
 
 ```js
@@ -177,7 +189,11 @@ Items with no `type` field, `type: null`, `type: 'post'`, or any unrecognized va
 
 **Writing to URL:** `syncHash()` builds hash from current state. Called after every state change.
 ```js
-syncHash() → builds: #mode=creators&nic=Business&sort=most-followers&q=justin
+syncHash() → builds: #mode=creators&nic=Business&sort=most-followers&folmin=10000&q=justin&density=1
+Also writes `engmin`, `engmax` (posts) and `folmin`, `folmax` (creators) when non-default.
+Omits `sort` if `currentSort === 'newest'` and `density` if `gridDensity === 0`.
+Empties hash entirely if the result is exactly `#mode=posts`.
+Uses `history.replaceState` (NOT `pushState`) so the browser Back button is unaffected.
 ```
 
 Filter keys are first 3 characters **lowercase**: `Niche` → `nic`, `Category` → `cat`, `Format` → `for`.
@@ -186,7 +202,24 @@ Filter keys are first 3 characters **lowercase**: `Niche` → `nic`, `Category` 
 After `loadFromHash()` completes, `skipSync = false`.
 
 **Reading from URL:** `loadFromHash()` parses hash and restores state.
-Key matching is **case-insensitive** (`key.toLowerCase()` matched against lowercase filter key prefix).
+Key matching is **case-insensitive** using TWO strategies: the full filter key (lowercased) starts with the hash key, OR the first 3 characters match exactly. So both `niche=Business` and `nic=Business` resolve to the `Niche` category.
+
+---
+
+## Sort System
+
+`applySort(val)` sorts the current mode's source array **in-place** (Array.sort mutation).
+`sortSwipes(val)` wraps it: sets `currentSort`, clears `currentViewName`, then `renderFilterBar(); applyFilters(); syncHash()`.
+
+Available sort options per mode (from the `<select class="sort-select">` dropdown):
+
+| Mode | Options |
+|---|---|
+| **All modes** | `newest` (Newest added) + `oldest` (Oldest added) |
+| **Posts** | + `most-engaged`, `least-engaged`, `most-liked`, `least-liked`, `most-commented`, `least-commented`, `most-reposted`, `least-reposted`, `longest` (Longest read), `shortest` (Quickest read), `media-first` (Has media first) |
+| **Creators** | + `most-followers`, `least-followers`, `az` (A-Z), `za` (Z-A) |
+| **Websites** | + `az`, `za` |
+| **Snippets** | + `longest`, `shortest` |
 
 ---
 
@@ -206,6 +239,33 @@ tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; ... })
 
 ---
 
+### Media Pipeline — getMedia(url, postUrl)
+
+`getMedia()` renders the media preview in posts mode cards, checked in this order:
+1. Empty `url` → returns `''` (no media)
+2. `video.twimg.com` → `<video>` proxied through a Cloudflare Worker (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
+3. YouTube (`youtube.com/watch` or `youtu.be`) → `<iframe>` embed
+4. Vimeo (`vimeo.com`) → `<iframe>` embed
+5. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video autoplay loop muted playsinline controls>`
+6. Fallback → `<img loading="lazy">` with `onclick` lightbox (single-quote escaped) and `onerror` hide
+
+The `postUrl` parameter is received by `getMedia()` but currently unused inside the function.
+
+---
+
+### Layout Modes (Posts only)
+
+`layoutMode`: `'grid'` | `'masonry'` (localStorage key `swipeardy_layout_v1`).
+A toggle button in the filter bar switches layouts (Posts mode only).
+
+Masonry uses CSS `column-count` set in BOTH `applyDensity()` and `applyFilters()`:
+- viewport > 1000px → 4 columns (5 when `gridDensity === 1`)
+- viewport > 600px → 3 columns
+- else → 2 columns
+`grid.style.cssText = ''` restores the default grid layout for non-posts modes.
+
+---
+
 ## Saved Views (Presets)
 
 Each view object: `{ name, mode, filters, sort, density, search }`
@@ -217,6 +277,16 @@ Each view object: `{ name, mode, filters, sort, density, search }`
 4. `persist(); renderFilterBar(); applyFilters(); syncHash()`
 
 Views are stored in `views[]` array, synced to both localStorage (`swipeardy_views_v1`) and Supabase (`views_config` table, id=1).
+
+### Shareable Links
+
+Each view has a "copy shareable link" button that calls `copyShareLink(index)` → `encodeShareLink(preset)`.
+The generated URL contains `mode`, filter keys (3-char), `sort`, `density`, and `q` (search).
+`loadFromHash()` restores this state when opened and shows a "Save as view" toast after 400ms.
+
+**`currentViewName`** (default `null`) tracks whether the current filter/sort/search state matches a saved view.
+It is set by `applyView()` and `saveCurrentView()`.
+It is reset to `null` by ANY change to filters, sort, search, density, or mode.
 
 ---
 
@@ -253,6 +323,13 @@ fetch(SB_URL + '/swipes', {
 
 **Silent failure.** Errors are swallowed. localStorage is the source of truth.
 Supabase is a sync target — if it's unavailable the app continues working offline.
+
+There is also a convenience wrapper `sbFetch(path, opts)` at `~line 452` that auto-adds Supabase auth headers.
+It is used only in `deleteSwipe()`. Unlike the fire-and-forget pattern, `sbFetch` does NOT add `.catch(()=>{})`.
+
+Both `saveFilterConfig()` and `saveViewsConfig()` POST with the header
+`Prefer: resolution=merge-duplicates`, which tells Supabase to **upsert** (insert or update)
+rather than error on duplicate key conflicts.
 
 ---
 
@@ -369,6 +446,34 @@ var item = {
 ```
 
 In `loadSwipes()`, items without `type` fall into the default `swipes[]` bucket (posts mode). Extensions use `platform` field and `filters.Platform` to distinguish sources rather than `type`.
+
+---
+
+## Known Scale Limits & Tech Debt (Watchlist)
+
+These are NOT bugs today; they are ceilings that bite as the dataset grows.
+
+| Limit | Where | Typical threshold | Notes |
+|---|---|---|---|
+| **Supabase row cap** | `loadSwipes()` fetches `/swipes` with no pagination | default 1,000 rows | "Max rows" raised to 10,000 via dashboard. Still no code pagination — if the number of cards exceeds the Max-rows setting, older cards silently do not load. Code pagination will be needed around ~8,000+. |
+| **localStorage size** | `persist()` serializes the entire dataset (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | `QuotaExceededError` is swallowed silently per-key by individual try/catch blocks. The app continues but localStorage cache becomes stale. Data remains safe in Supabase. Fix later: store only UI prefs in localStorage, or move bulk data to IndexedDB. |
+| **Render-all** | `renderCards()` builds ALL filtered cards into one innerHTML string | noticeable lag at thousands | Images use `loading="lazy"`. No pagination or virtual scrolling. |
+| **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
+| **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | Verify that Row-Level Security (RLS) is enabled on your Supabase tables. Without RLS, anyone with the key can read/write all data. |
+
+### Fragile selector coupling (handle with care)
+
+- `setMode()` selects the active tab by its inline `onclick` attribute string:
+  ```js
+  .mode-segment[onclick="setMode('${mode}')"]
+  ```
+  Renaming `setMode` or changing the attribute format breaks this silently.
+
+- `saveSwipe()` / `updateSwipe()` read form filter checkboxes via:
+  ```js
+  input[type=checkbox][value][onchange*="${key}"]
+  ```
+  The `[onchange*=...]` substring match against the `onchange` attribute is fragile — special characters in a filter key can break the CSS selector.
 
 ---
 
