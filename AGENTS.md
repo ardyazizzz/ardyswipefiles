@@ -7,7 +7,7 @@ Read this first before making any modifications to understand how the pieces con
 
 ## Quick Start (30 seconds)
 
-Vanilla JavaScript single-file app (`index.html`, ~1680 lines) with Supabase backend.
+Vanilla JavaScript single-file app (`index.html`, ~1682 lines) with Supabase backend.
 **No framework, no build tools, zero npm dependencies.**
 
 Four content modes share a unified architecture:
@@ -305,11 +305,70 @@ If you change the item schema in index.html, you MUST update the extension too.
 
 **Extension files:**
 - `manifest.json` — V3 manifest
-- `background.js` — Service worker: bookmark polling, Supabase saves
+- `background.js` — Service worker: message routing, bookmark polling, Supabase saves, dedup checks
 - `content.js` — Content script for LinkedIn, Pinterest, X extraction
 - `content/panel.js` — Floating panel UI injected by extension icon
 - `content/x-bookmark-watcher.js` — X bookmark detection + toasts
 - `content/x-graphql-interceptor.js` — X fetch interceptor (runs in MAIN world)
+
+## Extension Message & Save Flow
+
+### Message Types
+
+The panel, content script, and background communicate via `chrome.runtime.sendMessage`:
+
+| Message Type | Handled by | Notes |
+|---|---|---|
+| `EXTRACT` | Background → forwards to content script | Single-post extraction |
+| `SWIPEAR:DY_SCAN_PAGE` | Background → forwards to content script | Page-level scan |
+| `SAVE_SWIPE` | Background directly | Saves extracted data to Supabase (no dedup) |
+| `SWIPEAR:DY_BOOKMARK` | `handleBookmarkSave` → `trySaveBookmark` | Single bookmark save with dedup |
+| `SWIPEAR:DY_BOOKMARK_BATCH` | `handleBookmarkBatch` | Batch bookmark sync |
+| `SWIPEAR:DY_BULK_IMPORT` | `handleBulkImport` (dedup per post) | Bulk array save via panel |
+| `SWIPEAR:DY_REFRESH_TEMPLATE` | `saveRefreshTemplate` | Stores X API auth for bookmark polling |
+
+### `lastTabId` (Tab Routing)
+
+When the user clicks the extension icon, `chrome.action.onClicked` sets `lastTabId`. `EXTRACT` and `SWIPEAR:DY_SCAN_PAGE` messages are forwarded to that tab's content script via `chrome.tabs.sendMessage`.
+
+Forwarding fallback (`background.js`):
+```js
+var targetTabId = lastTabId || (sender.tab && sender.tab.id);
+```
+
+If the service worker restarts (extension reload), `lastTabId` resets to null. The fallback uses the sender's tab ID instead.
+
+### X Video Pipeline
+
+`x-graphql-interceptor.js` (MAIN world, `document_start`) intercepts `window.fetch` and `XMLHttpRequest`. When responses contain `legacy.extended_entities.media.video_info.variants`, it extracts the highest-bitrate MP4 URL.
+
+Flow:
+```
+Interceptor → postVideos() → writes swipeardy-video-cache DOM element (tweet ID as key)
+            → also posts window.postMessage('tweet-videos')
+                  → x-bookmark-watcher.js receives → also writes swipeardy-video-cache
+
+content.js fillVideoUrls() → reads swipeardy-video-cache → replaces blob: URLs with real video.twimg.com URLs
+```
+
+`fillVideoUrls()` matches by full tweet URL first, then falls back to tweet ID extracted from `postUrl`. It is called in:
+- `scanTwitterFromCache()` — during scan
+- `EXTRACT` handler — during single-extract (X platform only)
+
+### Extension Item Schema
+
+`SAVE_SWIPE` constructs items WITHOUT a `type` field:
+
+```js
+var item = {
+  id: Date.now(),
+  author, date, platform, text, image,
+  postUrl, reactions, comments, reposts,
+  filters: message.data.filters || {}
+};
+```
+
+In `loadSwipes()`, items without `type` fall into the default `swipes[]` bucket (posts mode). Extensions use `platform` field and `filters.Platform` to distinguish sources rather than `type`.
 
 ---
 
@@ -328,3 +387,5 @@ If you change the item schema in index.html, you MUST update the extension too.
 6. **Direct variable access.** Never access `filters`, `filterColors`, `activeFilters` directly. Always use `getF()`, `getFC()`, `getAF()`.
 
 7. **`persist()` swallowing errors.** `persist()` uses `try/catch(e){}` — if localStorage is full or corrupted, errors are silently swallowed. The app continues but state may not save.
+
+8. **Extension `background.js` criticality.** `background.js` runs as a Chrome service worker and handles ALL message routing and Supabase saves. If deleted, the entire extension breaks (no saves, no scan forwarding, no bookmark sync). Before commit `928c94c` it was untracked — a `git reset --hard` would permanently delete it. It is now tracked in git. Always commit it.
