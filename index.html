@@ -938,13 +938,13 @@
     if (!url) return '';
     if (/video\.twimg\.com/.test(url)) {
       var proxy = 'https://swipe-proxy.ardyazizrw.workers.dev/?url=' + encodeURIComponent(url);
-      return `<video class="card-video" autoplay loop muted playsinline controls src="${proxy}"></video>`;
+      return `<video class="card-video" muted playsinline controls preload="none" loop src="${proxy}"></video>`;
     }
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
+    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" loading="lazy" allowfullscreen></iframe>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
-    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
-    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" autoplay loop muted playsinline controls src="${url}"></video>`;
+    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" loading="lazy" allowfullscreen></iframe>`;
+    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" muted playsinline controls preload="none" loop src="${url}"></video>`;
     return `<img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
   }
 
