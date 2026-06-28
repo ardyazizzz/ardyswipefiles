@@ -246,7 +246,7 @@ tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; ... })
 2. `video.twimg.com` → `<video>` proxied through a Cloudflare Worker (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
 3. YouTube (`youtube.com/watch` or `youtu.be`) → `<iframe>` embed
 4. Vimeo (`vimeo.com`) → `<iframe>` embed
-5. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video autoplay loop muted playsinline controls>`
+5. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video muted playsinline controls preload="none" loop>`
 6. Fallback → `<img loading="lazy">` with `onclick` lightbox (single-quote escaped) and `onerror` hide
 
 The `postUrl` parameter is received by `getMedia()` but currently unused inside the function.
