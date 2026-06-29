@@ -1,10 +1,12 @@
 (function () {
   if (window.__swipeardyInjected) return;
   window.__swipeardyInjected = true;
+  var LOG = false;
 
   // ─── LinkedIn Save button watcher ───
   document.addEventListener('click', function (e) {
     if (location.hostname.indexOf('linkedin.com') === -1) return;
+    if (!e.target.closest('[aria-label*="save" i], [data-control-name="save"]')) return;
     var btn = findLinkedInSaveButton(e.target);
     if (!btn) return;
     if (!isLinkedInSaveAddAction(btn)) return;
@@ -57,7 +59,7 @@
     var counts = extractLinkedInCounts(card, '');
     var postUrl = extractLinkedInPostUrl(card);
     var btnCarouselImages = scanLinkedInImage(card);
-    console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
+    LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
     var image = btnCarouselImages.length > 0 ? btnCarouselImages[0] : extractLinkedInImage(card);
 
     var btnDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
@@ -66,7 +68,7 @@
       var btnDocLink = btnDocContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
       if (btnDocLink) btnDocUrl = btnDocLink.href;
     }
-    console.log('[DEBUG document btn]', btnDocUrl || 'no PDF URL found');
+    LOG&&console.log('[DEBUG document btn]', btnDocUrl || 'no PDF URL found');
 
     var date = '';
     var timeEl = card.querySelector('time[datetime]');
@@ -216,7 +218,7 @@
         if (line.toLowerCase().indexOf('reposted') !== -1) continue;
         return dedupeName(line);
       }
-      console.log('[Swipe.ardy cs] Author from post text: all lines were filtered');
+      LOG&&console.log('[Swipe.ardy cs] Author from post text: all lines were filtered');
     }
 
     var selectors = [
@@ -234,11 +236,11 @@
         var txt = dedupeName(visibleText(nodes[j]).replace(/\s+/g, ' ').trim());
         if (!txt || txt.toLowerCase() === 'post' || txt.toLowerCase() === 'promoted') continue;
         if (txt.length > 80) continue;
-        console.log('[Swipe.ardy cs] Author selector hit:', selectors[i], '->', txt);
+        LOG&&console.log('[Swipe.ardy cs] Author selector hit:', selectors[i], '->', txt);
         return txt;
       }
     }
-    console.log('[Swipe.ardy cs] Author: NO selectors matched');
+    LOG&&console.log('[Swipe.ardy cs] Author: NO selectors matched');
     return '';
   }
 
@@ -249,7 +251,7 @@
       var idx = text.indexOf(boundaries[bi]);
       if (idx !== -1) {
         text = text.slice(0, idx);
-        console.log('[Swipe.ardy cs] cleanSnippet: truncated at "' + boundaries[bi] + '"');
+        LOG&&console.log('[Swipe.ardy cs] cleanSnippet: truncated at "' + boundaries[bi] + '"');
         break;
       }
     }
@@ -265,7 +267,7 @@
     while (lines.length > 0 && ctaPattern.test(lines[0].trim()) && stripped < 2) {
       lines.shift();
       stripped++;
-      console.log('[Swipe.ardy cs] cleanSnippet: stripped leading CTA');
+      LOG&&console.log('[Swipe.ardy cs] cleanSnippet: stripped leading CTA');
     }
     text = lines.join('\n').trim();
 
@@ -296,7 +298,7 @@
       if (tsMatch) {
         var afterTs = postText.slice(postText.indexOf(tsMatch[0]) + tsMatch[0].length).trim();
         var cleaned = cleanSnippet(afterTs);
-        console.log('[Swipe.ardy cs] Snippet from after timestamp ->', cleaned.slice(0, 200));
+        LOG&&console.log('[Swipe.ardy cs] Snippet from after timestamp ->', cleaned.slice(0, 200));
         if (cleaned.length > 20) return cleaned;
       }
 
@@ -314,7 +316,7 @@
       if (captionLines.length > 0) {
         var snippet = captionLines.join(' ').replace(/\s+/g, ' ').trim();
         var cleaned2 = cleanSnippet(snippet);
-        console.log('[Swipe.ardy cs] Snippet from lines after timestamp ->', cleaned2.slice(0, 200));
+        LOG&&console.log('[Swipe.ardy cs] Snippet from lines after timestamp ->', cleaned2.slice(0, 200));
         if (cleaned2.length > 20) return cleaned2;
       }
     }
@@ -336,11 +338,11 @@
         txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\s+/g, ' ').trim();
         var lower = txt.toLowerCase();
         if (blacklist.filter(function (w) { return lower.indexOf(w) !== -1; }).length >= 3) continue;
-        console.log('[Swipe.ardy cs] Snippet selector hit:', selectors[i], '->', txt.slice(0, 150));
+        LOG&&console.log('[Swipe.ardy cs] Snippet selector hit:', selectors[i], '->', txt.slice(0, 150));
         return cleanSnippet(txt);
       }
     }
-    console.log('[Swipe.ardy cs] Snippet: NO selectors matched — tried', selectors);
+    LOG&&console.log('[Swipe.ardy cs] Snippet: NO selectors matched — tried', selectors);
     return '';
   }
 
@@ -362,10 +364,10 @@
       if (/reaction|like/i.test(label) && !reactions) reactions = num;
     }
 
-    console.log('[Swipe.ardy cs] Direct count query:', { reactions: reactions, comments: comments, reposts: reposts });
+    LOG&&console.log('[Swipe.ardy cs] Direct count query:', { reactions: reactions, comments: comments, reposts: reposts });
 
     var searchText = postAreaText || visibleText(card);
-    console.log('[Swipe.ardy cs] Count search text FULL:', searchText);
+    LOG&&console.log('[Swipe.ardy cs] Count search text FULL:', searchText);
 
     var searchLines = searchText.split('\n');
     var bareNumbers = [];
@@ -378,7 +380,7 @@
         bareNumbers = [];
       }
     }
-    console.log('[Swipe.ardy cs] Bare number sequence found:', bareNumbers);
+    LOG&&console.log('[Swipe.ardy cs] Bare number sequence found:', bareNumbers);
     if (bareNumbers.length >= 3) {
       reactions = bareNumbers[0];
       comments = bareNumbers[1];
@@ -391,7 +393,7 @@
     var skipSearchText = searchText;
     var mrIdx = skipSearchText.indexOf('Most relevant') !== -1 ? skipSearchText.indexOf('Most relevant') : skipSearchText.indexOf('most relevant');
     if (mrIdx !== -1) skipSearchText = skipSearchText.slice(0, mrIdx);
-    console.log('[Swipe.ardy cs] Truncated search text (first 200):', skipSearchText.slice(0, 200));
+    LOG&&console.log('[Swipe.ardy cs] Truncated search text (first 200):', skipSearchText.slice(0, 200));
 
     var commentTerms = ['comment', 'comments', 'komentar', 'komentari'];
     var repostTerms = ['repost', 'reposts', 'shared', 'share', 'shares'];
@@ -401,7 +403,7 @@
     var normalized = skipSearchText.replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ');
     var segments = normalized.split(/[\n\u2022\u00b7|]+/).map(function (s) { return s.trim(); }).filter(Boolean);
 
-    console.log('[Swipe.ardy cs] Count segments:', segments.slice(0, 30));
+    LOG&&console.log('[Swipe.ardy cs] Count segments:', segments.slice(0, 30));
 
     function extractByTerms(text, terms) {
       if (!text) return 0;
@@ -463,7 +465,7 @@
       if (am) reactions = parseCompactNumber(am[1]);
     }
 
-    console.log('[Swipe.ardy cs] Counts extracted:', { reactions: reactions, comments: comments, reposts: reposts });
+    LOG&&console.log('[Swipe.ardy cs] Counts extracted:', { reactions: reactions, comments: comments, reposts: reposts });
 
     return { reactions: reactions, comments: comments, reposts: reposts };
   }
@@ -595,32 +597,32 @@
           var d = new Date(dt);
           if (!isNaN(d.getTime())) {
             date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            console.log('[Swipe.ardy cs] Date fallback from <time datetime>:', dt, '->', date);
+            LOG&&console.log('[Swipe.ardy cs] Date fallback from <time datetime>:', dt, '->', date);
           }
         }
       }
     }
 
-    console.log('[Swipe.ardy cs] Activity ID from URL:', activityId, 'Decoded date:', date);
+    LOG&&console.log('[Swipe.ardy cs] Activity ID from URL:', activityId, 'Decoded date:', date);
 
     var sampleEls = document.querySelectorAll('[data-urn*="activity"], [data-id*="urn"], [data-activity-id], [data-activity], article, [class*="feed-shared-update"], [class*="occludable"]');
-    console.log('[Swipe.ardy cs] DOM scan — elements found:', sampleEls.length);
+    LOG&&console.log('[Swipe.ardy cs] DOM scan — elements found:', sampleEls.length);
     if (sampleEls.length > 0) {
       var first = sampleEls[0];
-      console.log('[Swipe.ardy cs] First element tag:', first.tagName, 'class:', first.className, 'data-urn:', first.getAttribute('data-urn'), 'data-id:', first.getAttribute('data-id'), 'data-activity:', first.getAttribute('data-activity'));
+      LOG&&console.log('[Swipe.ardy cs] First element tag:', first.tagName, 'class:', first.className, 'data-urn:', first.getAttribute('data-urn'), 'data-id:', first.getAttribute('data-id'), 'data-activity:', first.getAttribute('data-activity'));
     }
 
     var card = activityId ? findCardByActivityId(activityId) : null;
-    console.log('[Swipe.ardy cs] Activity ID match:', card ? 'FOUND' : 'NOT FOUND');
+    LOG&&console.log('[Swipe.ardy cs] Activity ID match:', card ? 'FOUND' : 'NOT FOUND');
 
     if (!card && activityId) {
       card = findCardByTimeElement();
-      console.log('[Swipe.ardy cs] Time element match:', card ? 'FOUND' : 'NOT FOUND');
+      LOG&&console.log('[Swipe.ardy cs] Time element match:', card ? 'FOUND' : 'NOT FOUND');
     }
 
     if (!card && activityId) {
       card = findCardByEngagement();
-      console.log('[Swipe.ardy cs] Engagement match:', card ? 'FOUND' : 'NOT FOUND');
+      LOG&&console.log('[Swipe.ardy cs] Engagement match:', card ? 'FOUND' : 'NOT FOUND');
     }
 
     if (!card) {
@@ -645,15 +647,15 @@
       cards = cards.filter(function (c) { return visibleText(c).length >= 40; });
       cards.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
       card = cards[0];
-      console.log('[Swipe.ardy cs] Fallback heuristic: picked card', card.tagName, visibleText(card).slice(0, 60));
+      LOG&&console.log('[Swipe.ardy cs] Fallback heuristic: picked card', card.tagName, visibleText(card).slice(0, 60));
     }
 
     if (!card) throw new Error('No LinkedIn post found on this page');
 
     var fullText = visibleText(card);
     var postText = getPostAreaText(fullText);
-    console.log('[Swipe.ardy cs] Card found, first 300 chars:', fullText.slice(0, 300));
-    console.log('[Swipe.ardy cs] Post area text (first 300):', postText.slice(0, 300));
+    LOG&&console.log('[Swipe.ardy cs] Card found, first 300 chars:', fullText.slice(0, 300));
+    LOG&&console.log('[Swipe.ardy cs] Post area text (first 300):', postText.slice(0, 300));
 
     var author = extractLinkedInAuthor(card);
     var text = extractLinkedInSnippet(card);
@@ -665,7 +667,7 @@
       var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
-    console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
+    LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
     var image = carouselImages.length > 0 ? carouselImages[0] : extractLinkedInImage(card);
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
@@ -675,7 +677,7 @@
       var sDocLink = sDocContainer.querySelector('a[href*="sanitized-pdf"], a[href*="document/dms"], a[download]');
       if (sDocLink) sDocUrl = sDocLink.href;
     }
-    console.log('[DEBUG document single]', sDocUrl || 'no PDF URL found');
+    LOG&&console.log('[DEBUG document single]', sDocUrl || 'no PDF URL found');
 
     return {
       author: author,
@@ -741,7 +743,7 @@
         var d = new Date(dt);
         if (!isNaN(d.getTime())) {
           date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-          console.log('[Swipe.ardy cs] Twitter date from <time datetime>:', dt, '->', date);
+          LOG&&console.log('[Swipe.ardy cs] Twitter date from <time datetime>:', dt, '->', date);
         }
       }
     }
@@ -770,7 +772,7 @@
         if (!reactions && /\blike\b/i.test(label)) { reactions = num; }
         if (!comments && /\brepl/i.test(label)) { comments = num; }
       }
-      console.log('[Swipe.ardy cs] Twitter stats from aria-label search:', { reactions: reactions, comments: comments, reposts: reposts });
+      LOG&&console.log('[Swipe.ardy cs] Twitter stats from aria-label search:', { reactions: reactions, comments: comments, reposts: reposts });
     }
 
     var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
@@ -923,7 +925,7 @@
       text = pinTitle || pinDesc || '';
     }
 
-    console.log('[Swipe.ardy cs] Pinterest final:', { author: author, text: (text||'').slice(0, 100), image: image.slice(0, 100), reactions: reactions, date: date });
+    LOG&&console.log('[Swipe.ardy cs] Pinterest final:', { author: author, text: (text||'').slice(0, 100), image: image.slice(0, 100), reactions: reactions, date: date });
 
     return {
       author: author,
@@ -944,7 +946,7 @@
     if (message.type === 'CHECK_PAGE') {
       var platform = detectPlatform();
       var isDetail = isPostDetailPage();
-      console.log('[Swipe.ardy cs] CHECK_PAGE ->', { platform: platform, isDetail: isDetail, url: location.href });
+      LOG&&console.log('[Swipe.ardy cs] CHECK_PAGE ->', { platform: platform, isDetail: isDetail, url: location.href });
       sendResponse({ platform: platform, isDetail: isDetail });
       return;
     }
@@ -952,15 +954,15 @@
     if (message.type === 'EXTRACT') {
       var platform = detectPlatform();
       if (!platform) {
-        console.log('[Swipe.ardy cs] EXTRACT -> unsupported platform');
+        LOG&&console.log('[Swipe.ardy cs] EXTRACT -> unsupported platform');
         sendResponse({ ok: false, error: 'This page is not LinkedIn, Twitter/X, or Pinterest.' });
         return;
       }
       try {
-        console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
+        LOG&&console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
         var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
         if (platform === 'X') fillVideoUrls([data]);
-        console.log('[Swipe.ardy cs] EXTRACT -> result', data);
+        LOG&&console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
       } catch (e) {
         console.error('[Swipe.ardy cs] EXTRACT -> error', e.message);
@@ -1293,6 +1295,13 @@
 
   var twitterScannedCache = {};
   var twitterScannedCount = 0;
+  var MAX_CACHE = 200;
+  function _capObj(obj) {
+    var keys = Object.keys(obj);
+    if (keys.length <= MAX_CACHE) return;
+    var toDel = keys.length - MAX_CACHE;
+    for (var i = 0; i < toDel; i++) { delete obj[keys[i]]; }
+  }
 
   function cacheTweetArticle(article) {
     var authorEl = article.querySelector('[data-testid="User-Name"]');
@@ -1345,23 +1354,33 @@
       reposts: reposts,
       filters: { Platform: 'X', Source: 'x:bookmark' }
     };
+    _capObj(twitterScannedCache);
     twitterScannedCount++;
   }
 
   function setupTwitterScanner() {
     if (location.hostname !== 'x.com' && location.hostname !== 'twitter.com') return;
     if (!document.body) { setTimeout(setupTwitterScanner, 200); return; }
+    var _debounceTimer = null;
+    var _pending = [];
+    function _flushPending() {
+      if (_pending.length === 0) return;
+      for (var pi = 0; pi < _pending.length; pi++) { cacheTweetArticle(_pending[pi]); }
+      _pending = [];
+    }
     var obs = new MutationObserver(function (mutations) {
       for (var m = 0; m < mutations.length; m++) {
         var added = mutations[m].addedNodes;
         for (var i = 0; i < added.length; i++) {
           var node = added[i];
           if (node.nodeType !== 1) continue;
-          if (node.tagName === 'ARTICLE' && node.getAttribute('data-testid') === 'tweet') { cacheTweetArticle(node); continue; }
+          if (node.tagName === 'ARTICLE' && node.getAttribute('data-testid') === 'tweet') { _pending.push(node); continue; }
           var articles = node.querySelectorAll ? node.querySelectorAll('article[data-testid="tweet"]') : [];
-          for (var j = 0; j < articles.length; j++) { cacheTweetArticle(articles[j]); }
+          for (var j = 0; j < articles.length; j++) { _pending.push(articles[j]); }
         }
       }
+      if (_debounceTimer) clearTimeout(_debounceTimer);
+      _debounceTimer = setTimeout(_flushPending, 200);
     });
     obs.observe(document.body, { childList: true, subtree: true });
     var existing = document.querySelectorAll('article[data-testid="tweet"]');

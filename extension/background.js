@@ -305,7 +305,12 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 
 chrome.windows.onFocusChanged.addListener(function (windowId) {
   if (windowId === chrome.windows.WINDOW_ID_NONE) return;
-  maybePollBookmarks();
+  chrome.tabs.query({active: true, windowId: windowId}, function (tabs) {
+    if (tabs.length === 0) return;
+    var url = tabs[0].url;
+    if (url && url.indexOf('x.com') === -1 && url.indexOf('twitter.com') === -1) return;
+    maybePollBookmarks();
+  });
 });
 
 function pollBookmarksRefresh() {

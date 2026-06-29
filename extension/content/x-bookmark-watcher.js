@@ -1,7 +1,8 @@
 (function () {
   if (window.__SWIPEARDY_WATCHER__) return;
   window.__SWIPEARDY_WATCHER__ = true;
-  console.log('[swipeardy-import] watcher: loaded');
+  var LOG = false;
+  LOG&&console.log('[swipeardy-import] watcher: loaded');
 
   var BOOKMARK_TESTID = 'bookmark';
 
@@ -10,6 +11,13 @@
   var tweetQuotedCache = {};
   var accumulatedBookmarks = {};
   var accumulatedBookmarksCount = 0;
+  var MAX_CACHE = 200;
+  function _capObj(obj) {
+    var keys = Object.keys(obj);
+    if (keys.length <= MAX_CACHE) return;
+    var toDel = keys.length - MAX_CACHE;
+    for (var i = 0; i < toDel; i++) { delete obj[keys[i]]; }
+  }
 
   window.addEventListener('message', function (event) {
     if (event.source !== window) return;
@@ -20,6 +28,7 @@
         var pair = data.videos[i];
         if (pair[0] && pair[1] && pair[1].videoUrl) tweetVideoCache[pair[0]] = pair[1];
       }
+      _capObj(tweetVideoCache);
       var wEl = document.getElementById('swipeardy-video-cache');
       if (!wEl) { wEl = document.createElement('div'); wEl.id = 'swipeardy-video-cache'; wEl.style.display = 'none'; document.body.appendChild(wEl); }
       var wCache = {};
@@ -35,12 +44,14 @@
         var t = data.threads[i];
         if (t[0] && Array.isArray(t[1]) && t[1].length > 1) tweetThreadCache[t[0]] = t[1];
       }
+      _capObj(tweetThreadCache);
     }
     if (data.type === 'quoted-cache' && Array.isArray(data.quoted)) {
       for (var i = 0; i < data.quoted.length; i++) {
         var q = data.quoted[i];
         if (q[0] && q[1]) tweetQuotedCache[q[0]] = q[1];
       }
+      _capObj(tweetQuotedCache);
     }
     if (data.type === 'bookmark-batch' && Array.isArray(data.bookmarks)) {
       for (var i = 0; i < data.bookmarks.length; i++) {
@@ -50,6 +61,7 @@
           accumulatedBookmarksCount++;
         }
       }
+      _capObj(accumulatedBookmarks);
       chrome.runtime.sendMessage({
         type: 'SWIPEAR:DY_BOOKMARK_BATCH',
         bookmarks: data.bookmarks
@@ -285,6 +297,7 @@
   }
 
   document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-testid="bookmark"]')) return;
     var button = findBookmarkButton(e.target);
     if (!button) return;
     if (!isBookmarkAddAction(button)) return;
