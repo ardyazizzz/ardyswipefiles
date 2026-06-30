@@ -662,18 +662,22 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
-    var carouselImages = scanLinkedInImage(card);
-    // Fallback: if card is MAIN and no carousel found, search page for document container
-    if (carouselImages.length === 0) {
-      var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
-      if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
-    }
-    if (carouselImages.length === 0) {
+    // Detect carousel first — the iframe is a global element, not inside the matched card
+    var carouselImages = [];
+    var carouselIframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
+    if (carouselIframe) {
       var fullUrls = await resolveCarouselImages(card);
       if (fullUrls.length > 0) {
         carouselImages = fullUrls;
       } else {
         carouselImages = extractCarouselCovers(card);
+      }
+    }
+    if (carouselImages.length === 0) {
+      carouselImages = scanLinkedInImage(card);
+      if (carouselImages.length === 0) {
+        var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
+        if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
       }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
