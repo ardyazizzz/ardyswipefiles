@@ -665,8 +665,10 @@
     // Detect carousel first — the iframe is a global element, not inside the matched card
     var carouselImages = [];
     var carouselIframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
+    console.log('[carousel] iframe found:', !!carouselIframe);
     if (carouselIframe) {
       var fullUrls = await resolveCarouselImages(card);
+      console.log('[carousel] fullUrls count:', fullUrls.length);
       if (fullUrls.length > 0) {
         carouselImages = fullUrls;
       } else {
@@ -684,6 +686,7 @@
         } catch(e) { console.warn('[carousel] coverPages fallback error:', e); }
       }
     }
+    console.log('[carousel] carouselImages after resolution:', carouselImages.length);
     // Only scan normally if NO carousel was detected — wrong card has comment images
     if (carouselImages.length === 0 && !carouselIframe) {
       carouselImages = scanLinkedInImage(card);
@@ -693,7 +696,7 @@
       }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
-    var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
+    var image = carouselImages.length > 0 ? carouselImages.join(',') : (carouselIframe ? '' : extractLinkedInImage(card));
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
                      || document.querySelector('.feed-shared-document__container, .update-components-document__container');
