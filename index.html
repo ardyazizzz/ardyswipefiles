@@ -202,6 +202,16 @@
     @keyframes lbIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
     .lightbox-close:hover { background: rgba(0,0,0,0.65); }
+    .card-thumbs { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0; scrollbar-width: thin; }
+    .card-thumbs::-webkit-scrollbar { height: 4px; }
+    .card-thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .thumb-img { width: 130px; height: 98px; object-fit: cover; border-radius: var(--radius-md); cursor: pointer; flex-shrink: 0; transition: opacity 0.15s; background: var(--bg-secondary); }
+    .thumb-img:hover { opacity: 0.85; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.45); color: #fff; font-size: 28px; width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .lightbox-nav:hover { background: rgba(0,0,0,0.7); }
+    .lightbox-prev { left: 12px; }
+    .lightbox-next { right: 12px; }
+    .lightbox-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 13px; font-weight: 500; background: rgba(0,0,0,0.5); padding: 4px 14px; border-radius: 20px; z-index: 10; pointer-events: none; user-select: none; }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; background: #000; }
     .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 600; transition: filter 0.18s var(--ease); }
     .card-linkedin:hover { filter: brightness(0.97); }
@@ -417,6 +427,9 @@
 
 <!-- Image lightbox -->
 <div class="overlay" id="imageOverlay" style="display:none" onclick="closeImageLightbox()">
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" onclick="event.stopPropagation();prevLightboxImage()" style="display:none"><i class="ri-arrow-left-s-line"></i></button>
+  <button class="lightbox-nav lightbox-next" id="lightboxNext" onclick="event.stopPropagation();nextLightboxImage()" style="display:none"><i class="ri-arrow-right-s-line"></i></button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
   <img id="lightboxImage" src="" alt="" class="lightbox-img" onclick="event.stopPropagation()" />
   <button class="lightbox-close" onclick="closeImageLightbox()"><i class="ri-close-line"></i></button>
 </div>
@@ -603,13 +616,68 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
+  var _lbImages = [];
+  var _lbIndex = 0;
+
   function openImageLightbox(url) {
+    _lbImages = [url];
+    _lbIndex = 0;
     document.getElementById('lightboxImage').src = url;
     document.getElementById('imageOverlay').style.display = 'flex';
+    updateLightboxNav();
   }
+
+  function openImageLightboxMulti(index, urlsStr) {
+    _lbImages = urlsStr.split(',').map(function(u){ return u.trim(); });
+    _lbIndex = index;
+    if (_lbIndex < 0) _lbIndex = 0;
+    if (_lbIndex >= _lbImages.length) _lbIndex = _lbImages.length - 1;
+    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
+    document.getElementById('imageOverlay').style.display = 'flex';
+    updateLightboxNav();
+  }
+
+  function updateLightboxNav() {
+    var prev = document.getElementById('lightboxPrev');
+    var next = document.getElementById('lightboxNext');
+    var counter = document.getElementById('lightboxCounter');
+    if (_lbImages.length > 1) {
+      prev.style.display = '';
+      next.style.display = '';
+      counter.textContent = (_lbIndex + 1) + ' / ' + _lbImages.length;
+    } else {
+      prev.style.display = 'none';
+      next.style.display = 'none';
+      counter.textContent = '';
+    }
+  }
+
+  function prevLightboxImage() {
+    if (_lbImages.length < 2) return;
+    _lbIndex--;
+    if (_lbIndex < 0) _lbIndex = _lbImages.length - 1;
+    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
+    updateLightboxNav();
+  }
+
+  function nextLightboxImage() {
+    if (_lbImages.length < 2) return;
+    _lbIndex++;
+    if (_lbIndex >= _lbImages.length) _lbIndex = 0;
+    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
+    updateLightboxNav();
+  }
+
   function closeImageLightbox() {
     document.getElementById('imageOverlay').style.display = 'none';
   }
+
+  document.addEventListener('keydown', function(e) {
+    if (document.getElementById('imageOverlay').style.display !== 'flex') return;
+    if (e.key === 'ArrowLeft') { prevLightboxImage(); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { nextLightboxImage(); e.preventDefault(); }
+    else if (e.key === 'Escape') { closeImageLightbox(); }
+  });
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
@@ -936,6 +1004,18 @@
 
   function getMedia(url, postUrl) {
     if (!url) return '';
+    if (url.indexOf(',') !== -1) {
+      var urls = url.split(',').map(function(u){ return u.trim(); }).filter(function(u){ return u; });
+      if (urls.length <= 1) { url = (urls[0] || ''); if (!url) return ''; }
+      else {
+        var safe = urls.map(function(u){ return u.replace(/'/g,"\\'"); }).join(',');
+        var h = '<div class="card-thumbs">';
+        for (var i = 0; i < urls.length; i++) {
+          h += '<img src="' + urls[i] + '" alt="" class="thumb-img" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" />';
+        }
+        return h + '</div>';
+      }
+    }
     if (/video\.twimg\.com/.test(url)) {
       var proxy = 'https://swipe-proxy.ardyazizrw.workers.dev/?url=' + encodeURIComponent(url);
       return `<video class="card-video" muted playsinline controls preload="none" loop src="${proxy}"></video>`;
