@@ -583,29 +583,34 @@
   async function extractCarouselImages() {
     try {
       var codeEls = document.querySelectorAll('code');
+      console.log('[carousel] code elements:', codeEls.length);
       for (var i = 0; i < codeEls.length; i++) {
         var content = codeEls[i].textContent;
         if (!content || content.indexOf('feedshare-document-master-manifest') === -1) continue;
+        console.log('[carousel] found manifest in code element', i);
         // Extract manifestUrl from LinkedIn's Relay/GraphQL JSON
         var m = content.match(/"manifestUrl":"(https:\/\/media\.licdn\.com[^"]+)"/);
-        if (!m) continue;
+        if (!m) { console.log('[carousel] regex failed to extract manifestUrl'); continue; }
         var manifestUrl = m[1].replace(/\\u0026/g, '&');
+        console.log('[carousel] manifestUrl found');
         // Fetch master manifest
         var resp = await fetch(manifestUrl);
-        if (!resp.ok) return extractCarouselCoversFromCode();
+        if (!resp.ok) { console.log('[carousel] manifest fetch failed:', resp.status); return extractCarouselCoversFromCode(); }
         var manifest = await resp.json();
-        if (!manifest.perResolutions || manifest.perResolutions.length === 0) return extractCarouselCoversFromCode();
+        if (!manifest.perResolutions || manifest.perResolutions.length === 0) { console.log('[carousel] no resolutions'); return extractCarouselCoversFromCode(); }
         // Pick best resolution
         var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
                || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
-        if (!res || !res.imageManifestUrl) return extractCarouselCoversFromCode();
+        if (!res || !res.imageManifestUrl) { console.log('[carousel] no suitable resolution'); return extractCarouselCoversFromCode(); }
         // Fetch image manifest
         var imgResp = await fetch(res.imageManifestUrl);
-        if (!imgResp.ok) return extractCarouselCoversFromCode();
+        if (!imgResp.ok) { console.log('[carousel] image manifest fetch failed:', imgResp.status); return extractCarouselCoversFromCode(); }
         var imgData = await imgResp.json();
-        if (!imgData.pages || imgData.pages.length === 0) return extractCarouselCoversFromCode();
+        if (!imgData.pages || imgData.pages.length === 0) { console.log('[carousel] no pages in manifest'); return extractCarouselCoversFromCode(); }
+        console.log('[carousel] success:', imgData.pages.length, 'pages');
         return imgData.pages;
       }
+      console.log('[carousel] no manifest in any code element');
       return extractCarouselCoversFromCode();
     } catch(e) { console.warn('[carousel] extract error:', e); return extractCarouselCoversFromCode(); }
   }
@@ -707,15 +712,18 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
-    var carouselImages = scanLinkedInImage(card);
-    // Fallback: if card is MAIN and no carousel found, search page for document container
+    // Try LinkedIn carousel FIRST — searches <code> JSON (global, not tied to card)
+    var carouselImages = await extractCarouselImages();
+    console.log('[extract] carousel from code:', carouselImages.length);
     if (carouselImages.length === 0) {
-      var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
-      if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
-    }
-    // If still no images, try LinkedIn carousel from Relay/GraphQL JSON in <code> element
-    if (carouselImages.length === 0) {
-      carouselImages = await extractCarouselImages();
+      // Not a carousel (or no <code> JSON) — scan for regular images
+      carouselImages = scanLinkedInImage(card);
+      console.log('[extract] scanLinkedInImage:', carouselImages.length);
+      if (carouselImages.length === 0) {
+        var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
+        if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
+        console.log('[extract] pageDoc scan:', carouselImages.length);
+      }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
     var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
