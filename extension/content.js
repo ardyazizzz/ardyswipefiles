@@ -669,10 +669,11 @@
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
     if (carouselImages.length === 0) {
-      carouselImages = extractCarouselCovers(card);
-      if (carouselImages.length > 0) {
-        var fullUrls = await resolveCarouselImages(card);
-        if (fullUrls.length > 0) carouselImages = fullUrls;
+      var fullUrls = await resolveCarouselImages(card);
+      if (fullUrls.length > 0) {
+        carouselImages = fullUrls;
+      } else {
+        carouselImages = extractCarouselCovers(card);
       }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
@@ -1186,7 +1187,7 @@
 
   async function resolveCarouselImages(card) {
     try {
-      var iframe = card.querySelector('iframe[data-id="feed-paginated-document-content"]');
+      var iframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
       if (!iframe) return [];
       var raw = iframe.getAttribute('data-native-document-config');
       if (!raw) return [];
