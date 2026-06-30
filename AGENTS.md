@@ -243,13 +243,23 @@ tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; ... })
 
 `getMedia()` renders the media preview in posts mode cards, checked in this order:
 1. Empty `url` → returns `''` (no media)
-2. `video.twimg.com` → `<video>` proxied through a Cloudflare Worker (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
-3. YouTube (`youtube.com/watch` or `youtu.be`) → `<iframe>` embed
-4. Vimeo (`vimeo.com`) → `<iframe>` embed
-5. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video muted playsinline controls preload="none" loop>`
-6. Fallback → `<img loading="lazy">` with `onclick` lightbox (single-quote escaped) and `onerror` hide
+2. Comma-separated URLs (multi-image) → split by comma, render `<div class="card-thumbs">` with `<img class="thumb-img">` thumbnails in a horizontal scrollable row. Each thumbnail calls `openImageLightboxMulti(index, urlsStr)` on click.
+3. `video.twimg.com` → `<video>` proxied through a Cloudflare Worker (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
+4. YouTube (`youtube.com/watch` or `youtu.be`) → `<iframe>` embed
+5. Vimeo (`vimeo.com`) → `<iframe>` embed
+6. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video muted playsinline controls preload="none" loop>`
+7. Fallback → `<img loading="lazy">` with `onclick` lightbox (single-quote escaped), `onerror` hide, and `.card-img` class
 
 The `postUrl` parameter is received by `getMedia()` but currently unused inside the function.
+
+### Image Lightbox
+
+Lightbox overlay (`#imageOverlay`) supports both single and multi-image navigation:
+- **Single image:** `openImageLightbox(url)` — sets `_lbImages = [url]`, hides nav
+- **Multi-image:** `openImageLightboxMulti(index, urlsStr)` — splits comma-separated URLs, shows prev/next arrows + position counter badge
+- **Navigation:** `prevLightboxImage()` / `nextLightboxImage()` — circular wrap-around via `_lbImages[]` array + `_lbIndex`
+- **Keyboard:** ArrowLeft → prev, ArrowRight → next, Escape → close
+- **CSS:** `.lightbox-nav`, `.lightbox-prev`, `.lightbox-next`, `.lightbox-counter`, `.lightbox-close`
 
 ---
 
