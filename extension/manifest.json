@@ -9,8 +9,7 @@
     "https://x.com/*",
     "https://twitter.com/*",
     "https://*.pinterest.com/*",
-    "https://dmhiitzunsdqyxopqsby.supabase.co/*",
-    "https://media.licdn.com/*"
+    "https://dmhiitzunsdqyxopqsby.supabase.co/*"
   ],
   "background": {
     "service_worker": "background.js"
