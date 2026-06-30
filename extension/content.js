@@ -60,7 +60,7 @@
     var postUrl = extractLinkedInPostUrl(card);
     var btnCarouselImages = scanLinkedInImage(card);
     LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
-    var image = btnCarouselImages.length > 0 ? btnCarouselImages[0] : extractLinkedInImage(card);
+    var image = btnCarouselImages.length > 0 ? btnCarouselImages.join(',') : extractLinkedInImage(card);
 
     var btnDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
     var btnDocUrl = '';
@@ -668,7 +668,7 @@
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
-    var image = carouselImages.length > 0 ? carouselImages[0] : extractLinkedInImage(card);
+    var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
                      || document.querySelector('.feed-shared-document__container, .update-components-document__container');
@@ -775,8 +775,10 @@
       LOG&&console.log('[Swipe.ardy cs] Twitter stats from aria-label search:', { reactions: reactions, comments: comments, reposts: reposts });
     }
 
-    var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
-    var image = imgEl ? (imgEl.src || '') : '';
+    var imgEls = article.querySelectorAll('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
+    var twImgs = [];
+    for (var ti = 0; ti < imgEls.length; ti++) { var s = imgEls[ti].src; if (s && s.indexOf('blob:') !== 0 && twImgs.indexOf(s) === -1) twImgs.push(s); }
+    var image = twImgs.length > 0 ? twImgs.join(',') : '';
 
     return {
       author: author,
@@ -1192,7 +1194,7 @@
         var author = scanLinkedInAuthor(root);
         var counts = extractLinkedInCounts(root, '');
         var images = scanLinkedInImage(root);
-        var image = images.length > 0 ? images[0] : extractLinkedInImage(root);
+        var image = images.length > 0 ? images.join(',') : extractLinkedInImage(root);
 
         var docContainer = root.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
         var documentUrl = '';
@@ -1265,8 +1267,10 @@
       if (!retweetBtn) retweetBtn = article.querySelector('button[aria-label*="Repost"], button[aria-label*="Retweet"]');
       if (retweetBtn) reposts = extractCountFromButton(retweetBtn);
 
-      var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
-      var image = imgEl ? (imgEl.src || '') : '';
+      var imgEls = article.querySelectorAll('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
+      var twImgs = [];
+      for (var ti = 0; ti < imgEls.length; ti++) { var s = imgEls[ti].src; if (s && s.indexOf('blob:') !== 0 && twImgs.indexOf(s) === -1) twImgs.push(s); }
+      var image = twImgs.length > 0 ? twImgs.join(',') : '';
       var vid = article.querySelector('video'); if (vid) { var vsrc = vid.getAttribute('src'); if (!vsrc) { var ss = vid.querySelectorAll('source'); for (var si = 0; si < ss.length; si++) { if (ss[si].getAttribute('type') === 'video/mp4') { vsrc = ss[si].getAttribute('src'); break; } } } if (vsrc) image = vsrc; }
 
       var postUrl = '';
@@ -1331,8 +1335,10 @@
     var retweetBtn = article.querySelector('[data-testid="retweet"], [data-testid="unretweet"]');
     if (!retweetBtn) retweetBtn = article.querySelector('button[aria-label*="Repost"], button[aria-label*="Retweet"]');
     if (retweetBtn) reposts = extractCountFromButton(retweetBtn);
-    var imgEl = article.querySelector('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
-    var image = imgEl ? (imgEl.src || '') : '';
+    var imgEls = article.querySelectorAll('img[src*="media"], img[src*="video_thumb"], [data-testid="tweetPhoto"] img');
+    var twImgs = [];
+    for (var ti = 0; ti < imgEls.length; ti++) { var s = imgEls[ti].src; if (s && s.indexOf('blob:') !== 0 && twImgs.indexOf(s) === -1) twImgs.push(s); }
+    var image = twImgs.length > 0 ? twImgs.join(',') : '';
     var vid = article.querySelector('video'); if (vid) { var vsrc = vid.getAttribute('src'); if (!vsrc) { var ss = vid.querySelectorAll('source'); for (var si = 0; si < ss.length; si++) { if (ss[si].getAttribute('type') === 'video/mp4') { vsrc = ss[si].getAttribute('src'); break; } } } if (vsrc) image = vsrc; }
     var postUrl = '';
     var links = article.querySelectorAll('a[href*="/status/"]');

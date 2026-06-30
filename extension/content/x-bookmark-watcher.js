@@ -380,7 +380,7 @@
       payload.videoUrl = tweetVideo.videoUrl;
       payload.posterUrl = tweetVideo.posterUrl;
     } else if (imageUrls.length > 0) {
-      payload.imageUrl = twimgLarge(imageUrls[0]);
+      payload.imageUrl = imageUrls.length > 0 ? imageUrls.map(function(u){ return twimgLarge(u); }).join(',') : '';
     }
 
     chrome.runtime.sendMessage(payload, function (response) {
