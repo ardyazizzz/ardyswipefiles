@@ -664,8 +664,14 @@
     var postUrl = extractLinkedInPostUrl(card);
     // Detect carousel first — the iframe is a global element, not inside the matched card
     var carouselImages = [];
-    var carouselIframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
-    console.log('[carousel] iframe found:', !!carouselIframe);
+    // LinkedIn lazy-loads the carousel iframe — poll 5x at 300ms intervals
+    var carouselIframe = null;
+    for (var rt = 0; rt < 5; rt++) {
+      carouselIframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
+      if (carouselIframe) break;
+      if (rt < 4) await new Promise(function(r) { setTimeout(r, 300); });
+    }
+    console.log('[carousel] iframe found:', !!carouselIframe, '(after', rt, 'retries)');
     if (carouselIframe) {
       var fullUrls = await resolveCarouselImages(card);
       console.log('[carousel] fullUrls count:', fullUrls.length);
