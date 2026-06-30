@@ -664,23 +664,23 @@
     var postUrl = extractLinkedInPostUrl(card);
     // Detect carousel first — the iframe is a global element, not inside the matched card
     var carouselImages = [];
-    // LinkedIn lazy-loads the carousel iframe — poll 5x at 300ms intervals
-    var carouselIframe = null;
-    for (var rt = 0; rt < 5; rt++) {
-      carouselIframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
-      if (carouselIframe) break;
-      if (rt < 4) await new Promise(function(r) { setTimeout(r, 300); });
+    // Search for carousel config attribute directly — LinkedIn may change element type or data-id
+    var configEl = null;
+    for (var rt = 0; rt < 3; rt++) {
+      configEl = document.querySelector('[data-native-document-config]');
+      if (configEl) break;
+      if (rt < 2) await new Promise(function(r) { setTimeout(r, 300); });
     }
-    console.log('[carousel] iframe found:', !!carouselIframe, '(after', rt, 'retries)');
-    if (carouselIframe) {
+    console.log('[carousel] config element:', configEl ? configEl.tagName : 'not found');
+    if (configEl) {
       var fullUrls = await resolveCarouselImages(card);
       console.log('[carousel] fullUrls count:', fullUrls.length);
       if (fullUrls.length > 0) {
         carouselImages = fullUrls;
       } else {
-        // Direct cover extraction from global iframe — bypasses wrong card
+        // Cover fallback directly from config attribute
         try {
-          var cfgRaw = carouselIframe.getAttribute('data-native-document-config');
+          var cfgRaw = configEl.getAttribute('data-native-document-config');
           if (cfgRaw) {
             var cfg = JSON.parse(cfgRaw);
             if (cfg.doc && cfg.doc.coverPages) {
@@ -694,7 +694,7 @@
     }
     console.log('[carousel] carouselImages after resolution:', carouselImages.length);
     // Only scan normally if NO carousel was detected — wrong card has comment images
-    if (carouselImages.length === 0 && !carouselIframe) {
+    if (carouselImages.length === 0 && !configEl) {
       carouselImages = scanLinkedInImage(card);
       if (carouselImages.length === 0) {
         var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
@@ -702,7 +702,7 @@
       }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
-    var image = carouselImages.length > 0 ? carouselImages.join(',') : (carouselIframe ? '' : extractLinkedInImage(card));
+    var image = carouselImages.length > 0 ? carouselImages.join(',') : (configEl ? '' : extractLinkedInImage(card));
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
                      || document.querySelector('.feed-shared-document__container, .update-components-document__container');
@@ -1212,9 +1212,9 @@
 
   async function resolveCarouselImages(card) {
     try {
-      var iframe = document.querySelector('iframe[data-id="feed-paginated-document-content"]');
-      if (!iframe) return [];
-      var raw = iframe.getAttribute('data-native-document-config');
+      var el = document.querySelector('[data-native-document-config]');
+      if (!el) return [];
+      var raw = el.getAttribute('data-native-document-config');
       if (!raw) return [];
       var cfg = JSON.parse(raw);
       if (!cfg.doc || !cfg.doc.manifestUrl) return extractCarouselCovers(card);
