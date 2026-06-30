@@ -60,6 +60,7 @@
     var postUrl = extractLinkedInPostUrl(card);
     var btnCarouselImages = scanLinkedInImage(card);
     LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
+    if (btnCarouselImages.length === 0) btnCarouselImages = extractCarouselCovers(card);
     var image = btnCarouselImages.length > 0 ? btnCarouselImages.join(',') : extractLinkedInImage(card);
 
     var btnDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
@@ -564,7 +565,7 @@
     return null;
   }
 
-  function extractLinkedIn() {
+  async function extractLinkedIn() {
     var activityId = '';
     var am = location.pathname.match(/activity:(\d+)/) || location.pathname.match(/-(\d{10,20})-/) || location.pathname.match(/share:(\d+)/);
     if (am) activityId = am[1];
@@ -666,6 +667,13 @@
     if (carouselImages.length === 0) {
       var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
+    }
+    if (carouselImages.length === 0) {
+      carouselImages = extractCarouselCovers(card);
+      if (carouselImages.length > 0) {
+        var fullUrls = await resolveCarouselImages(card);
+        if (fullUrls.length > 0) carouselImages = fullUrls;
+      }
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
     var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
@@ -962,7 +970,17 @@
       }
       try {
         LOG&&console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
-        var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
+        if (platform === 'LinkedIn') {
+          extractLinkedIn().then(function(data) {
+            LOG&&console.log('[Swipe.ardy cs] EXTRACT -> result', data);
+            sendResponse({ ok: true, data: data });
+          }).catch(function(e) {
+            console.error('[Swipe.ardy cs] EXTRACT -> error', e.message);
+            sendResponse({ ok: false, error: e.message });
+          });
+          return true;
+        }
+        var data = platform === 'Pinterest' ? extractPinterest() : extractTwitter();
         if (platform === 'X') fillVideoUrls([data]);
         LOG&&console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
@@ -1150,6 +1168,47 @@
     return results;
   }
 
+  function extractCarouselCovers(card) {
+    try {
+      var iframe = card.querySelector('iframe[data-id="feed-paginated-document-content"]');
+      if (!iframe) return [];
+      var raw = iframe.getAttribute('data-native-document-config');
+      if (!raw) return [];
+      var cfg = JSON.parse(raw);
+      if (cfg.doc && cfg.doc.coverPages) {
+        return cfg.doc.coverPages
+          .filter(function(p) { return p.config && p.config.src; })
+          .map(function(p) { return p.config.src; });
+      }
+    } catch(e) {}
+    return [];
+  }
+
+  async function resolveCarouselImages(card) {
+    try {
+      var iframe = card.querySelector('iframe[data-id="feed-paginated-document-content"]');
+      if (!iframe) return [];
+      var raw = iframe.getAttribute('data-native-document-config');
+      if (!raw) return [];
+      var cfg = JSON.parse(raw);
+      if (!cfg.doc || !cfg.doc.manifestUrl) return extractCarouselCovers(card);
+      var resp = await fetch(cfg.doc.manifestUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      if (!resp.ok) return extractCarouselCovers(card);
+      var manifest = await resp.json();
+      if (!manifest.perResolutions || manifest.perResolutions.length === 0) return extractCarouselCovers(card);
+      var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
+             || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
+      if (!res || !res.imageManifestUrl) return extractCarouselCovers(card);
+      var imgResp = await fetch(res.imageManifestUrl);
+      if (!imgResp.ok) return extractCarouselCovers(card);
+      var imgData = await imgResp.json();
+      if (!imgData.pages || imgData.pages.length === 0) return extractCarouselCovers(card);
+      return imgData.pages;
+    } catch(e) { return extractCarouselCovers(card); }
+  }
+
   function getLinkedInLabel(card) {
     if (card.querySelector('.feed-shared-carousel__container, .update-components-carousel__container, [class*="carousel"]'))
       return 'Carousel';
@@ -1194,6 +1253,7 @@
         var author = scanLinkedInAuthor(root);
         var counts = extractLinkedInCounts(root, '');
         var images = scanLinkedInImage(root);
+        if (images.length === 0) images = extractCarouselCovers(root);
         var image = images.length > 0 ? images.join(',') : extractLinkedInImage(root);
 
         var docContainer = root.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]');
