@@ -119,6 +119,28 @@ function trySaveBookmark(item, tweetId, opts) {
   });
 }
 
+function batchDedupCheck(urls) {
+  if (!urls || urls.length === 0) return Promise.resolve({});
+  var encoded = urls.map(function (u) { return encodeURIComponent(u); }).join(',');
+  return fetch(SB_URL + '/swipes?postUrl=in.(' + encoded + ')&select=postUrl', {
+    headers: SB_HEADERS
+  }).then(function (res) {
+    return res.text().then(function (text) {
+      if (!res.ok) return {};
+      try {
+        var rows = JSON.parse(text);
+        var set = {};
+        if (Array.isArray(rows)) {
+          for (var i = 0; i < rows.length; i++) {
+            if (rows[i] && rows[i].postUrl) set[rows[i].postUrl] = true;
+          }
+        }
+        return set;
+      } catch (e) { return {}; }
+    });
+  }).catch(function () { return {}; });
+}
+
 function doDedupCheck(postUrl) {
   if (!postUrl) return Promise.resolve(false);
   return fetch(SB_URL + '/swipes?postUrl=eq.' + encodeURIComponent(postUrl) + '&select=id&limit=1', {
@@ -469,44 +491,61 @@ function handleBulkImport(posts) {
     return Promise.resolve({ ok: true, saved: 0, duplicates: 0 });
   }
 
-  var saved = 0;
-  var duplicates = 0;
-
-  function processNext(idx) {
-    if (idx >= posts.length) {
-      return Promise.resolve({ ok: true, saved: saved, duplicates: duplicates });
-    }
-    var p = posts[idx];
-    var item = {
-      id: Date.now() + idx,
-      author: p.author || '',
-      date: p.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      platform: p.platform || '',
-      text: p.text || '',
-      image: p.image || '',
-      postUrl: p.postUrl || '',
-      reactions: p.reactions || 0,
-      comments: p.comments || 0,
-      reposts: p.reposts || 0,
-      filters: p.filters || {}
-    };
-
-    return doDedupCheck(item.postUrl).then(function (isDup) {
-      if (isDup) {
-        duplicates++;
-        return processNext(idx + 1);
-      }
-      return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
-        .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          saved++;
-          return processNext(idx + 1);
-        })
-        .catch(function () {
-          return processNext(idx + 1);
-        });
-    });
+  var urlsToCheck = [];
+  for (var i = 0; i < posts.length; i++) {
+    if (posts[i].postUrl) urlsToCheck.push(posts[i].postUrl);
   }
 
-  return processNext(0);
+  if (urlsToCheck.length === 0) {
+    return Promise.resolve({ ok: true, saved: 0, duplicates: 0 });
+  }
+
+  return batchDedupCheck(urlsToCheck).then(function (existingSet) {
+    var toSave = [];
+    for (var j = 0; j < posts.length; j++) {
+      if (posts[j].postUrl && existingSet.hasOwnProperty(posts[j].postUrl)) continue;
+      toSave.push(j);
+    }
+
+    var duplicates = posts.length - toSave.length;
+    var saved = 0;
+    var CHUNK = 5;
+
+    function saveChunk(startIdx) {
+      if (startIdx >= toSave.length) {
+        return Promise.resolve({ ok: true, saved: saved, duplicates: duplicates });
+      }
+      var end = Math.min(startIdx + CHUNK, toSave.length);
+      var batch = [];
+      for (var k = startIdx; k < end; k++) {
+        var idx = toSave[k];
+        var p = posts[idx];
+        var item = {
+          id: Date.now() + idx,
+          author: p.author || '',
+          date: p.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          platform: p.platform || '',
+          text: p.text || '',
+          image: p.image || '',
+          postUrl: p.postUrl || '',
+          reactions: p.reactions || 0,
+          comments: p.comments || 0,
+          reposts: p.reposts || 0,
+          filters: p.filters || {}
+        };
+        batch.push(
+          fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
+            .then(function (res) {
+              if (res.ok) saved++;
+            })
+            .catch(function () {})
+        );
+      }
+      return Promise.all(batch).then(function () {
+        return saveChunk(startIdx + CHUNK);
+      });
+    }
+
+    return saveChunk(0);
+  });
 }
