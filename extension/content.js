@@ -564,37 +564,50 @@
     return null;
   }
 
-  function waitForCarouselConfig(timeoutMs) {
-    return new Promise(function(resolve) {
-      var el = document.querySelector('[data-native-document-config]');
-      if (el) return resolve(el);
-      var observer = new MutationObserver(function() {
-        var found = document.querySelector('[data-native-document-config]');
-        if (found) { observer.disconnect(); resolve(found); }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-      setTimeout(function() { observer.disconnect(); resolve(null); }, timeoutMs || 10000);
-    });
+  function extractCarouselCoversFromCode() {
+    try {
+      var codeEls = document.querySelectorAll('code');
+      for (var i = 0; i < codeEls.length; i++) {
+        var content = codeEls[i].textContent;
+        if (!content || content.indexOf('feedshare-document-cover-images') === -1) continue;
+        var m2 = content.match(/"imageUrls":\[([^\]]+)\]/);
+        if (m2) {
+          var urls = m2[1].match(/https:\/\/[^"]+/g);
+          if (urls) return urls.map(function(u) { return u.replace(/\\u0026/g, '&'); });
+        }
+      }
+    } catch(e) {}
+    return [];
   }
 
-  async function fetchCarouselImages(cfg) {
+  async function extractCarouselImages() {
     try {
-      if (!cfg || !cfg.doc || !cfg.doc.manifestUrl) return [];
-      var resp = await fetch(cfg.doc.manifestUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-      });
-      if (!resp.ok) return [];
-      var manifest = await resp.json();
-      if (!manifest.perResolutions || manifest.perResolutions.length === 0) return [];
-      var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
-             || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
-      if (!res || !res.imageManifestUrl) return [];
-      var imgResp = await fetch(res.imageManifestUrl);
-      if (!imgResp.ok) return [];
-      var imgData = await imgResp.json();
-      if (!imgData.pages || imgData.pages.length === 0) return [];
-      return imgData.pages;
-    } catch(e) { console.warn('[carousel] fetch error:', e); return []; }
+      var codeEls = document.querySelectorAll('code');
+      for (var i = 0; i < codeEls.length; i++) {
+        var content = codeEls[i].textContent;
+        if (!content || content.indexOf('feedshare-document-master-manifest') === -1) continue;
+        // Extract manifestUrl from LinkedIn's Relay/GraphQL JSON
+        var m = content.match(/"manifestUrl":"(https:\/\/media\.licdn\.com[^"]+)"/);
+        if (!m) continue;
+        var manifestUrl = m[1].replace(/\\u0026/g, '&');
+        // Fetch master manifest
+        var resp = await fetch(manifestUrl);
+        if (!resp.ok) return extractCarouselCoversFromCode();
+        var manifest = await resp.json();
+        if (!manifest.perResolutions || manifest.perResolutions.length === 0) return extractCarouselCoversFromCode();
+        // Pick best resolution
+        var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
+               || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
+        if (!res || !res.imageManifestUrl) return extractCarouselCoversFromCode();
+        // Fetch image manifest
+        var imgResp = await fetch(res.imageManifestUrl);
+        if (!imgResp.ok) return extractCarouselCoversFromCode();
+        var imgData = await imgResp.json();
+        if (!imgData.pages || imgData.pages.length === 0) return extractCarouselCoversFromCode();
+        return imgData.pages;
+      }
+      return extractCarouselCoversFromCode();
+    } catch(e) { console.warn('[carousel] extract error:', e); return extractCarouselCoversFromCode(); }
   }
 
   async function extractLinkedIn() {
@@ -694,37 +707,18 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
-    // Start carousel detection IMMEDIATELY (parallel) — don't wait for scanLinkedInImage to fail on wrong card
-    var carouselPromise = waitForCarouselConfig(10000);
     var carouselImages = scanLinkedInImage(card);
-    var carouselConfigEl = null;
     // Fallback: if card is MAIN and no carousel found, search page for document container
     if (carouselImages.length === 0) {
       var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
-    // If still no images, wait for parallel carousel detection (observer already running)
+    // If still no images, try LinkedIn carousel from Relay/GraphQL JSON in <code> element
     if (carouselImages.length === 0) {
-      carouselConfigEl = await carouselPromise;
-      if (carouselConfigEl) {
-        try {
-          var raw2 = carouselConfigEl.getAttribute('data-native-document-config');
-          var cfg2 = JSON.parse(raw2);
-          if (cfg2 && cfg2.doc) {
-            var fullUrls = await fetchCarouselImages(cfg2);
-            if (fullUrls.length > 0) {
-              carouselImages = fullUrls;
-            } else if (cfg2.doc.coverPages) {
-              carouselImages = cfg2.doc.coverPages
-                .filter(function(p) { return p.config && p.config.src; })
-                .map(function(p) { return p.config.src; });
-            }
-          }
-        } catch(e) { console.warn('[carousel] config error:', e); }
-      }
+      carouselImages = await extractCarouselImages();
     }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
-    var image = carouselImages.length > 0 ? carouselImages.join(',') : (carouselConfigEl ? '' : extractLinkedInImage(card));
+    var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
                      || document.querySelector('.feed-shared-document__container, .update-components-document__container');
