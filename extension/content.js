@@ -694,6 +694,8 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
+    // Start carousel detection IMMEDIATELY (parallel) — don't wait for scanLinkedInImage to fail on wrong card
+    var carouselPromise = waitForCarouselConfig(10000);
     var carouselImages = scanLinkedInImage(card);
     var carouselConfigEl = null;
     // Fallback: if card is MAIN and no carousel found, search page for document container
@@ -701,9 +703,9 @@
       var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
-    // If still no images, wait for lazy-loaded carousel document iframe (MutationObserver)
+    // If still no images, wait for parallel carousel detection (observer already running)
     if (carouselImages.length === 0) {
-      carouselConfigEl = await waitForCarouselConfig(10000);
+      carouselConfigEl = await carouselPromise;
       if (carouselConfigEl) {
         try {
           var raw2 = carouselConfigEl.getAttribute('data-native-document-config');
