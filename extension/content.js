@@ -564,7 +564,40 @@
     return null;
   }
 
-  function extractLinkedIn() {
+  function waitForCarouselConfig(timeoutMs) {
+    return new Promise(function(resolve) {
+      var el = document.querySelector('[data-native-document-config]');
+      if (el) return resolve(el);
+      var observer = new MutationObserver(function() {
+        var found = document.querySelector('[data-native-document-config]');
+        if (found) { observer.disconnect(); resolve(found); }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      setTimeout(function() { observer.disconnect(); resolve(null); }, timeoutMs || 10000);
+    });
+  }
+
+  async function fetchCarouselImages(cfg) {
+    try {
+      if (!cfg || !cfg.doc || !cfg.doc.manifestUrl) return [];
+      var resp = await fetch(cfg.doc.manifestUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      if (!resp.ok) return [];
+      var manifest = await resp.json();
+      if (!manifest.perResolutions || manifest.perResolutions.length === 0) return [];
+      var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
+             || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
+      if (!res || !res.imageManifestUrl) return [];
+      var imgResp = await fetch(res.imageManifestUrl);
+      if (!imgResp.ok) return [];
+      var imgData = await imgResp.json();
+      if (!imgData.pages || imgData.pages.length === 0) return [];
+      return imgData.pages;
+    } catch(e) { console.warn('[carousel] fetch error:', e); return []; }
+  }
+
+  async function extractLinkedIn() {
     var activityId = '';
     var am = location.pathname.match(/activity:(\d+)/) || location.pathname.match(/-(\d{10,20})-/) || location.pathname.match(/share:(\d+)/);
     if (am) activityId = am[1];
@@ -662,13 +695,34 @@
     var counts = extractLinkedInCounts(card, postText);
     var postUrl = extractLinkedInPostUrl(card);
     var carouselImages = scanLinkedInImage(card);
+    var carouselConfigEl = null;
     // Fallback: if card is MAIN and no carousel found, search page for document container
     if (carouselImages.length === 0) {
       var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
       if (pageDoc) { carouselImages = scanLinkedInImage(pageDoc); }
     }
+    // If still no images, wait for lazy-loaded carousel document iframe (MutationObserver)
+    if (carouselImages.length === 0) {
+      carouselConfigEl = await waitForCarouselConfig(10000);
+      if (carouselConfigEl) {
+        try {
+          var raw2 = carouselConfigEl.getAttribute('data-native-document-config');
+          var cfg2 = JSON.parse(raw2);
+          if (cfg2 && cfg2.doc) {
+            var fullUrls = await fetchCarouselImages(cfg2);
+            if (fullUrls.length > 0) {
+              carouselImages = fullUrls;
+            } else if (cfg2.doc.coverPages) {
+              carouselImages = cfg2.doc.coverPages
+                .filter(function(p) { return p.config && p.config.src; })
+                .map(function(p) { return p.config.src; });
+            }
+          }
+        } catch(e) { console.warn('[carousel] config error:', e); }
+      }
+    }
     LOG&&console.log('[DEBUG carousel single]', getLinkedInLabel(card), 'found:', carouselImages.length, carouselImages.slice(0,3));
-    var image = carouselImages.length > 0 ? carouselImages.join(',') : extractLinkedInImage(card);
+    var image = carouselImages.length > 0 ? carouselImages.join(',') : (carouselConfigEl ? '' : extractLinkedInImage(card));
 
     var sDocContainer = card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"]')
                      || document.querySelector('.feed-shared-document__container, .update-components-document__container');
@@ -962,7 +1016,17 @@
       }
       try {
         LOG&&console.log('[Swipe.ardy cs] EXTRACT -> extracting from', platform);
-        var data = platform === 'LinkedIn' ? extractLinkedIn() : platform === 'Pinterest' ? extractPinterest() : extractTwitter();
+        if (platform === 'LinkedIn') {
+          extractLinkedIn().then(function(data) {
+            LOG&&console.log('[Swipe.ardy cs] EXTRACT -> LinkedIn result', data);
+            sendResponse({ ok: true, data: data });
+          }).catch(function(e) {
+            console.error('[Swipe.ardy cs] EXTRACT -> LinkedIn error', e.message);
+            sendResponse({ ok: false, error: e.message });
+          });
+          return true;
+        }
+        var data = platform === 'Pinterest' ? extractPinterest() : extractTwitter();
         if (platform === 'X') fillVideoUrls([data]);
         LOG&&console.log('[Swipe.ardy cs] EXTRACT -> result', data);
         sendResponse({ ok: true, data: data });
