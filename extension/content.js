@@ -670,10 +670,22 @@
       if (fullUrls.length > 0) {
         carouselImages = fullUrls;
       } else {
-        carouselImages = extractCarouselCovers(card);
+        // Direct cover extraction from global iframe — bypasses wrong card
+        try {
+          var cfgRaw = carouselIframe.getAttribute('data-native-document-config');
+          if (cfgRaw) {
+            var cfg = JSON.parse(cfgRaw);
+            if (cfg.doc && cfg.doc.coverPages) {
+              carouselImages = cfg.doc.coverPages
+                .filter(function(p) { return p.config && p.config.src; })
+                .map(function(p) { return p.config.src; });
+            }
+          }
+        } catch(e) { console.warn('[carousel] coverPages fallback error:', e); }
       }
     }
-    if (carouselImages.length === 0) {
+    // Only scan normally if NO carousel was detected — wrong card has comment images
+    if (carouselImages.length === 0 && !carouselIframe) {
       carouselImages = scanLinkedInImage(card);
       if (carouselImages.length === 0) {
         var pageDoc = document.querySelector('.feed-shared-document__container, .update-components-document__container');
@@ -1211,7 +1223,7 @@
       var imgData = await imgResp.json();
       if (!imgData.pages || imgData.pages.length === 0) return extractCarouselCovers(card);
       return imgData.pages;
-    } catch(e) { return extractCarouselCovers(card); }
+    } catch(e) { console.warn('[carousel] resolveCarouselImages error:', e); return extractCarouselCovers(card); }
   }
 
   function getLinkedInLabel(card) {
