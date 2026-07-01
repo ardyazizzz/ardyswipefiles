@@ -459,6 +459,65 @@ In `loadSwipes()`, items without `type` fall into the default `swipes[]` bucket 
 
 ---
 
+## LinkedIn Extraction Flow
+
+### Extraction Order (in `extractLinkedIn()`)
+
+```
+1. extractCarouselImages()     ← FIRST: searches <code> JSON for carousel manifest
+2. scanLinkedInImage(card)     ← FALLBACK: scans <img> tags with specific selectors
+3. scanLinkedInImage(pageDoc)  ← FALLBACK: scans document container
+4. extractLinkedInImage(card)  ← LAST RESORT: broad img search with URL filters
+```
+
+Carousel detection runs FIRST so it takes priority over regular image scanning. For non-carousel posts, `extractCarouselImages()` returns empty in ~1ms (no manifest in JSON).
+
+### Carousel Detection — `<code>` JSON Approach
+
+**Critical:** For logged-in users, LinkedIn does NOT use `data-native-document-config` iframe attributes (the Hermes workflow document was tested on non-logged-in pages). Instead, carousel data is stored in `<code>` elements as Relay/GraphQL JSON.
+
+```
+<code> element → JSON → "manifestUrl" → fetch manifest → perResolutions → imageManifestUrl → pages[]
+```
+
+- `extractCarouselImages()` — searches `<code>` elements for `feedshare-document-master-manifest`, extracts `manifestUrl` via regex, fetches manifest → image manifest → returns all slide URLs
+- `extractCarouselCoversFromCode()` — fallback: extracts cover image URLs from the same JSON (3 images, 480px)
+- `host_permissions` includes `https://media.licdn.com/*` for manifest fetches
+
+### Image URL Pattern Filters
+
+Both `scanLinkedInImage()` and `extractLinkedInImage()` filter out unwanted images by URL pattern:
+
+| URL pattern | Filtered by | What it blocks |
+|---|---|---|
+| `profile-displayphoto` | Both | LinkedIn profile photos |
+| `profile-framedphoto` | Both | LinkedIn framed profile photos (100x100) |
+| `profile-displaybackgrou` | `extractLinkedInImage` only | LinkedIn profile backgrounds |
+| `comment-image` | Both | LinkedIn comment attachments |
+| `/ghost/` | Both | LinkedIn ghost placeholders |
+
+### `cleanSnippet()` Boundary Ordering
+
+`cleanSnippet()` truncates extracted text at the first boundary string found. **Boundary order matters** — boundaries are checked in array order, not text position order. Boundaries that appear EARLIER in the extracted text must be FIRST in the array:
+
+```
+['Activate to view larger image', 'Add a comment', 'Open Emoji Keyboard', 
+ 'Like Reply', 'Like\nReply', 'Load more comments', 'Reaction button',
+ 'Most relevant', 'most relevant', ...]
+```
+
+If `Most relevant` were first, it would match LATE in the text (after comment section), keeping unwanted UI chrome. Putting `Activate to view larger image` and `Add a comment` first ensures truncation happens right after the post content.
+
+### Timestamp Detection
+
+`extractLinkedInSnippet()` finds the post timestamp to separate header from content. The regex handles both formats:
+- `5mo •` (abbreviated)
+- `5 months ago •` (full text)
+
+After the timestamp, LinkedIn header junk (`Follow`, `Connect`, `Visible to anyone...`) is stripped before returning the caption.
+
+---
+
 ## Known Scale Limits & Tech Debt (Watchlist)
 
 These are NOT bugs today; they are ceilings that bite as the dataset grows.
