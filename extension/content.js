@@ -432,9 +432,9 @@
       return 0;
     }
 
-    comments = extractByTerms(normalized, commentTerms) || extractFromSegments(commentTerms) || comments;
-    reposts = extractByTerms(normalized, repostTerms) || extractFromSegments(repostTerms) || reposts;
-    reactions = extractByTerms(normalized, reactionTerms) || extractFromSegments(reactionTerms) || reactions;
+    comments = extractFromSegments(commentTerms) || comments;
+    reposts = extractFromSegments(repostTerms) || reposts;
+    reactions = extractFromSegments(reactionTerms) || reactions;
 
     if (!reactions) {
       var othersPatterns = [
