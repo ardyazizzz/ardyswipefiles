@@ -294,11 +294,11 @@
     var postText = getPostAreaText(fullText);
 
     if (postText) {
-      var tsMatch = postText.match(/\d+[hmdw]o?\s*·\s*|\d+\s+(?:months?|days?|weeks?|years?)\s*(?:ago)?\s*·\s*/i);
+      var tsMatch = postText.match(/\d+[hmdw]o?\s*·\s*|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?\s*·\s*/i);
       if (tsMatch) {
         var afterTs = postText.slice(postText.indexOf(tsMatch[0]) + tsMatch[0].length).trim();
         // Strip LinkedIn header junk that appears between timestamp and content
-        afterTs = afterTs.replace(/^(?:Follow|Connect|Connect with[^\n"]*?|Visible to anyone[^\n"]*?|View profile[^\n"]*?)\s*/i, '').trim();
+        afterTs = afterTs.replace(/^(?:Follow|Connect|Connect with[^\n"]*?|Visible to anyone[^\n]*|View profile[^\n"]*?)\s*/i, '').trim();
         var cleaned = cleanSnippet(afterTs);
         LOG&&console.log('[Swipe.ardy cs] Snippet from after timestamp ->', cleaned.slice(0, 200));
         if (cleaned.length > 20) return cleaned;
@@ -311,7 +311,7 @@
         var line = lines[li].trim();
         if (!line) continue;
         if (line.indexOf('\u2022') === 0 || line.indexOf('•') === 0) continue;
-        if (/^\d+[hmdw]o?|\d+\s+(?:months?|days?|weeks?|years?)\s*(?:ago)?/i.test(line)) { pastTimestamp = true; continue; }
+        if (/^\d+[hmdw]o?|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?/i.test(line)) { pastTimestamp = true; continue; }
         if (!pastTimestamp && line.length <= 60) continue;
         if (pastTimestamp) captionLines.push(line);
       }
