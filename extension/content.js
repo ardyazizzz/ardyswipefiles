@@ -520,6 +520,7 @@
       if (!src || src.indexOf('data:') === 0) continue;
       if (/\/ghost\//i.test(src)) continue;
       if (/profile-displayphoto/i.test(src)) continue;
+      if (/profile-framedphoto/i.test(src)) continue;
       if (/profile-displaybackgrou/i.test(src)) continue;
       if (/comment-image/i.test(src)) continue;
       return src;
@@ -1209,7 +1210,7 @@
         var src = img.src || img.getAttribute('data-delayed-url') || '';
         if (!src || src.indexOf('data:') === 0) continue;
         if (cls.indexOf('actor') !== -1 || cls.indexOf('avatar') !== -1 || cls.indexOf('ghost') !== -1 || cls.indexOf('presence') !== -1) continue;
-        if (/\/ghost\//i.test(src) || /profile-displayphoto/i.test(src)) continue;
+        if (/\/ghost\//i.test(src) || /profile-displayphoto/i.test(src) || /profile-framedphoto/i.test(src) || /comment-image/i.test(src)) continue;
         if (seen.hasOwnProperty(src)) continue;
         seen[src] = true;
         results.push(src);
