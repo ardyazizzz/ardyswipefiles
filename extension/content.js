@@ -246,7 +246,7 @@
 
   function cleanSnippet(text) {
     if (!text) return '';
-    var boundaries = ['Most relevant', 'most relevant', 'Reaction button', 'Like\nReply', 'Add a comment', 'About\nAccessibility', 'Help Center', 'LinkedIn Corporation', 'Get the LinkedIn app', 'Privacy & Terms'];
+    var boundaries = ['Most relevant', 'most relevant', 'Reaction button', 'Like\nReply', 'Like Reply', 'Load more comments', 'Activate to view larger image', 'Add a comment', 'About\nAccessibility', 'Help Center', 'LinkedIn Corporation', 'Get the LinkedIn app', 'Privacy & Terms'];
     for (var bi = 0; bi < boundaries.length; bi++) {
       var idx = text.indexOf(boundaries[bi]);
       if (idx !== -1) {
