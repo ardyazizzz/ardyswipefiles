@@ -202,8 +202,10 @@
     @keyframes lbIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
     .lightbox-close:hover { background: rgba(0,0,0,0.65); }
-    .card-hero-wrap { position: relative; cursor: zoom-in; }
-    .card-hero-img { width: 100%; max-height: 180px; object-fit: cover; display: block; background: var(--bg-secondary); }
+    .card-hero-wrap { position: relative; }
+    .card-hero-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+    .card-hero-track::-webkit-scrollbar { display: none; }
+    .card-hero-track > img { flex: 0 0 100%; width: 100%; max-height: 180px; object-fit: cover; display: block; background: var(--bg-secondary); scroll-snap-align: start; cursor: zoom-in; }
     .card-hero-badge { position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none; }
     .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.45); color: #fff; font-size: 28px; width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
     .lightbox-nav:hover { background: rgba(0,0,0,0.7); }
@@ -1007,8 +1009,12 @@
       if (urls.length <= 1) { url = (urls[0] || ''); if (!url) return ''; }
       else {
         var safe = urls.map(function(u){ return u.replace(/'/g,"\\'"); }).join(',');
-        var h = '<div class="card-hero-wrap" data-idx="0">';
-        h += '<img src="' + urls[0] + '" class="card-hero-img" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(parseInt(this.parentElement.dataset.idx||0),\'' + safe + '\')" />';
+        var h = '<div class="card-hero-wrap">';
+        h += '<div class="card-hero-track" onscroll="updateCarouselBadge(this)">';
+        for (var i = 0; i < urls.length; i++) {
+          h += '<img src="' + urls[i] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" />';
+        }
+        h += '</div>';
         h += '<div class="card-hero-badge">1 / ' + urls.length + '</div>';
         h += '</div>';
         return h;
@@ -1024,6 +1030,16 @@
     if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" loading="lazy" allowfullscreen></iframe>`;
     if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" muted playsinline controls preload="none" loop src="${url}"></video>`;
     return `<img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
+  }
+
+  function updateCarouselBadge(track) {
+    var wrap = track.parentElement;
+    var badge = wrap.querySelector('.card-hero-badge');
+    var total = track.querySelectorAll('img').length;
+    var idx = Math.round(track.scrollLeft / track.clientWidth);
+    if (idx < 0) idx = 0;
+    if (idx >= total) idx = total - 1;
+    badge.textContent = (idx + 1) + ' / ' + total;
   }
 
   function renderFilterBar() {
