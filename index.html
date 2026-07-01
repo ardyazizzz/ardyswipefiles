@@ -197,7 +197,9 @@
     }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
     .card-text.text-3 { -webkit-line-clamp: 3; max-height: calc(3 * 12.5px * 1.62); }
-    .card-img { width: 100%; max-height: 180px; object-fit: cover; display: block; background: var(--bg-secondary); cursor: zoom-in; }
+    .img-wrap { position: relative; background: var(--bg-secondary); overflow: hidden; }
+    .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.35; transform: scale(1.1); pointer-events: none; }
+    .card-img { position: relative; z-index: 1; width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
     .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); object-fit: contain; animation: lbIn 0.22s var(--ease); }
     @keyframes lbIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
@@ -205,7 +207,8 @@
     .card-hero-wrap { position: relative; }
     .card-hero-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
     .card-hero-track::-webkit-scrollbar { display: none; }
-    .card-hero-track > img { flex: 0 0 100%; width: 100%; max-height: 180px; object-fit: cover; display: block; background: var(--bg-secondary); scroll-snap-align: start; cursor: zoom-in; }
+    .card-hero-track > .slide { flex: 0 0 100%; scroll-snap-align: start; position: relative; overflow: hidden; min-height: 80px; background: var(--bg-secondary); }
+    .card-hero-track > .slide > img { width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; position: relative; z-index: 1; }
     .card-hero-badge { position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none; }
     .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.45); color: #fff; font-size: 28px; width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
     .lightbox-nav:hover { background: rgba(0,0,0,0.7); }
@@ -1012,7 +1015,7 @@
         var h = '<div class="card-hero-wrap">';
         h += '<div class="card-hero-track" onscroll="updateCarouselBadge(this)">';
         for (var i = 0; i < urls.length; i++) {
-          h += '<img src="' + urls[i] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" />';
+          h += '<div class="slide"><div class="img-bg" style=\'background-image:url("' + urls[i] + '")\'></div><img src="' + urls[i] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" /></div>';
         }
         h += '</div>';
         h += '<div class="card-hero-badge">1 / ' + urls.length + '</div>';
@@ -1029,7 +1032,7 @@
     const vm = url.match(/vimeo\.com\/(\d+)/);
     if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" loading="lazy" allowfullscreen></iframe>`;
     if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" muted playsinline controls preload="none" loop src="${url}"></video>`;
-    return `<img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
+    return `<div class="img-wrap"><div class="img-bg" style="background-image:url(&quot;${url}&quot;)"></div><img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" /></div>`;
   }
 
   function updateCarouselBadge(track) {
