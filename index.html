@@ -305,14 +305,13 @@
     /* ===== Auth overlay ===== */
     .auth-overlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: var(--bg-canvas);
-      background-image: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-canvas) 55%);
-      background-attachment: fixed;
+      background: var(--overlay);
       display: flex; align-items: center; justify-content: center;
       padding: 20px;
       animation: fadeIn 0.2s var(--ease);
     }
     .auth-card {
+      position: relative;
       width: 100%; max-width: 340px;
       background: var(--bg);
       border: 1px solid var(--border);
@@ -353,6 +352,14 @@
       color: var(--danger); font-size: 13px; text-align: center;
       display: none; margin-top: 4px;
     }
+    .auth-close {
+      position: absolute; top: 14px; right: 14px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-tertiary); font-size: 20px; padding: 5px;
+      border-radius: var(--radius-sm); display: flex; align-items: center;
+      transition: all 0.15s var(--ease);
+    }
+    .auth-close:hover { background: var(--bg-secondary); color: var(--text-primary); }
 
     /* ===== Read-only (guest) mode ===== */
     body[data-auth="guest"] #addBtn { display: none !important; }
@@ -368,6 +375,7 @@
 
 <div class="auth-overlay" id="authOverlay" style="display:none">
   <div class="auth-card">
+    <button class="auth-close" onclick="hideAuthOverlay()"><i class="ri-close-line"></i></button>
     <div class="auth-logo">
       <span class="brand-name">Swipe<span>.</span>ardy</span>
       <p>Sign in to manage your swipes</p>
