@@ -7,7 +7,7 @@ Read this first before making any modifications to understand how the pieces con
 
 ## Quick Start (30 seconds)
 
-Vanilla JavaScript single-file app (`index.html`, ~1682 lines) with Supabase backend.
+Vanilla JavaScript single-file app (`index.html`, ~1941 lines) with Supabase backend.
 **No framework, no build tools, zero npm dependencies.**
 
 Four content modes share a unified architecture:
@@ -15,6 +15,10 @@ Four content modes share a unified architecture:
 
 All items live in ONE Supabase table (`/swipes`) with a `type` field.
 Items are split client-side into 4 parallel arrays on load.
+
+**Auth:** Password Cerdas — hardcoded email + user-typed password via `sbRTC.auth.signInWithPassword()`.
+Guests can browse (read-only); authenticated users can add/edit/delete.
+RLS policies enforce this at the database level.
 
 ---
 
@@ -57,7 +61,9 @@ const SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
 const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
 ```
 
-Key is publishable/anon — meant to be public. Without RLS policies, anyone with this key can CRUD everything.
+Key is publishable/anon — meant to be public. RLS policies protect write operations:
+`anon` can only SELECT; `authenticated` can INSERT/UPDATE/DELETE.
+Reads use `SB_KEY` (anon). Writes use `sbFetchAuth()` which sends the user's `access_token` as the Bearer.
 
 ---
 
@@ -101,15 +107,16 @@ deleteSwipe(id)
 2. applyDensity()                 (sync)
 3. [loading placeholder shown]   (sync)
 4. init() (async IIFE):
-   a. await loadSwipes()          → localStorage first, then Supabase GET /swipes
-   b. await loadFilterConfigs()   → Supabase GET /filter_configs → merge into local state
-   c. await loadViewsConfig()     → Supabase GET /views_config → replace views array
-   d. setMode(activeMode, true)   → skipRender=true, no syncHash
-   e. persist()                   → write everything to localStorage
-   f. renderFilterBar() + applyFilters()  → full render with data
-   g. loadFromHash()              → restore state from URL hash (if any)
-   h. skipSync = false            → unlock syncHash for user interactions
-   i. subscribeRealtime()         → 3 WebSocket channels
+   a. await initAuth()            → check Supabase session, set data-auth attribute on <body>
+   b. await loadSwipes()          → localStorage first, then Supabase GET /swipes
+   c. await loadFilterConfigs()   → Supabase GET /filter_configs → merge into local state
+   d. await loadViewsConfig()     → Supabase GET /views_config → replace views array
+   e. setMode(activeMode, true)   → skipRender=true, no syncHash
+   f. persist()                   → write everything to localStorage
+   g. renderFilterBar() + applyFilters()  → full render with data
+   h. loadFromHash()              → restore state from URL hash (if any)
+   i. skipSync = false            → unlock syncHash for user interactions
+   j. subscribeRealtime()         → 3 WebSocket channels
 ```
 
 **Key detail:** `setMode` is called with `skipRender=true` to avoid premature hash writes during boot.
@@ -322,20 +329,21 @@ Three WebSocket channels via Supabase Realtime v2:
 
 ## Fire-and-Forget Supabase Pattern
 
-All Supabase writes use this pattern:
+All Supabase **writes** use `sbFetchAuth()` which auto-adds Supabase auth headers:
 ```js
-fetch(SB_URL + '/swipes', {
-    method: 'POST', // or PATCH, DELETE
-    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify(item)
-}).catch(()=>{})
+sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
 ```
 
-**Silent failure.** Errors are swallowed. localStorage is the source of truth.
+`sbFetchAuth()` uses the cached `_authToken` (user's `access_token` from Supabase Auth session)
+as the Bearer token instead of the anon `SB_KEY`. If no session (guest), it falls back to `SB_KEY`
+— but RLS will reject the write at the database level.
+
+**Silent failure.** Errors are swallowed (`.catch(()=>{})`). localStorage is the source of truth.
 Supabase is a sync target — if it's unavailable the app continues working offline.
 
-There is also a convenience wrapper `sbFetch(path, opts)` at `~line 452` that auto-adds Supabase auth headers.
-It is used only in `deleteSwipe()`. Unlike the fire-and-forget pattern, `sbFetch` does NOT add `.catch(()=>{})`.
+There is also a legacy convenience wrapper `sbFetch(path, opts)` that auto-adds anon Supabase headers
+(using `SB_KEY` as Bearer). It is no longer used for writes — all writes now go through `sbFetchAuth()`.
+`sbFetch` is no longer called anywhere in `index.html` (reads use raw `fetch` directly with the anon key).
 
 Both `saveFilterConfig()` and `saveViewsConfig()` POST with the header
 `Prefer: resolution=merge-duplicates`, which tells Supabase to **upsert** (insert or update)
@@ -349,6 +357,90 @@ rather than error on duplicate key conflicts.
 `initDark()` IIFE (runs on page load) checks localStorage first, then `prefers-color-scheme` media query as fallback.
 Stored in `swipeardy_dark_v1` localStorage key.
 CSS uses `[data-theme="dark"]` selector for dark variants of all custom properties.
+
+---
+
+## Auth System (Password Cerdas)
+
+Single-user auth via Supabase Auth. The email is hardcoded in the source; only the password is typed by the user.
+
+### How It Works
+
+```
+initAuth() → sbRTC.auth.getSession()
+  ├─ Session found → data-auth="user" on <body>, _authToken cached
+  └─ No session → data-auth="guest" on <body> (read-only mode)
+
+Guest clicks "Sign in" → showAuthOverlay() → types password
+  → sbRTC.auth.signInWithPassword({ email: AUTH_EMAIL, password })
+  → on success → updateAuthState(session) → data-auth="user", overlay hidden
+  → on failure → error message shown, user retries
+```
+
+### Key Variables
+
+| Variable | Purpose |
+|---|---|
+| `AUTH_EMAIL` | Hardcoded email (const, line ~554). User must create this account in Supabase dashboard. |
+| `currentUser` | Set to `session.user` when logged in, `null` when guest. Checked by guards. |
+| `_authToken` | Cached `session.access_token`. Used by `sbFetchAuth()` as Bearer token. |
+
+### `sbFetchAuth(path, opts)` vs `sbFetch(path, opts)`
+
+| | `sbFetch` | `sbFetchAuth` |
+|---|---|---|
+| Bearer token | `SB_KEY` (anon) | `_authToken` (user session) or `SB_KEY` fallback |
+| Used for | Reads (GET /swipes, /filter_configs, /views_config) | Writes (POST/PATCH/DELETE) |
+| RLS result | SELECT allowed for anon | INSERT/UPDATE/DELETE allowed for authenticated |
+
+### Guest Mode (Read-Only)
+
+When `data-auth="guest"` on `<body>`, CSS hides:
+- `#addBtn` (Add swipe button)
+- `#manageFiltersBtn` (Manage filters button)
+- `#logoutBtn` (Sign out button)
+- `.card-btn` (Delete buttons on cards)
+- `.card-edit-hint` (Click to edit hints)
+
+JS guards also check `currentUser` in `openAddModal()`, `openEditModal()`, `deleteSwipe()` —
+if null, they call `showAuthOverlay()` or return early.
+
+### Session Persistence
+
+Supabase Auth sessions are stored in localStorage by the Supabase JS client.
+Once logged in, the session persists across page reloads (no need to login every time).
+The `onAuthStateChange` listener handles session restoration and token refresh automatically.
+
+### RLS Policies (must be enabled in Supabase dashboard)
+
+```sql
+-- Enable RLS on all 3 tables
+ALTER TABLE swipes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE filter_configs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE views_config ENABLE ROW LEVEL SECURITY;
+
+-- Public read + insert (anon can SELECT and INSERT)
+-- INSERT is allowed so the Chrome extension can still save new items
+CREATE POLICY "public_read" ON swipes FOR SELECT TO anon USING (true);
+CREATE POLICY "public_insert" ON swipes FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "public_read" ON filter_configs FOR SELECT TO anon USING (true);
+CREATE POLICY "public_read" ON views_config FOR SELECT TO anon USING (true);
+
+-- Authenticated full access (using TO authenticated, NOT auth.role())
+CREATE POLICY "auth_select" ON swipes FOR SELECT TO authenticated USING (true);
+CREATE POLICY "auth_insert" ON swipes FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "auth_update" ON swipes FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "auth_delete" ON swipes FOR DELETE TO authenticated USING (true);
+CREATE POLICY "auth_all" ON filter_configs FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "auth_all" ON views_config FOR ALL TO authenticated USING (true) WITH CHECK (true);
+```
+
+### Extension Impact
+
+The Chrome extension saves to `/swipes` using the anon `SB_KEY` without authentication.
+The RLS policy above allows anon INSERT, so the extension can still save new items.
+But anon cannot UPDATE or DELETE — those operations require the authenticated user session.
+This is a deliberate tradeoff: extension stays working, but data cannot be modified or deleted by anonymous users.
 
 ---
 
@@ -528,7 +620,7 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 | **localStorage size** | `persist()` serializes the entire dataset (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | `QuotaExceededError` is swallowed silently per-key by individual try/catch blocks. The app continues but localStorage cache becomes stale. Data remains safe in Supabase. Fix later: store only UI prefs in localStorage, or move bulk data to IndexedDB. |
 | **Render-all** | `renderCards()` builds ALL filtered cards into one innerHTML string | noticeable lag at thousands | Images use `loading="lazy"`. No pagination or virtual scrolling. |
 | **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
-| **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | Verify that Row-Level Security (RLS) is enabled on your Supabase tables. Without RLS, anyone with the key can read/write all data. |
+| **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). |
 
 ### Fragile selector coupling (handle with care)
 
@@ -562,4 +654,8 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 
 7. **`persist()` swallowing errors.** `persist()` uses `try/catch(e){}` — if localStorage is full or corrupted, errors are silently swallowed. The app continues but state may not save.
 
-8. **Extension `background.js` criticality.** `background.js` runs as a Chrome service worker and handles ALL message routing and Supabase saves. If deleted, the entire extension breaks (no saves, no scan forwarding, no bookmark sync). Before commit `928c94c` it was untracked — a `git reset --hard` would permanently delete it. It is now tracked in git. Always commit it.
+8. **`AUTH_EMAIL` must match Supabase dashboard.** The hardcoded email in `AUTH_EMAIL` must exactly match the user created in the Supabase Auth dashboard. If you change it in code without updating the dashboard, login will always fail.
+
+9. **`sbFetchAuth` token caching.** `_authToken` is cached at login time and refreshed by `onAuthStateChange`. If you bypass `updateAuthState()` and set `_authToken` manually, token refresh may break silently.
+
+10. **Extension `background.js` criticality.** `background.js` runs as a Chrome service worker and handles ALL message routing and Supabase saves. If deleted, the entire extension breaks (no saves, no scan forwarding, no bookmark sync). Before commit `928c94c` it was untracked — a `git reset --hard` would permanently delete it. It is now tracked in git. Always commit it.

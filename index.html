@@ -301,9 +301,84 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
+
+    /* ===== Auth overlay ===== */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg-canvas);
+      background-image: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-canvas) 55%);
+      background-attachment: fixed;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s var(--ease);
+    }
+    .auth-card {
+      width: 100%; max-width: 340px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.22s var(--ease);
+    }
+    .auth-logo { text-align: center; margin-bottom: 1.75rem; }
+    .auth-logo .brand-name { font-size: 22px; }
+    .auth-logo p { color: var(--text-tertiary); font-size: 13px; margin-top: 6px; }
+    .auth-form { display: flex; flex-direction: column; gap: 12px; }
+    .auth-form input {
+      width: 100%; font-size: 15px; font-family: inherit;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: var(--bg);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease);
+    }
+    .auth-form input::placeholder { color: var(--text-tertiary); }
+    .auth-form input:focus { border-color: var(--accent); box-shadow: var(--ring); }
+    .auth-form button {
+      width: 100%; padding: 12px 14px;
+      border: none; border-radius: var(--radius-md);
+      background: var(--accent); color: var(--accent-text);
+      font-size: 14px; font-weight: 600; font-family: inherit;
+      cursor: pointer;
+      transition: background 0.16s var(--ease), transform 0.1s var(--ease);
+      box-shadow: 0 1px 2px rgba(79,70,229,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .auth-form button:hover { background: var(--accent-hover); }
+    .auth-form button:active { transform: translateY(1px); }
+    .auth-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-error {
+      color: var(--danger); font-size: 13px; text-align: center;
+      display: none; margin-top: 4px;
+    }
+
+    /* ===== Read-only (guest) mode ===== */
+    body[data-auth="guest"] #addBtn { display: none !important; }
+    body[data-auth="guest"] #manageFiltersBtn { display: none !important; }
+    body[data-auth="guest"] #logoutBtn { display: none !important; }
+    body[data-auth="guest"] .card-edit-hint { display: none !important; }
+    body[data-auth="guest"] .card-btn { display: none !important; }
+    body[data-auth="guest"] .card-body { cursor: default; }
+    body[data-auth="user"] #signinBtn { display: none !important; }
   </style>
 </head>
-<body>
+<body data-auth="guest">
+
+<div class="auth-overlay" id="authOverlay" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="brand-name">Swipe<span>.</span>ardy</span>
+      <p>Sign in to manage your swipes</p>
+    </div>
+    <form class="auth-form" onsubmit="handleLogin(event)">
+      <input type="password" id="authPassword" placeholder="Enter password" autocomplete="current-password" />
+      <button type="submit" id="authSubmit">Sign in</button>
+    </form>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
 
 <div class="app">
   <div class="header">
@@ -325,12 +400,14 @@
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
       </div>
-      <button class="btn-ghost" onclick="openSettings()">
+      <button class="btn-ghost" id="manageFiltersBtn" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
       </button>
       <button class="btn-primary" onclick="openAddModal()" id="addBtn">
         <i class="ri-add-line"></i> Add swipe
       </button>
+      <button class="btn-ghost" id="signinBtn" onclick="showAuthOverlay()" title="Sign in" style="padding:8px 13px"><i class="ri-login-box-line"></i> Sign in</button>
+      <button class="btn-ghost" id="logoutBtn" onclick="handleLogout()" title="Sign out" style="padding:8px 11px"><i class="ri-logout-box-r-line"></i></button>
     </div>
   </div>
 
@@ -472,6 +549,87 @@
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
   let _localChange = 0;
+
+  /* ===== Auth (Password Cerdas) ===== */
+  const AUTH_EMAIL = 'ardy@swipeardy.com';
+  let currentUser = null;
+  let _authToken = null;
+
+  function sbFetchAuth(path, opts = {}) {
+    const token = _authToken || SB_KEY;
+    return fetch(SB_URL + path, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...opts.headers },
+      ...opts
+    });
+  }
+
+  function updateAuthState(session) {
+    if (session && session.user) {
+      currentUser = session.user;
+      _authToken = session.access_token || null;
+      document.body.setAttribute('data-auth', 'user');
+      document.getElementById('authOverlay').style.display = 'none';
+    } else {
+      currentUser = null;
+      _authToken = null;
+      document.body.setAttribute('data-auth', 'guest');
+    }
+  }
+
+  async function initAuth() {
+    try {
+      const { data: { session } } = await sbRTC.auth.getSession();
+      updateAuthState(session);
+    } catch(e) { updateAuthState(null); }
+  }
+
+  function showAuthOverlay() {
+    document.getElementById('authOverlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('authPassword').focus(), 50);
+  }
+
+  function hideAuthOverlay() {
+    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('authError').style.display = 'none';
+    document.getElementById('authPassword').value = '';
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const input = document.getElementById('authPassword');
+    const btn = document.getElementById('authSubmit');
+    const err = document.getElementById('authError');
+    const password = input.value;
+    if (!password) return;
+    btn.disabled = true; btn.textContent = 'Signing in\u2026';
+    err.style.display = 'none';
+    try {
+      const { data, error } = await sbRTC.auth.signInWithPassword({ email: AUTH_EMAIL, password });
+      if (error) throw error;
+      if (data && data.session) updateAuthState(data.session);
+      input.value = '';
+    } catch(ex) {
+      err.textContent = 'Wrong password. Try again.';
+      err.style.display = 'block';
+      input.value = '';
+      setTimeout(() => input.focus(), 0);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign in';
+    }
+  }
+
+  async function handleLogout() {
+    try { await sbRTC.auth.signOut(); } catch(e) {}
+    updateAuthState(null);
+  }
+
+  sbRTC.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+      updateAuthState(session);
+    } else if (event === 'SIGNED_OUT') {
+      updateAuthState(null);
+    }
+  });
 
   function handleRealtimeChange(payload) {
     if (Date.now() - _localChange < 1500) return;
@@ -746,7 +904,7 @@
     const f = getF(); const c = getFC();
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
-      await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
+      await sbFetchAuth('/filter_configs', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body });
     } catch(e) {}
   }
 
@@ -758,7 +916,7 @@
   }
 
   function saveViewsConfig() {
-    fetch(SB_URL + '/views_config', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
+    sbFetchAuth('/views_config', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
   }
 
   function setMode(mode, skipRender) {
@@ -1379,6 +1537,7 @@
   }
 
   function deleteSwipe(id) {
+    if (!currentUser) return;
     const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     if (!confirm('Delete this ' + label + '?')) return;
     if (activeMode === 'posts') {
@@ -1391,11 +1550,12 @@
       snippets = snippets.filter(x => x.id !== id);
     }
     persist(); applyFilters();
-    sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
+    sbFetchAuth('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
     showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' deleted');
   }
 
   function openAddModal() {
+    if (!currentUser) { showAuthOverlay(); return; }
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
     const isSnippet = activeMode === 'snippets';
@@ -1463,22 +1623,22 @@
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Website saved ✓');
     } else if (isCreator) {
       creators.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Creator saved ✓');
     } else if (isSnippet) {
       snippets.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Swipe saved ✓');
     }
   }
@@ -1486,6 +1646,7 @@
   let editingId = null;
 
   function openEditModal(id) {
+    if (!currentUser) { showAuthOverlay(); return; }
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === id);
     if (!s) return;
@@ -1577,7 +1738,7 @@
     const id = editingId;
     const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts, followers: s.followers });
     persist(); closeEditModal(); applyFilters();
-    fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
+    sbFetchAuth('/swipes?id=eq.' + id, { method: 'PATCH', body }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
@@ -1651,7 +1812,7 @@
     persist(); saveFilterConfig();
     affected.forEach(item => {
       const body = JSON.stringify({ filters: item.filters });
-      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
+      sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
     });
     renderSettingsPanel();
   }
@@ -1687,7 +1848,7 @@
     persist(); saveFilterConfig();
     affected.forEach(item => {
       const body = JSON.stringify({ filters: item.filters });
-      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
+      sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
     });
     renderSettingsPanel();
   }
@@ -1747,7 +1908,7 @@
   }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); closeImageLightbox(); }
+    if (e.key === 'Escape') { hideAuthOverlay(); closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); closeImageLightbox(); }
   });
   window.addEventListener('resize', () => { if (activeMode === 'posts') applyDensity(); });
 
@@ -1765,6 +1926,7 @@
   })();
 
   (async function init() {
+    await initAuth();
     await loadSwipes();
     await loadFilterConfigs();
     await loadViewsConfig();
