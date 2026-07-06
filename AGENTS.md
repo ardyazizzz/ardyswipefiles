@@ -393,6 +393,8 @@ Guest clicks "Sign in" → showAuthOverlay() → types password
 | Used for | Reads (GET /swipes, /filter_configs, /views_config) | Writes (POST/PATCH/DELETE) |
 | RLS result | SELECT allowed for anon | INSERT/UPDATE/DELETE allowed for authenticated |
 
+> **Critical:** RLS policies only work after the role has table-level access via `GRANT`. If `authenticated` role lacks `GRANT` on the table, writes return **403 `permission denied for table`** even with valid RLS policies. This is a common silent failure — the app works locally (localStorage) but reverts on refresh because Supabase writes fail silently (`.catch(()=>{})`).
+
 ### Guest Mode (Read-Only)
 
 When `data-auth="guest"` on `<body>`, CSS hides:
@@ -418,6 +420,11 @@ The `onAuthStateChange` listener handles session restoration and token refresh a
 ALTER TABLE swipes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE filter_configs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE views_config ENABLE ROW LEVEL SECURITY;
+
+-- Grant table-level access to authenticated role (required BEFORE RLS)
+GRANT ALL ON public.swipes TO authenticated;
+GRANT ALL ON public.filter_configs TO authenticated;
+GRANT ALL ON public.views_config TO authenticated;
 
 -- Public read + insert (anon can SELECT and INSERT)
 -- INSERT is allowed so the Chrome extension can still save new items
@@ -620,7 +627,7 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 | **localStorage size** | `persist()` serializes the entire dataset (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | `QuotaExceededError` is swallowed silently per-key by individual try/catch blocks. The app continues but localStorage cache becomes stale. Data remains safe in Supabase. Fix later: store only UI prefs in localStorage, or move bulk data to IndexedDB. |
 | **Render-all** | `renderCards()` builds ALL filtered cards into one innerHTML string | noticeable lag at thousands | Images use `loading="lazy"`. No pagination or virtual scrolling. |
 | **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
-| **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). |
+| **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). **Gotcha:** `authenticated` role also needs explicit `GRANT` on tables — RLS alone returns 403 on writes. |
 
 ### Fragile selector coupling (handle with care)
 
@@ -659,3 +666,5 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 9. **`sbFetchAuth` token caching.** `_authToken` is cached at login time and refreshed by `onAuthStateChange`. If you bypass `updateAuthState()` and set `_authToken` manually, token refresh may break silently.
 
 10. **Extension `background.js` criticality.** `background.js` runs as a Chrome service worker and handles ALL message routing and Supabase saves. If deleted, the entire extension breaks (no saves, no scan forwarding, no bookmark sync). Before commit `928c94c` it was untracked — a `git reset --hard` would permanently delete it. It is now tracked in git. Always commit it.
+
+11. **`GRANT` before RLS.** RLS policies with `TO authenticated` require the `authenticated` role to have table-level access via `GRANT ALL ON public.swipes TO authenticated`. Without it, writes silently return 403 `permission denied for table` (caught by `.catch(()=>{})`). The app updates localStorage but reverts on refresh because Supabase writes never went through. Always include `GRANT` statements before `CREATE POLICY` in the setup SQL.
