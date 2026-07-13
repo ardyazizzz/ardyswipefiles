@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -111,7 +111,6 @@
     .btn-ghost:hover { background: var(--bg-tertiary); border-color: var(--border-hover); color: var(--text-primary); }
     .btn-ghost:active { transform: translateY(1px); }
     .btn-ghost:focus-visible { outline: none; box-shadow: var(--ring); }
-    .btn-ghost.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
     .btn-cancel { padding: 9px 16px; font-size: 13px; font-weight: 500; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.18s var(--ease); }
     .btn-cancel:hover { background: var(--bg-secondary); border-color: var(--border-hover); color: var(--text-primary); }
     .btn-save { padding: 9px 16px; font-size: 13px; font-weight: 600; border-radius: var(--radius-md); border: none; background: var(--accent); color: var(--accent-text); cursor: pointer; font-family: inherit; transition: background 0.18s var(--ease), transform 0.1s var(--ease), box-shadow 0.18s var(--ease); box-shadow: 0 1px 2px rgba(79,70,229,0.25); }
@@ -125,7 +124,7 @@
     .dropdown-btn i { transition: transform 0.18s var(--ease); }
     .dropdown-btn.active { background: var(--accent-soft); color: var(--accent-hover); border-color: rgba(79,70,229,0.35); font-weight: 600; }
     .dropdown-btn:hover:not(.active) { border-color: var(--border-hover); color: var(--text-primary); background: var(--bg-tertiary); }
-    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 6px; min-width: 188px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; box-shadow: var(--shadow); transform-origin: top left; animation: ddIn 0.16s var(--ease); }
+    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 6px; min-width: 188px; z-index: 100; display: none; box-shadow: var(--shadow); transform-origin: top left; animation: ddIn 0.16s var(--ease); }
     .dropdown-menu.open { display: block; }
     @keyframes ddIn { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .dropdown-item { padding: 8px 10px; font-size: 13px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background 0.12s var(--ease), color 0.12s var(--ease); }
@@ -167,7 +166,7 @@
     @media (max-width: 800px) { .grid.masonry { column-count: 3; } }
     @media (max-width: 500px) { .grid.masonry { column-count: 2; } }
 
-    .card { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
+    .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow); }
     .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
     .card-body:hover .card-text { color: var(--text-primary); }
@@ -198,24 +197,11 @@
     }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
     .card-text.text-3 { -webkit-line-clamp: 3; max-height: calc(3 * 12.5px * 1.62); }
-    .img-wrap { position: relative; background: var(--bg-secondary); overflow: hidden; }
-    .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(20px); opacity: 0.35; transform: scale(1.1); pointer-events: none; }
-    .card-img { position: relative; z-index: 1; width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
+    .card-img { width: 100%; max-height: 180px; object-fit: cover; display: block; background: var(--bg-secondary); cursor: zoom-in; }
     .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); object-fit: contain; animation: lbIn 0.22s var(--ease); }
     @keyframes lbIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
     .lightbox-close:hover { background: rgba(0,0,0,0.65); }
-    .card-hero-wrap { position: relative; }
-    .card-hero-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
-    .card-hero-track::-webkit-scrollbar { display: none; }
-    .card-hero-track > .slide { flex: 0 0 100%; scroll-snap-align: start; position: relative; overflow: hidden; min-height: 80px; background: var(--bg-secondary); }
-    .card-hero-track > .slide > img { width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; position: relative; z-index: 1; }
-    .card-hero-badge { position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none; }
-    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.45); color: #fff; font-size: 28px; width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-    .lightbox-nav:hover { background: rgba(0,0,0,0.7); }
-    .lightbox-prev { left: 12px; }
-    .lightbox-next { right: 12px; }
-    .lightbox-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 13px; font-weight: 500; background: rgba(0,0,0,0.5); padding: 4px 14px; border-radius: 20px; z-index: 10; pointer-events: none; user-select: none; }
     .card-video { width: 100%; aspect-ratio: 16/9; border: none; display: block; background: #000; }
     .card-linkedin { width: 100%; aspect-ratio: 16/9; background: var(--info-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--info-text); cursor: pointer; text-decoration: none; font-size: 13px; font-weight: 600; transition: filter 0.18s var(--ease); }
     .card-linkedin:hover { filter: brightness(0.97); }
@@ -243,23 +229,6 @@
     .empty-state i { font-size: 42px; display: block; margin-bottom: 14px; color: var(--border-hover); }
     .empty-state p { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
     .empty-state small { font-size: 12.5px; }
-
-    .card-check { position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border-strong); background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 3; opacity: 0; transform: scale(0.7); transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease); pointer-events: none; }
-    .card.selectable .card-check { opacity: 1; transform: scale(1); }
-    .card.selected { box-shadow: 0 0 0 2px var(--accent), var(--shadow); }
-    .card.selected .card-check { background: var(--accent); border-color: var(--accent); }
-    .card.selected .card-check::after { content: ''; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -1px; }
-
-    .batch-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); box-shadow: 0 -4px 24px rgba(16,24,40,0.10); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 100; transform: translateY(100%); transition: transform 0.28s var(--ease); }
-    [data-theme="dark"] .batch-bar { box-shadow: 0 -4px 28px rgba(0,0,0,0.45); }
-    .batch-bar.show { transform: translateY(0); }
-    .batch-count { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
-    .batch-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .batch-link { font-size: 12.5px; font-weight: 500; color: var(--accent); cursor: pointer; border: none; background: none; padding: 6px 10px; border-radius: var(--radius-sm); transition: background 0.15s var(--ease); }
-    .batch-link:hover { background: var(--accent-soft); }
-    .btn-danger { background: var(--danger); color: #fff; border: none; padding: 9px 20px; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s var(--ease); white-space: nowrap; }
-    .btn-danger:hover { opacity: 0.9; transform: scale(1.03); }
-    .btn-danger:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
     .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--text-primary); color: #fff; padding: 11px 22px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.22s var(--ease), transform 0.22s var(--ease); pointer-events: none; z-index: 9999; white-space: nowrap; box-shadow: var(--shadow-lg); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -319,93 +288,9 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
-
-    /* ===== Auth overlay ===== */
-    .auth-overlay {
-      position: fixed; inset: 0; z-index: 9999;
-      background: var(--overlay);
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.2s var(--ease);
-    }
-    .auth-card {
-      position: relative;
-      width: 100%; max-width: 340px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 2.25rem 2rem;
-      box-shadow: var(--shadow-lg);
-      animation: modalIn 0.22s var(--ease);
-    }
-    .auth-logo { text-align: center; margin-bottom: 1.75rem; }
-    .auth-logo .brand-name { font-size: 22px; }
-    .auth-logo p { color: var(--text-tertiary); font-size: 13px; margin-top: 6px; }
-    .auth-form { display: flex; flex-direction: column; gap: 12px; }
-    .auth-form input {
-      width: 100%; font-size: 15px; font-family: inherit;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      background: var(--bg);
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease);
-    }
-    .auth-form input::placeholder { color: var(--text-tertiary); }
-    .auth-form input:focus { border-color: var(--accent); box-shadow: var(--ring); }
-    .auth-form button {
-      width: 100%; padding: 12px 14px;
-      border: none; border-radius: var(--radius-md);
-      background: var(--accent); color: var(--accent-text);
-      font-size: 14px; font-weight: 600; font-family: inherit;
-      cursor: pointer;
-      transition: background 0.16s var(--ease), transform 0.1s var(--ease);
-      box-shadow: 0 1px 2px rgba(79,70,229,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
-    }
-    .auth-form button:hover { background: var(--accent-hover); }
-    .auth-form button:active { transform: translateY(1px); }
-    .auth-form button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .auth-error {
-      color: var(--danger); font-size: 13px; text-align: center;
-      display: none; margin-top: 4px;
-    }
-    .auth-close {
-      position: absolute; top: 14px; right: 14px;
-      background: none; border: none; cursor: pointer;
-      color: var(--text-tertiary); font-size: 20px; padding: 5px;
-      border-radius: var(--radius-sm); display: flex; align-items: center;
-      transition: all 0.15s var(--ease);
-    }
-    .auth-close:hover { background: var(--bg-secondary); color: var(--text-primary); }
-
-    /* ===== Read-only (guest) mode ===== */
-    body[data-auth="guest"] #addBtn { display: none !important; }
-    body[data-auth="guest"] #manageFiltersBtn { display: none !important; }
-    body[data-auth="guest"] #logoutBtn { display: none !important; }
-    body[data-auth="guest"] .card-edit-hint { display: none !important; }
-    body[data-auth="guest"] .card-btn { display: none !important; }
-    body[data-auth="guest"] #selectToggle { display: none !important; }
-    body[data-auth="guest"] .card-body { cursor: default; }
-    body[data-auth="user"] #signinBtn { display: none !important; }
   </style>
 </head>
-<body data-auth="guest">
-
-<div class="auth-overlay" id="authOverlay" style="display:none">
-  <div class="auth-card">
-    <button class="auth-close" onclick="hideAuthOverlay()"><i class="ri-close-line"></i></button>
-    <div class="auth-logo">
-      <span class="brand-name">Swipe<span>.</span>ardy</span>
-      <p>Sign in to manage your swipes</p>
-    </div>
-    <form class="auth-form" onsubmit="handleLogin(event)">
-      <input type="password" id="authPassword" placeholder="Enter password" autocomplete="current-password" />
-      <button type="submit" id="authSubmit">Sign in</button>
-    </form>
-    <div class="auth-error" id="authError"></div>
-  </div>
-</div>
+<body>
 
 <div class="app">
   <div class="header">
@@ -427,29 +312,18 @@
         <i class="ri-search-line"></i>
         <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
       </div>
-      <button class="btn-ghost" id="manageFiltersBtn" onclick="openSettings()">
+      <button class="btn-ghost" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
       </button>
       <button class="btn-primary" onclick="openAddModal()" id="addBtn">
         <i class="ri-add-line"></i> Add swipe
       </button>
-      <button class="btn-ghost" id="signinBtn" onclick="showAuthOverlay()" title="Sign in" style="padding:8px 13px"><i class="ri-login-box-line"></i> Sign in</button>
-      <button class="btn-ghost" id="logoutBtn" onclick="handleLogout()" title="Sign out" style="padding:8px 11px"><i class="ri-logout-box-r-line"></i></button>
     </div>
   </div>
 
   <div class="filterbar" id="filterBar"></div>
   <div class="results-label" id="resultsLabel"></div>
   <div class="grid" id="cardGrid"></div>
-</div>
-
-<div class="batch-bar" id="batchBar">
-  <span class="batch-count" id="batchCount">0 selected</span>
-  <div class="batch-actions">
-    <button class="batch-link" onclick="deselectAll()">Deselect</button>
-    <button class="btn-danger" id="batchDeleteBtn" onclick="batchDeleteSelected()" disabled>Delete selected</button>
-    <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="toggleSelectMode()">Cancel</button>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -543,9 +417,6 @@
 
 <!-- Image lightbox -->
 <div class="overlay" id="imageOverlay" style="display:none" onclick="closeImageLightbox()">
-  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" onclick="event.stopPropagation();prevLightboxImage()" style="display:none"><i class="ri-arrow-left-s-line"></i></button>
-  <button class="lightbox-nav lightbox-next" id="lightboxNext" onclick="event.stopPropagation();nextLightboxImage()" style="display:none"><i class="ri-arrow-right-s-line"></i></button>
-  <div class="lightbox-counter" id="lightboxCounter"></div>
   <img id="lightboxImage" src="" alt="" class="lightbox-img" onclick="event.stopPropagation()" />
   <button class="lightbox-close" onclick="closeImageLightbox()"><i class="ri-close-line"></i></button>
 </div>
@@ -585,87 +456,6 @@
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
   let _localChange = 0;
-
-  /* ===== Auth (Password Cerdas) ===== */
-  const AUTH_EMAIL = 'ardy@swipeardy.com';
-  let currentUser = null;
-  let _authToken = null;
-
-  function sbFetchAuth(path, opts = {}) {
-    const token = _authToken || SB_KEY;
-    return fetch(SB_URL + path, {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...opts.headers },
-      ...opts
-    });
-  }
-
-  function updateAuthState(session) {
-    if (session && session.user) {
-      currentUser = session.user;
-      _authToken = session.access_token || null;
-      document.body.setAttribute('data-auth', 'user');
-      document.getElementById('authOverlay').style.display = 'none';
-    } else {
-      currentUser = null;
-      _authToken = null;
-      document.body.setAttribute('data-auth', 'guest');
-    }
-  }
-
-  async function initAuth() {
-    try {
-      const { data: { session } } = await sbRTC.auth.getSession();
-      updateAuthState(session);
-    } catch(e) { updateAuthState(null); }
-  }
-
-  function showAuthOverlay() {
-    document.getElementById('authOverlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('authPassword').focus(), 50);
-  }
-
-  function hideAuthOverlay() {
-    document.getElementById('authOverlay').style.display = 'none';
-    document.getElementById('authError').style.display = 'none';
-    document.getElementById('authPassword').value = '';
-  }
-
-  async function handleLogin(e) {
-    e.preventDefault();
-    const input = document.getElementById('authPassword');
-    const btn = document.getElementById('authSubmit');
-    const err = document.getElementById('authError');
-    const password = input.value;
-    if (!password) return;
-    btn.disabled = true; btn.textContent = 'Signing in\u2026';
-    err.style.display = 'none';
-    try {
-      const { data, error } = await sbRTC.auth.signInWithPassword({ email: AUTH_EMAIL, password });
-      if (error) throw error;
-      if (data && data.session) updateAuthState(data.session);
-      input.value = '';
-    } catch(ex) {
-      err.textContent = 'Wrong password. Try again.';
-      err.style.display = 'block';
-      input.value = '';
-      setTimeout(() => input.focus(), 0);
-    } finally {
-      btn.disabled = false; btn.textContent = 'Sign in';
-    }
-  }
-
-  async function handleLogout() {
-    try { await sbRTC.auth.signOut(); } catch(e) {}
-    updateAuthState(null);
-  }
-
-  sbRTC.auth.onAuthStateChange(function(event, session) {
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-      updateAuthState(session);
-    } else if (event === 'SIGNED_OUT') {
-      updateAuthState(null);
-    }
-  });
 
   function handleRealtimeChange(payload) {
     if (Date.now() - _localChange < 1500) return;
@@ -813,68 +603,13 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  var _lbImages = [];
-  var _lbIndex = 0;
-
   function openImageLightbox(url) {
-    _lbImages = [url];
-    _lbIndex = 0;
     document.getElementById('lightboxImage').src = url;
     document.getElementById('imageOverlay').style.display = 'flex';
-    updateLightboxNav();
   }
-
-  function openImageLightboxMulti(index, urlsStr) {
-    _lbImages = urlsStr.split(',').map(function(u){ return u.trim(); });
-    _lbIndex = index;
-    if (_lbIndex < 0) _lbIndex = 0;
-    if (_lbIndex >= _lbImages.length) _lbIndex = _lbImages.length - 1;
-    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
-    document.getElementById('imageOverlay').style.display = 'flex';
-    updateLightboxNav();
-  }
-
-  function updateLightboxNav() {
-    var prev = document.getElementById('lightboxPrev');
-    var next = document.getElementById('lightboxNext');
-    var counter = document.getElementById('lightboxCounter');
-    if (_lbImages.length > 1) {
-      prev.style.display = '';
-      next.style.display = '';
-      counter.textContent = (_lbIndex + 1) + ' / ' + _lbImages.length;
-    } else {
-      prev.style.display = 'none';
-      next.style.display = 'none';
-      counter.textContent = '';
-    }
-  }
-
-  function prevLightboxImage() {
-    if (_lbImages.length < 2) return;
-    _lbIndex--;
-    if (_lbIndex < 0) _lbIndex = _lbImages.length - 1;
-    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
-    updateLightboxNav();
-  }
-
-  function nextLightboxImage() {
-    if (_lbImages.length < 2) return;
-    _lbIndex++;
-    if (_lbIndex >= _lbImages.length) _lbIndex = 0;
-    document.getElementById('lightboxImage').src = _lbImages[_lbIndex];
-    updateLightboxNav();
-  }
-
   function closeImageLightbox() {
     document.getElementById('imageOverlay').style.display = 'none';
   }
-
-  document.addEventListener('keydown', function(e) {
-    if (document.getElementById('imageOverlay').style.display !== 'flex') return;
-    if (e.key === 'ArrowLeft') { prevLightboxImage(); e.preventDefault(); }
-    else if (e.key === 'ArrowRight') { nextLightboxImage(); e.preventDefault(); }
-    else if (e.key === 'Escape') { closeImageLightbox(); }
-  });
 
   let filters = load(LS_FILTERS, DEFAULT_FILTERS);
   let filterColors = load(LS_FILTER_COLORS, DEFAULT_FILTER_COLORS);
@@ -940,7 +675,7 @@
     const f = getF(); const c = getFC();
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
-      await sbFetchAuth('/filter_configs', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body });
+      await fetch(SB_URL + '/filter_configs', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body });
     } catch(e) {}
   }
 
@@ -952,12 +687,11 @@
   }
 
   function saveViewsConfig() {
-    sbFetchAuth('/views_config', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
+    fetch(SB_URL + '/views_config', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
   }
 
   function setMode(mode, skipRender) {
     if (mode !== activeMode) {
-      if (selectMode) { selectMode = false; selectedIds.clear(); document.getElementById('batchBar').classList.remove('show'); }
       activeMode = mode;
       currentSort = 'newest';
       if (!skipRender) document.getElementById('searchInput').value = '';
@@ -994,8 +728,6 @@
   let numericFilters = load(LS_NUMERIC_FILTERS, { engMin: '', engMax: '', folMin: '', folMax: '' });
   let currentViewName = null;
   let currentSort = 'newest';
-  let selectMode = false;
-  let selectedIds = new Set();
   let skipSync = true;
 
   function applyDensity() {
@@ -1204,42 +936,16 @@
 
   function getMedia(url, postUrl) {
     if (!url) return '';
-    if (url.indexOf(',') !== -1) {
-      var urls = url.split(',').map(function(u){ return u.trim(); }).filter(function(u){ return u; });
-      if (urls.length <= 1) { url = (urls[0] || ''); if (!url) return ''; }
-      else {
-        var safe = urls.map(function(u){ return u.replace(/'/g,"\\'"); }).join(',');
-        var h = '<div class="card-hero-wrap">';
-        h += '<div class="card-hero-track" onscroll="updateCarouselBadge(this)">';
-        for (var i = 0; i < urls.length; i++) {
-          h += '<div class="slide"><div class="img-bg" style=\'background-image:url("' + urls[i] + '")\'></div><img src="' + urls[i] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" /></div>';
-        }
-        h += '</div>';
-        h += '<div class="card-hero-badge">1 / ' + urls.length + '</div>';
-        h += '</div>';
-        return h;
-      }
-    }
     if (/video\.twimg\.com/.test(url)) {
       var proxy = 'https://swipe-proxy.ardyazizrw.workers.dev/?url=' + encodeURIComponent(url);
-      return `<video class="card-video" muted playsinline controls preload="none" loop src="${proxy}"></video>`;
+      return `<video class="card-video" autoplay loop muted playsinline controls src="${proxy}"></video>`;
     }
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" loading="lazy" allowfullscreen></iframe>`;
+    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
-    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" loading="lazy" allowfullscreen></iframe>`;
-    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" muted playsinline controls preload="none" loop src="${url}"></video>`;
-    return `<div class="img-wrap"><div class="img-bg" style="background-image:url(&quot;${url}&quot;)"></div><img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" /></div>`;
-  }
-
-  function updateCarouselBadge(track) {
-    var wrap = track.parentElement;
-    var badge = wrap.querySelector('.card-hero-badge');
-    var total = track.querySelectorAll('img').length;
-    var idx = Math.round(track.scrollLeft / track.clientWidth);
-    if (idx < 0) idx = 0;
-    if (idx >= total) idx = total - 1;
-    badge.textContent = (idx + 1) + ' / ' + total;
+    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe>`;
+    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" autoplay loop muted playsinline controls src="${url}"></video>`;
+    return `<img src="${url}" alt="" class="card-img" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" />`;
   }
 
   function renderFilterBar() {
@@ -1331,7 +1037,6 @@
     </select>`;
     html += `${activeMode === 'posts' ? `<button class="btn-ghost" style="padding:6px 10px" onclick="toggleLayout()" title="Switch to ${layoutMode === 'masonry' ? 'Grid' : 'Masonry'}"><i class="${layoutMode === 'masonry' ? 'ri-layout-masonry-fill' : 'ri-layout-grid-fill'}" style="font-size:13px"></i></button>` : ''}`;
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-column-line" style="font-size:13px"></i></button>`;
-    html += `<button class="btn-ghost ${selectMode ? 'active' : ''}" id="selectToggle" style="padding:6px 10px" onclick="toggleSelectMode()" title="Select cards"><i class="ri-checkbox-multiple-line" style="font-size:13px"></i></button>`;
     const totalSelected = Object.values(getAF()).reduce((s, a) => s + a.length, 0);
     if (totalSelected) html += `<button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
@@ -1479,13 +1184,9 @@
       const av = getAv(s.author);
       const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { const seen = new Set(); if (Array.isArray(v)) v.forEach(x => { if (x && !seen.has(x)) { seen.add(x); tags.push([k,x]); } }); else if (v) tags.push([k,v]); });
       const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M1.75024 0H22.2502v8.25h-2.5V2.5h-6.5v19H19V24H5v-2.5h5.7502v-19H4.25024v5.75h-2.5V0Z" clip-rule="evenodd"/></svg>`;
-      const isSel = selectMode && selectedIds.has(s.id);
-      const cardCheck = selectMode ? '<div class="card-check"></div>' : '';
-      const bodyFn = selectMode ? 'toggleCardSelection' : 'openEditModal';
       if (activeMode === 'snippets') {
-        return `<div class="card${selectMode ? ' selectable' : ''}${isSel ? ' selected' : ''}" data-id="${s.id}">
-          ${cardCheck}
-          <div class="card-body" onclick="${bodyFn}(${s.id})">
+        return `<div class="card">
+          <div class="card-body" onclick="openEditModal(${s.id})">
             <div class="card-top">
               <div class="card-author">
                 <div>
@@ -1503,9 +1204,8 @@
         </div>`;
       }
       if (activeMode === 'websites') {
-        return `<div class="card${selectMode ? ' selectable' : ''}${isSel ? ' selected' : ''}" data-id="${s.id}">
-          ${cardCheck}
-          <div class="card-body" onclick="${bodyFn}(${s.id})">
+        return `<div class="card">
+          <div class="card-body" onclick="openEditModal(${s.id})">
             <div class="card-top">
               <div class="card-author">
                 <div>
@@ -1525,9 +1225,8 @@
         </div>`;
       }
       if (activeMode === 'creators') {
-        return `<div class="card${selectMode ? ' selectable' : ''}${isSel ? ' selected' : ''}" data-id="${s.id}">
-          ${cardCheck}
-          <div class="card-body" onclick="${bodyFn}(${s.id})">
+        return `<div class="card">
+          <div class="card-body" onclick="openEditModal(${s.id})">
             <div class="card-top">
               <div class="card-author">
                 ${s.image
@@ -1551,9 +1250,8 @@
           <div class="card-engagement-bar"><div class="card-engagement-badge"><i class="ri-user-follow-line" style="font-size:13px"></i>${s.followers ? fmtNum(s.followers) + ' followers' : '— followers'}</div><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>
         </div>`;
       }
-      return `<div class="card${selectMode ? ' selectable' : ''}${isSel ? ' selected' : ''}" data-id="${s.id}">
-        ${cardCheck}
-        <div class="card-body" onclick="${bodyFn}(${s.id})">
+      return `<div class="card">
+        <div class="card-body" onclick="openEditModal(${s.id})">
           <div class="card-top">
             <div class="card-author">
               <div>
@@ -1584,7 +1282,6 @@
   }
 
   function deleteSwipe(id) {
-    if (!currentUser) return;
     const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     if (!confirm('Delete this ' + label + '?')) return;
     if (activeMode === 'posts') {
@@ -1597,58 +1294,11 @@
       snippets = snippets.filter(x => x.id !== id);
     }
     persist(); applyFilters();
-    sbFetchAuth('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
+    sbFetch('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
     showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' deleted');
-    if (selectedIds.has(id)) { selectedIds.delete(id); updateBatchBar(); }
   }
 
-  function toggleSelectMode() {
-    selectMode = !selectMode;
-    if (!selectMode) { selectedIds.clear(); document.getElementById('batchBar').classList.remove('show'); }
-    renderFilterBar(); applyFilters();
-  }
-
-  function toggleCardSelection(id) {
-    if (!selectMode) return;
-    if (selectedIds.has(id)) selectedIds.delete(id);
-    else selectedIds.add(id);
-    var card = document.querySelector('.card[data-id="' + id + '"]');
-    if (card) card.classList.toggle('selected', selectedIds.has(id));
-    updateBatchBar();
-  }
-
-  function deselectAll() {
-    selectedIds.clear();
-    document.querySelectorAll('.card.selected').forEach(function(c) { c.classList.remove('selected'); });
-    updateBatchBar();
-  }
-
-  function updateBatchBar() {
-    var n = selectedIds.size;
-    document.getElementById('batchCount').textContent = n + ' selected';
-    document.getElementById('batchDeleteBtn').disabled = n === 0;
-    document.getElementById('batchBar').classList.toggle('show', selectMode && n > 0);
-  }
-
-  function batchDeleteSelected() {
-    if (!currentUser || selectedIds.size === 0) return;
-    var label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
-    var count = selectedIds.size;
-    if (!confirm('Delete ' + count + ' ' + label + 's? This cannot be undone.')) return;
-    _localChange = Date.now();
-    selectedIds.forEach(function(id) {
-      if (activeMode === 'posts') swipes = swipes.filter(function(x) { return x.id !== id; });
-      else if (activeMode === 'creators') creators = creators.filter(function(x) { return x.id !== id; });
-      else if (activeMode === 'websites') websites = websites.filter(function(x) { return x.id !== id; });
-      else snippets = snippets.filter(function(x) { return x.id !== id; });
-      sbFetchAuth('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(function(){});
-    });
-    persist(); selectedIds.clear(); selectMode = false;
-    document.getElementById('batchBar').classList.remove('show');
-    renderFilterBar(); applyFilters();
-    showToast(count + ' ' + label + 's deleted');
-  }  function openAddModal() {
-    if (!currentUser) { showAuthOverlay(); return; }
+  function openAddModal() {
     const isCreator = activeMode === 'creators';
     const isWebsite = activeMode === 'websites';
     const isSnippet = activeMode === 'snippets';
@@ -1716,22 +1366,23 @@
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Website saved ✓');
     } else if (isCreator) {
       creators.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Creator saved ✓');
     } else if (isSnippet) {
       snippets.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
       showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
       persist(); closeAddModal(); applyFilters();
-      sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
+      fetch(SB_URL + '/swipes', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: sbBody }).catch(()=>{});
+      showToast('Swipe saved ✓');
       showToast('Swipe saved ✓');
     }
   }
@@ -1739,7 +1390,6 @@
   let editingId = null;
 
   function openEditModal(id) {
-    if (!currentUser) { showAuthOverlay(); return; }
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const s = source.find(x => x.id === id);
     if (!s) return;
@@ -1831,7 +1481,7 @@
     const id = editingId;
     const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts, followers: s.followers });
     persist(); closeEditModal(); applyFilters();
-    sbFetchAuth('/swipes?id=eq.' + id, { method: 'PATCH', body }).catch(()=>{});
+    fetch(SB_URL + '/swipes?id=eq.' + id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
 
@@ -1905,7 +1555,7 @@
     persist(); saveFilterConfig();
     affected.forEach(item => {
       const body = JSON.stringify({ filters: item.filters });
-      sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
+      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
     });
     renderSettingsPanel();
   }
@@ -1941,7 +1591,7 @@
     persist(); saveFilterConfig();
     affected.forEach(item => {
       const body = JSON.stringify({ filters: item.filters });
-      sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
+      fetch(SB_URL + '/swipes?id=eq.' + item.id, { method: 'PATCH', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body }).catch(()=>{});
     });
     renderSettingsPanel();
   }
@@ -2001,7 +1651,7 @@
   }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { hideAuthOverlay(); closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); closeImageLightbox(); }
+    if (e.key === 'Escape') { closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); closeImageLightbox(); }
   });
   window.addEventListener('resize', () => { if (activeMode === 'posts') applyDensity(); });
 
@@ -2019,7 +1669,6 @@
   })();
 
   (async function init() {
-    await initAuth();
     await loadSwipes();
     await loadFilterConfigs();
     await loadViewsConfig();

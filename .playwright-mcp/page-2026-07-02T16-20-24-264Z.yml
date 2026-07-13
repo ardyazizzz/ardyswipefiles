@@ -1,0 +1,17 @@
+- generic [ref=f3e2]:
+  - paragraph [ref=f3e3]:
+    - img [ref=f3e4]
+  - paragraph [ref=f3e5]:
+    - strong [ref=f3e6]: We're having a really bad day.
+  - paragraph [ref=f3e7]: The Unicorns have taken over. We're doing our best to get them under control and get GitHub back up and running.
+  - generic [ref=f3e8]:
+    - link "Contact Support" [ref=f3e9] [cursor=pointer]:
+      - /url: https://github.com/contact
+    - text: —
+    - link "GitHub Status" [ref=f3e10] [cursor=pointer]:
+      - /url: https://status.github.com
+    - text: —
+    - link "@githubstatus" [ref=f3e11] [cursor=pointer]:
+      - /url: https://twitter.com/githubstatus
+  - link [ref=f3e12] [cursor=pointer]:
+    - /url: /

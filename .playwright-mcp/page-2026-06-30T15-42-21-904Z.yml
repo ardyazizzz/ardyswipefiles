@@ -1,0 +1,1149 @@
+- generic [active] [ref=f26e13]:
+  - generic:
+    - region "Toast message":
+      - heading "0 notifications total" [level=2] [ref=f26e15]
+      - alert
+  - region [ref=f26e12]
+  - generic [ref=f26e18]:
+    - generic [ref=f26e19]:
+      - heading "Update to our terms and data use" [level=1] [ref=f26e20]
+      - paragraph [ref=f26e22]:
+        - text: As of November 3, 2025, we are using some of your LinkedIn data to improve the content-generating AI that enhances your experience, unless you opt out in your
+        - link "settings" [ref=f26e23] [cursor=pointer]:
+          - /url: https://www.linkedin.com/mypreferences/d/settings/data-for-ai-improvement
+        - text: . We also updated our terms. See what’s new and how to manage your data.
+        - link "Learn more" [ref=f26e24] [cursor=pointer]:
+          - /url: https://www.linkedin.com/help/linkedin/answer/a8059228
+    - button "Dismiss" [ref=f26e25] [cursor=pointer]:
+      - img [ref=f26e26]
+      - generic [ref=f26e28]: Dismiss
+  - generic [ref=f26e29]:
+    - generic [ref=f26e31]:
+      - button "Skip to search" [ref=f26e32] [cursor=pointer]:
+        - generic [ref=f26e33]: Skip to search
+      - button "Skip to main content" [ref=f26e34] [cursor=pointer]:
+        - generic [ref=f26e35]: Skip to main content
+      - button "Keyboard shortcuts" [ref=f26e36] [cursor=pointer]:
+        - generic [ref=f26e37]: Keyboard shortcuts
+      - button "Close jump menu" [ref=f26e38] [cursor=pointer]:
+        - img [ref=f26e39]
+        - generic [ref=f26e41]: Close jump menu
+    - banner "Global Navigation" [ref=f26e42]:
+      - generic [ref=f26e43]:
+        - link "LinkedIn" [ref=f26e44] [cursor=pointer]:
+          - /url: https://www.linkedin.com/feed/?nis=true
+          - img "LinkedIn" [ref=f26e47]:
+            - img [ref=f26e48]
+        - generic [ref=f26e52]:
+          - combobox "Search" [ref=f26e53]
+          - generic:
+            - img
+        - navigation "Primary Navigation" [ref=f26e54]:
+          - list [ref=f26e55]:
+            - listitem [ref=f26e56]:
+              - link "new feed updates notifications Home" [ref=f26e57] [cursor=pointer]:
+                - /url: https://www.linkedin.com/feed/?nis=true&
+                - generic [ref=f26e58]:
+                  - generic [ref=f26e61]: new feed updates notifications
+                  - img [ref=f26e65]
+                - generic "Home" [ref=f26e67]
+            - listitem [ref=f26e68]:
+              - link "My Network" [ref=f26e69] [cursor=pointer]:
+                - /url: https://www.linkedin.com/mynetwork/?
+                - img [ref=f26e73]
+                - generic "My Network" [ref=f26e75]
+            - listitem [ref=f26e76]:
+              - link "Jobs" [ref=f26e77] [cursor=pointer]:
+                - /url: https://www.linkedin.com/jobs/?
+                - img [ref=f26e81]
+                - generic "Jobs" [ref=f26e83]
+            - listitem [ref=f26e84]:
+              - link "Messaging" [ref=f26e85] [cursor=pointer]:
+                - /url: https://www.linkedin.com/messaging/?
+                - img [ref=f26e89]
+                - generic "Messaging" [ref=f26e91]
+            - listitem [ref=f26e92]:
+              - link "1 new notification Notifications" [ref=f26e93] [cursor=pointer]:
+                - /url: https://www.linkedin.com/notifications/?
+                - generic [ref=f26e94]:
+                  - generic [ref=f26e95]:
+                    - generic [ref=f26e96]: "1"
+                    - generic [ref=f26e97]: 1 new notification
+                  - img [ref=f26e101]
+                - generic "Notifications" [ref=f26e103]
+            - listitem [ref=f26e104]:
+              - button "Brian Huntington Me" [ref=f26e106] [cursor=pointer]:
+                - img "Brian Huntington" [ref=f26e107]
+                - generic [ref=f26e108]:
+                  - text: Me
+                  - img [ref=f26e109]
+            - listitem [ref=f26e111]:
+              - button "For Business" [ref=f26e113] [cursor=pointer]:
+                - img [ref=f26e117]
+                - generic "For Business" [ref=f26e119]:
+                  - text: For Business
+                  - img [ref=f26e120]
+            - listitem [ref=f26e122]:
+              - link "Try Premium for €0" [ref=f26e124] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=f26e125]:
+                  - img [ref=f26e126]
+                  - generic [ref=f26e128]: Try Premium for €0
+    - generic [ref=f26e135]:
+      - complementary "User profile" [ref=f26e136]:
+        - generic [ref=f26e138]:
+          - generic [ref=f26e139]:
+            - link "Default background" [ref=f26e140] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+            - link "Photo of Brian Huntington" [ref=f26e142] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+              - img "Photo of Brian Huntington" [ref=f26e143]
+            - generic [ref=f26e144]:
+              - link "Brian Huntington Student at Dublin City University Dundalk, County Louth" [ref=f26e145] [cursor=pointer]:
+                - /url: /in/brian-huntington-11820b2a4/
+                - heading "Brian Huntington" [level=3] [ref=f26e147]
+                - paragraph [ref=f26e148]: Student at Dublin City University
+                - paragraph [ref=f26e149]: Dundalk, County Louth
+              - button "Add Experience" [ref=f26e150] [cursor=pointer]:
+                - generic [ref=f26e151]:
+                  - img [ref=f26e152]
+                  - generic [ref=f26e154]: Experience
+          - link "Access exclusive tools & insights Try Premium for €0" [ref=f26e156] [cursor=pointer]:
+            - /url: http://www.linkedin.com/premium/products/?upsellOrderOrigin=Tracking%3Av1%3Apremium_homepage_identity_upsell%3ANav%3AIn-Product&referenceId=0uHWKTBNS9mmPfxCAI9N5Q%3D%3D&isSS=true&upsellSlotId=IDENTITY_MODULE&destRedirectURL=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fupdate%2Furn%3Ali%3Aactivity%3A7210966387656216577%2F%3FupdateEntityUrn%3Durn%253Ali%253Afs_updateV2%253A%2528urn%253Ali%253Aactivity%253A7210966387656216577%252CFEED_DETAIL%252CEMPTY%252CDEFAULT%252Cfalse%2529%26originTrackingId%3DUGKPdK2PTYKbvKONh7y7Qg%253D%253D
+            - heading "Access exclusive tools & insights" [level=3] [ref=f26e157]
+            - generic [ref=f26e158]:
+              - img [ref=f26e159]
+              - generic [ref=f26e161]: Try Premium for €0
+          - list [ref=f26e165]:
+            - listitem [ref=f26e166]:
+              - link "Connections Grow your network Grow your network by adding connections." [ref=f26e167] [cursor=pointer]:
+                - /url: /mynetwork/
+                - generic [ref=f26e168]:
+                  - generic [ref=f26e169]:
+                    - generic [ref=f26e170]: Connections
+                    - generic [ref=f26e171]: Grow your network
+                  - img "Grow your network by adding connections." [ref=f26e173]
+      - main "Feed detail update" [ref=f26e175]:
+        - heading "Feed detail update" [level=1] [ref=f26e176]
+        - generic "Update container" [ref=f26e177]:
+          - article [ref=f26e181]:
+            - generic [ref=f26e183]:
+              - heading "Feed post" [level=2] [ref=f26e184]
+              - generic [ref=f26e185]:
+                - generic [ref=f26e186]:
+                  - generic [ref=f26e187]:
+                    - generic [ref=f26e188]:
+                      - link "View Rohit Virkud’s graphic link" [ref=f26e189] [cursor=pointer]:
+                        - /url: https://www.linkedin.com/in/rohitvirkud?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAADvmQYMB9GeaQQcCNDuTcCvSAIDtByL1wns
+                        - img "View Rohit Virkud’s graphic link" [ref=f26e193]
+                      - generic [ref=f26e194]:
+                        - 'link "View: Rohit Virkud Verified • 3rd+ I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e195] [cursor=pointer]':
+                          - /url: https://www.linkedin.com/in/rohitvirkud?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAADvmQYMB9GeaQQcCNDuTcCvSAIDtByL1wns
+                          - generic [ref=f26e196]:
+                            - generic [ref=f26e199]: Rohit Virkud
+                            - generic [ref=f26e201]:
+                              - img [ref=f26e202]
+                              - text: • 3rd+
+                          - generic [ref=f26e205]: I help independent CFPs build brand & business on LinkedIn
+                        - generic [ref=f26e207]:
+                          - text: 2yr •
+                          - img [ref=f26e210]
+                    - button "Follow Rohit Virkud" [ref=f26e212] [cursor=pointer]:
+                      - img [ref=f26e213]
+                      - generic [ref=f26e215]: Follow
+                  - button "Open control menu for post by Rohit Virkud" [ref=f26e218] [cursor=pointer]:
+                    - img [ref=f26e219]
+                - generic [ref=f26e225]:
+                  - text: Your LinkedIn Presence is Weak 👉 (No BS)
+                  - text: Get some value? Do RESHARE this with your network.
+                  - link "hashtag profileoptimisation" [ref=f26e226] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/search/results/all/?keywords=%23profileoptimisation&origin=HASH_TAG_FROM_FEED
+                    - generic [ref=f26e227]: hashtag
+                    - generic [ref=f26e228]: "#profileoptimisation"
+                  - link "hashtag brandbuilding" [ref=f26e229] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/search/results/all/?keywords=%23brandbuilding&origin=HASH_TAG_FROM_FEED
+                    - generic [ref=f26e230]: hashtag
+                    - generic [ref=f26e231]: "#brandbuilding"
+                  - link "hashtag linkedIngrowth" [ref=f26e232] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/search/results/all/?keywords=%23linkedingrowth&origin=HASH_TAG_FROM_FEED
+                    - generic [ref=f26e233]: hashtag
+                    - generic [ref=f26e234]: "#linkedIngrowth"
+                - generic [ref=f26e236]:
+                  - alert [ref=f26e237]: Your document has finished loading
+                  - iframe [ref=f26e238]:
+                    - main [ref=f27e4]:
+                      - generic [ref=f27e8]:
+                        - generic [ref=f27e9]: Your LinkedIn Presence is Weak
+                        - generic [ref=f27e10]: •
+                        - generic [ref=f27e11]: 9 pages
+                      - list [ref=f27e14]:
+                        - listitem [ref=f27e15]:
+                          - img "Rohit Virkud Repost Your is Weak LinkedIn Presence Real Client Case Study"
+                        - listitem [ref=f27e16]:
+                          - img
+                        - listitem [ref=f27e17]
+                        - listitem [ref=f27e18]
+                        - listitem [ref=f27e19]
+                        - listitem [ref=f27e20]
+                        - listitem [ref=f27e21]
+                        - listitem [ref=f27e22]
+                        - listitem [ref=f27e23]
+                      - button "Go to next page of document" [ref=f27e25] [cursor=pointer]:
+                        - img [ref=f27e27]
+                        - generic [ref=f27e29]: Go to next page of document
+                      - img [ref=f27e32]
+                      - generic [ref=f27e36]:
+                        - generic [ref=f27e38]:
+                          - generic [ref=f27e39]:
+                            - generic [ref=f27e40]: Current page
+                            - generic [ref=f27e41]: "1"
+                          - text: /
+                          - generic [ref=f27e42]:
+                            - generic [ref=f27e43]: Total pages
+                            - text: "9"
+                        - progressbar "Progress bar Slide 1/9" [ref=f27e45] [cursor=pointer]
+                        - button "Enter full screen. An accessible version of the document is available in full screen mode." [ref=f27e50] [cursor=pointer]:
+                          - img [ref=f27e52]
+                          - generic [ref=f27e54]: Enter full screen. An accessible version of the document is available in full screen mode.
+                - generic [ref=f26e239]:
+                  - list [ref=f26e243]:
+                    - listitem [ref=f26e244]:
+                      - button "188 reactions" [ref=f26e245] [cursor=pointer]:
+                        - img "like" [ref=f26e246]
+                        - img "love" [ref=f26e247]
+                        - img "support" [ref=f26e248]
+                        - generic [ref=f26e249]: "188"
+                    - listitem [ref=f26e250]:
+                      - list [ref=f26e251]:
+                        - listitem [ref=f26e252]:
+                          - button "126 comments on Rohit Virkud’s post" [ref=f26e253] [cursor=pointer]:
+                            - generic [ref=f26e254]: 126 comments
+                          - text: ·
+                        - listitem [ref=f26e255]:
+                          - button "1 repost of Rohit Virkud’s post" [ref=f26e256] [cursor=pointer]:
+                            - generic [ref=f26e257]: 1 repost
+                  - generic [ref=f26e258]:
+                    - heading "Reactions" [level=3] [ref=f26e259]
+                    - list "Reactions" [ref=f26e260]:
+                      - listitem [ref=f26e261]:
+                        - link "View Mamoona B’s graphic link, reacted with LIKE, graphic" [ref=f26e262] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAEraDugB3SbO7vdm4X7a5rm0XzSve9QOXUc
+                          - generic [ref=f26e264]:
+                            - img "View Mamoona B’s graphic link" [ref=f26e267]
+                            - img "like" [ref=f26e268]
+                      - listitem [ref=f26e269]:
+                        - link "View Ariba iqbal’s graphic link, reacted with LIKE, graphic" [ref=f26e270] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAEL_39gB6Yd2iNTN2E92HkIAoJxBOZ-d5OI
+                          - generic [ref=f26e272]:
+                            - img "View Ariba iqbal’s graphic link" [ref=f26e275]
+                            - img "like" [ref=f26e276]
+                      - listitem [ref=f26e277]:
+                        - link "View Asif khan’s graphic link, reacted with LIKE, graphic" [ref=f26e278] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAAMmkA4Bw_F8OiKYH5P67Jbn2OiPYTdjwRI
+                          - generic [ref=f26e280]:
+                            - img "View Asif khan’s graphic link" [ref=f26e283]
+                            - img "like" [ref=f26e284]
+                      - listitem [ref=f26e285]:
+                        - link "View Fahim Adnan’s graphic link, reacted with EMPATHY, graphic" [ref=f26e286] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAADzjLL8Bp8o5knhUMjKtgJFSWqSxdvnclQM
+                          - generic [ref=f26e288]:
+                            - img "View Fahim Adnan’s graphic link" [ref=f26e291]
+                            - img "love" [ref=f26e292]
+                      - listitem [ref=f26e293]:
+                        - link "View Nikita Raj’s graphic link, reacted with LIKE, graphic" [ref=f26e294] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAE3M3VUBzCd35KRmtQxdhvjsySn44tFRevg
+                          - generic [ref=f26e296]:
+                            - img "View Nikita Raj’s graphic link" [ref=f26e299]
+                            - img "like" [ref=f26e300]
+                      - listitem [ref=f26e301]:
+                        - link "View Laiba Tahir’s graphic link, reacted with LIKE, graphic" [ref=f26e302] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAEC7pG4BmQ2nbV0Xs0vo8t6nB21JCsjgHL4
+                          - generic [ref=f26e304]:
+                            - img "View Laiba Tahir’s graphic link" [ref=f26e307]
+                            - img "like" [ref=f26e308]
+                      - listitem [ref=f26e309]:
+                        - link "View Moorthi G’s graphic link, reacted with LIKE, graphic" [ref=f26e310] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAADZV4wMBG1xyGbo_O6x6reLLWnoQovQ7atA
+                          - generic [ref=f26e312]:
+                            - img "View Moorthi G’s graphic link" [ref=f26e315]
+                            - img "like" [ref=f26e316]
+                      - listitem [ref=f26e317]:
+                        - button "See 180 more reactions" [ref=f26e318] [cursor=pointer]: …
+                  - generic [ref=f26e319]:
+                    - generic [ref=f26e320]:
+                      - button "React Like" [ref=f26e321] [cursor=pointer]:
+                        - generic [ref=f26e323]:
+                          - img [ref=f26e324]
+                          - generic [ref=f26e326]: Like
+                      - button "Open reactions menu":
+                        - img [ref=f26e328] [cursor=pointer]
+                    - button "Comment" [ref=f26e332] [cursor=pointer]:
+                      - img [ref=f26e333]
+                      - generic [ref=f26e335]: Comment
+                    - button "Repost" [ref=f26e338] [cursor=pointer]:
+                      - img [ref=f26e339]
+                      - generic [ref=f26e341]: Repost
+                    - button "Send in a private message" [ref=f26e344] [cursor=pointer]:
+                      - img [ref=f26e345]
+                      - generic [ref=f26e348]: Send
+              - generic [ref=f26e350]:
+                - generic [ref=f26e352]:
+                  - img "Brian Huntington" [ref=f26e354]
+                  - generic [ref=f26e357]:
+                    - generic [ref=f26e361]:
+                      - textbox "Text editor for creating content" [ref=f26e363]:
+                        - paragraph [ref=f26e364]
+                        - text: Add a comment…
+                      - generic [ref=f26e365]: Add a comment…
+                    - generic [ref=f26e367]:
+                      - button "Open Emoji Keyboard" [ref=f26e370] [cursor=pointer]:
+                        - img
+                        - generic [ref=f26e371]: Open Emoji Keyboard
+                      - button "Add a photo" [ref=f26e373] [cursor=pointer]:
+                        - img [ref=f26e374]
+                - button "Current selected sort order is Most relevant" [ref=f26e379] [cursor=pointer]:
+                  - generic [ref=f26e380]: Current selected sort order is Most relevant
+                  - generic [ref=f26e381]:
+                    - text: Most relevant
+                    - img [ref=f26e382]
+                - generic [ref=f26e384]:
+                  - generic [ref=f26e387]:
+                    - article [ref=f26e389]:
+                      - generic [ref=f26e390]:
+                        - generic [ref=f26e391]:
+                          - link "View Garima Kourav🦅’s graphic link" [ref=f26e392] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/graphic-designer-creative-specialist-linked
+                            - img "View Garima Kourav🦅’s graphic link" [ref=f26e395]
+                          - 'link "View: Garima Kourav🦅 • 3rd+ I make designs that SPEAK louder than words I Carousels, Banners &amp; Infographics l Logo design" [ref=f26e396] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/graphic-designer-creative-specialist-linked
+                            - heading "Garima Kourav🦅 • 3rd+" [level=3] [ref=f26e397]:
+                              - generic [ref=f26e398]: Garima Kourav🦅
+                              - generic [ref=f26e399]: • 3rd+
+                            - generic [ref=f26e400]: I make designs that SPEAK louder than words I Carousels, Banners & Infographics l Logo design
+                        - generic [ref=f26e401]:
+                          - time [ref=f26e402]: 2y
+                          - button "Open options for Garima Kourav🦅’s comment" [ref=f26e405] [cursor=pointer]:
+                            - img "Open options for Garima Kourav🦅’s comment" [ref=f26e406]
+                      - generic [ref=f26e408]:
+                        - button [ref=f26e409] [cursor=pointer]
+                        - generic [ref=f26e416]:
+                          - text: Thanks for sharing these case studies, they are like a treasure of inspiration for people like me
+                          - link "Rohit Virkud" [ref=f26e418] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                          - text: Love the design, especially the colour palette🔥
+                      - generic [ref=f26e419]:
+                        - generic [ref=f26e420]:
+                          - button [ref=f26e421] [cursor=pointer]
+                          - generic [ref=f26e423]:
+                            - generic [ref=f26e424]:
+                              - generic [ref=f26e425]:
+                                - button "React Like to Garima Kourav🦅’s comment" [ref=f26e426] [cursor=pointer]:
+                                  - generic [ref=f26e429]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e431] [cursor=pointer]
+                              - generic [ref=f26e433]: ·
+                              - button "5 Reactions on Garima Kourav🦅’s comment" [ref=f26e434] [cursor=pointer]:
+                                - img "like" [ref=f26e435]
+                                - generic [ref=f26e436]: "5"
+                            - generic [ref=f26e438]:
+                              - button "Reply to Garima Kourav🦅’s comment" [ref=f26e439] [cursor=pointer]:
+                                - generic [ref=f26e441]: Reply
+                              - generic [ref=f26e442]: ·
+                              - generic [ref=f26e443]: 1 reply
+                              - generic [ref=f26e444]: 1 Comment on Garima Kourav🦅’s comment
+                        - generic [ref=f26e446]:
+                          - button [ref=f26e447] [cursor=pointer]
+                          - article [ref=f26e449]:
+                            - generic [ref=f26e450]:
+                              - generic [ref=f26e451]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e452] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e455]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e456] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e457]:
+                                    - generic [ref=f26e458]: Rohit Virkud
+                                    - img [ref=f26e460]
+                                    - generic [ref=f26e462]: Author
+                                  - generic [ref=f26e463]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e464]:
+                                - time [ref=f26e465]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e468] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e469]
+                            - generic [ref=f26e479]:
+                              - link "Garima Kourav🦅" [ref=f26e481] [cursor=pointer]:
+                                - /url: /in/graphic-designer-creative-specialist-linked/
+                              - text: glad you like it
+                            - generic [ref=f26e486]:
+                              - generic [ref=f26e488]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e489] [cursor=pointer]:
+                                  - generic [ref=f26e492]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e494] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e498] [cursor=pointer]:
+                                - generic [ref=f26e500]: Reply
+                    - article [ref=f26e502]:
+                      - generic [ref=f26e503]:
+                        - generic [ref=f26e504]:
+                          - link "View Ashish D’s graphic link" [ref=f26e505] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/pratik-deshmukh-designer
+                            - img "View Ashish D’s graphic link" [ref=f26e508]
+                          - 'link "View: Ashish D • 3rd+ Designer" [ref=f26e509] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/pratik-deshmukh-designer
+                            - heading "Ashish D • 3rd+" [level=3] [ref=f26e510]:
+                              - generic [ref=f26e511]: Ashish D
+                              - generic [ref=f26e512]: • 3rd+
+                            - generic [ref=f26e513]: Designer
+                        - generic [ref=f26e514]:
+                          - time [ref=f26e515]: 2y
+                          - button "Open options for Ashish D’s comment" [ref=f26e518] [cursor=pointer]:
+                            - img "Open options for Ashish D’s comment" [ref=f26e519]
+                      - generic [ref=f26e521]:
+                        - button [ref=f26e522] [cursor=pointer]
+                        - generic [ref=f26e529]:
+                          - text: Outstanding work
+                          - link "Rohit Virkud" [ref=f26e531] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                          - text: 🔥
+                      - generic [ref=f26e532]:
+                        - generic [ref=f26e533]:
+                          - button [ref=f26e534] [cursor=pointer]
+                          - generic [ref=f26e536]:
+                            - generic [ref=f26e537]:
+                              - generic [ref=f26e538]:
+                                - button "React Like to Ashish D’s comment" [ref=f26e539] [cursor=pointer]:
+                                  - generic [ref=f26e542]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e544] [cursor=pointer]
+                              - generic [ref=f26e546]: ·
+                              - button "5 Reactions on Ashish D’s comment" [ref=f26e547] [cursor=pointer]:
+                                - img "like" [ref=f26e548]
+                                - generic [ref=f26e549]: "5"
+                            - generic [ref=f26e551]:
+                              - button "Reply to Ashish D’s comment" [ref=f26e552] [cursor=pointer]:
+                                - generic [ref=f26e554]: Reply
+                              - generic [ref=f26e555]: ·
+                              - generic [ref=f26e556]: 2 replies
+                              - generic [ref=f26e557]: 2 Replies on Ashish D’s comment
+                        - generic [ref=f26e558]:
+                          - generic [ref=f26e559]:
+                            - button [ref=f26e560] [cursor=pointer]
+                            - button "Load previous replies on Ashish D’s comment" [ref=f26e563] [cursor=pointer]:
+                              - generic [ref=f26e564]: See previous replies
+                          - generic [ref=f26e565]:
+                            - button [ref=f26e566] [cursor=pointer]
+                            - article [ref=f26e568]:
+                              - generic [ref=f26e569]:
+                                - generic [ref=f26e570]:
+                                  - link "View Ashish D’s graphic link" [ref=f26e571] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/pratik-deshmukh-designer
+                                    - img "View Ashish D’s graphic link" [ref=f26e574]
+                                  - 'link "View: Ashish D • 3rd+ Designer" [ref=f26e575] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/pratik-deshmukh-designer
+                                    - heading "Ashish D • 3rd+" [level=3] [ref=f26e576]:
+                                      - generic [ref=f26e577]: Ashish D
+                                      - generic [ref=f26e578]: • 3rd+
+                                    - generic [ref=f26e579]: Designer
+                                - generic [ref=f26e580]:
+                                  - time [ref=f26e581]: 2y
+                                  - button "Open options for Ashish D’s comment" [ref=f26e584] [cursor=pointer]:
+                                    - img "Open options for Ashish D’s comment" [ref=f26e585]
+                              - generic [ref=f26e595]:
+                                - link "Rohit Virkud" [ref=f26e597] [cursor=pointer]:
+                                  - /url: /in/rohitvirkud/
+                                - text: pinky promise bhul gye 😂
+                              - generic [ref=f26e602]:
+                                - generic [ref=f26e603]:
+                                  - generic [ref=f26e604]:
+                                    - button "React Like to Ashish D’s comment" [ref=f26e605] [cursor=pointer]:
+                                      - generic [ref=f26e608]: Like
+                                    - button "Open reactions menu":
+                                      - img [ref=f26e610] [cursor=pointer]
+                                  - generic [ref=f26e612]: ·
+                                  - button "2 Reactions on Ashish D’s comment" [ref=f26e613] [cursor=pointer]:
+                                    - img "like" [ref=f26e614]
+                                    - img "funny" [ref=f26e615]
+                                    - generic [ref=f26e616]: "2"
+                                - button "Reply to Ashish D’s comment" [ref=f26e619] [cursor=pointer]:
+                                  - generic [ref=f26e621]: Reply
+                    - article [ref=f26e623]:
+                      - generic [ref=f26e624]:
+                        - generic [ref=f26e625]:
+                          - link "View Darshan Khude’s open to work graphic link" [ref=f26e626] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/darshanmkhude
+                            - img "View Darshan Khude’s open to work graphic link" [ref=f26e629]
+                          - 'link "View: Darshan Khude • 3rd+ Helping People Learn Through Content, Communication &amp; Digital Media" [ref=f26e630] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/darshanmkhude
+                            - heading "Darshan Khude • 3rd+" [level=3] [ref=f26e631]:
+                              - generic [ref=f26e632]: Darshan Khude
+                              - generic [ref=f26e633]:
+                                - img [ref=f26e634]
+                                - text: • 3rd+
+                            - generic [ref=f26e636]: Helping People Learn Through Content, Communication & Digital Media
+                        - generic [ref=f26e637]:
+                          - time [ref=f26e638]: 2y
+                          - button "Open options for Darshan Khude’s comment" [ref=f26e641] [cursor=pointer]:
+                            - img "Open options for Darshan Khude’s comment" [ref=f26e642]
+                      - generic [ref=f26e644]:
+                        - button [ref=f26e645] [cursor=pointer]
+                        - generic [ref=f26e652]:
+                          - text: Focus on showcasing your achievements and expertise, engage with your network and consistently share valuable content. It will strengthen your LinkedIn presence.
+                          - text: Great changes, I am gonna make changes in my profile with your points.
+                      - generic [ref=f26e653]:
+                        - generic [ref=f26e654]:
+                          - button [ref=f26e655] [cursor=pointer]
+                          - generic [ref=f26e657]:
+                            - generic [ref=f26e658]:
+                              - generic [ref=f26e659]:
+                                - button "React Like to Darshan Khude’s comment" [ref=f26e660] [cursor=pointer]:
+                                  - generic [ref=f26e663]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e665] [cursor=pointer]
+                              - generic [ref=f26e667]: ·
+                              - button "3 Reactions on Darshan Khude’s comment" [ref=f26e668] [cursor=pointer]:
+                                - img "like" [ref=f26e669]
+                                - generic [ref=f26e670]: "3"
+                            - generic [ref=f26e672]:
+                              - button "Reply to Darshan Khude’s comment" [ref=f26e673] [cursor=pointer]:
+                                - generic [ref=f26e675]: Reply
+                              - generic [ref=f26e676]: ·
+                              - generic [ref=f26e677]: 1 reply
+                              - generic [ref=f26e678]: 1 Comment on Darshan Khude’s comment
+                        - generic [ref=f26e680]:
+                          - button [ref=f26e681] [cursor=pointer]
+                          - article [ref=f26e683]:
+                            - generic [ref=f26e684]:
+                              - generic [ref=f26e685]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e686] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e689]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e690] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e691]:
+                                    - generic [ref=f26e692]: Rohit Virkud
+                                    - img [ref=f26e694]
+                                    - generic [ref=f26e696]: Author
+                                  - generic [ref=f26e697]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e698]:
+                                - time [ref=f26e699]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e702] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e703]
+                            - generic [ref=f26e713]:
+                              - link "Disha Khude" [ref=f26e715] [cursor=pointer]:
+                                - /url: /in/darshanmkhude/
+                              - text: True that
+                            - generic [ref=f26e720]:
+                              - generic [ref=f26e722]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e723] [cursor=pointer]:
+                                  - generic [ref=f26e726]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e728] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e732] [cursor=pointer]:
+                                - generic [ref=f26e734]: Reply
+                    - article [ref=f26e736]:
+                      - generic [ref=f26e737]:
+                        - generic [ref=f26e738]:
+                          - link "View Brandon Wallace’s graphic link" [ref=f26e739] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/brandonwallacedfw
+                            - img "View Brandon Wallace’s graphic link" [ref=f26e742]
+                          - 'link "View: Brandon Wallace • 3rd+ Helping Multifamily Contractors use LinkedIn to win more bids." [ref=f26e743] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/brandonwallacedfw
+                            - heading "Brandon Wallace • 3rd+" [level=3] [ref=f26e744]:
+                              - generic [ref=f26e745]: Brandon Wallace
+                              - generic [ref=f26e746]:
+                                - img [ref=f26e747]:
+                                  - img [ref=f26e748]
+                                - text: • 3rd+
+                            - generic [ref=f26e750]: Helping Multifamily Contractors use LinkedIn to win more bids.
+                        - generic [ref=f26e751]:
+                          - time [ref=f26e752]: 2y
+                          - button "Open options for Brandon Wallace’s comment" [ref=f26e755] [cursor=pointer]:
+                            - img "Open options for Brandon Wallace’s comment" [ref=f26e756]
+                      - generic [ref=f26e758]:
+                        - button [ref=f26e759] [cursor=pointer]
+                        - generic [ref=f26e766]:
+                          - text: You help others get clarity for sure
+                          - link "Rohit Virkud" [ref=f26e768] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                          - text: "!"
+                      - generic [ref=f26e769]:
+                        - generic [ref=f26e770]:
+                          - button [ref=f26e771] [cursor=pointer]
+                          - generic [ref=f26e773]:
+                            - generic [ref=f26e774]:
+                              - generic [ref=f26e775]:
+                                - button "React Like to Brandon Wallace’s comment" [ref=f26e776] [cursor=pointer]:
+                                  - generic [ref=f26e779]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e781] [cursor=pointer]
+                              - generic [ref=f26e783]: ·
+                              - button "2 Reactions on Brandon Wallace’s comment" [ref=f26e784] [cursor=pointer]:
+                                - img "like" [ref=f26e785]
+                                - generic [ref=f26e786]: "2"
+                            - generic [ref=f26e788]:
+                              - button "Reply to Brandon Wallace’s comment" [ref=f26e789] [cursor=pointer]:
+                                - generic [ref=f26e791]: Reply
+                              - generic [ref=f26e792]: ·
+                              - generic [ref=f26e793]: 1 reply
+                              - generic [ref=f26e794]: 1 Comment on Brandon Wallace’s comment
+                        - generic [ref=f26e796]:
+                          - button [ref=f26e797] [cursor=pointer]
+                          - article [ref=f26e799]:
+                            - generic [ref=f26e800]:
+                              - generic [ref=f26e801]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e802] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e805]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e806] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e807]:
+                                    - generic [ref=f26e808]: Rohit Virkud
+                                    - img [ref=f26e810]
+                                    - generic [ref=f26e812]: Author
+                                  - generic [ref=f26e813]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e814]:
+                                - time [ref=f26e815]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e818] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e819]
+                            - generic [ref=f26e829]:
+                              - link "Brandon Wallace" [ref=f26e831] [cursor=pointer]:
+                                - /url: /in/brandonwallacedfw/
+                              - text: Thanks man
+                            - generic [ref=f26e836]:
+                              - generic [ref=f26e837]:
+                                - generic [ref=f26e838]:
+                                  - button "React Like to Rohit Virkud’s comment" [ref=f26e839] [cursor=pointer]:
+                                    - generic [ref=f26e842]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f26e844] [cursor=pointer]
+                                - generic [ref=f26e846]: ·
+                                - button "1 Reaction on Rohit Virkud’s comment" [ref=f26e847] [cursor=pointer]:
+                                  - img "like" [ref=f26e848]
+                                  - generic [ref=f26e849]: "1"
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e852] [cursor=pointer]:
+                                - generic [ref=f26e854]: Reply
+                    - article [ref=f26e856]:
+                      - generic [ref=f26e857]:
+                        - generic [ref=f26e858]:
+                          - link "View Ayesha Iqbal’s graphic link" [ref=f26e859] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/ayesha-iqbal444
+                            - img "View Ayesha Iqbal’s graphic link" [ref=f26e862]
+                          - 'link "View: Ayesha Iqbal • 3rd+ Writing the right thing to monetize your brand on LinkedIn | Ghostwriter for smart execs/professionals | Strategy to fix unclear positioning + Attract your ICPs" [ref=f26e863] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/ayesha-iqbal444
+                            - heading "Ayesha Iqbal • 3rd+" [level=3] [ref=f26e864]:
+                              - generic [ref=f26e865]: Ayesha Iqbal
+                              - generic [ref=f26e866]: • 3rd+
+                            - generic [ref=f26e867]: Writing the right thing to monetize your brand on LinkedIn | Ghostwriter for smart execs/professionals | Strategy to fix unclear positioning + Attract your ICPs
+                        - generic [ref=f26e868]:
+                          - time [ref=f26e869]: 2y
+                          - button "Open options for Ayesha Iqbal’s comment" [ref=f26e872] [cursor=pointer]:
+                            - img "Open options for Ayesha Iqbal’s comment" [ref=f26e873]
+                      - generic [ref=f26e875]:
+                        - button [ref=f26e876] [cursor=pointer]
+                        - generic [ref=f26e883]:
+                          - text: The transformation is lit
+                          - link "Rohit Virkud" [ref=f26e885] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                      - generic [ref=f26e886]:
+                        - generic [ref=f26e887]:
+                          - button [ref=f26e888] [cursor=pointer]
+                          - generic [ref=f26e890]:
+                            - generic [ref=f26e891]:
+                              - generic [ref=f26e892]:
+                                - button "React Like to Ayesha Iqbal’s comment" [ref=f26e893] [cursor=pointer]:
+                                  - generic [ref=f26e896]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e898] [cursor=pointer]
+                              - generic [ref=f26e900]: ·
+                              - button "2 Reactions on Ayesha Iqbal’s comment" [ref=f26e901] [cursor=pointer]:
+                                - img "like" [ref=f26e902]
+                                - generic [ref=f26e903]: "2"
+                            - generic [ref=f26e905]:
+                              - button "Reply to Ayesha Iqbal’s comment" [ref=f26e906] [cursor=pointer]:
+                                - generic [ref=f26e908]: Reply
+                              - generic [ref=f26e909]: ·
+                              - generic [ref=f26e910]: 1 reply
+                              - generic [ref=f26e911]: 1 Comment on Ayesha Iqbal’s comment
+                        - generic [ref=f26e913]:
+                          - button [ref=f26e914] [cursor=pointer]
+                          - article [ref=f26e916]:
+                            - generic [ref=f26e917]:
+                              - generic [ref=f26e918]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e919] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e922]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e923] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e924]:
+                                    - generic [ref=f26e925]: Rohit Virkud
+                                    - img [ref=f26e927]
+                                    - generic [ref=f26e929]: Author
+                                  - generic [ref=f26e930]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e931]:
+                                - time [ref=f26e932]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e935] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e936]
+                            - generic [ref=f26e946]:
+                              - link "Ayesha Iqbal" [ref=f26e948] [cursor=pointer]:
+                                - /url: /in/ayesha-iqbal444/
+                              - text: Thank you so much
+                            - generic [ref=f26e953]:
+                              - generic [ref=f26e955]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e956] [cursor=pointer]:
+                                  - generic [ref=f26e959]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e961] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e965] [cursor=pointer]:
+                                - generic [ref=f26e967]: Reply
+                    - article [ref=f26e969]:
+                      - generic [ref=f26e970]:
+                        - generic [ref=f26e971]:
+                          - link "View Zaid 💡 S.’s graphic link" [ref=f26e972] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/zaids
+                            - img "View Zaid 💡 S.’s graphic link" [ref=f26e975]
+                          - 'link "View: Zaid 💡 S. • 3rd+ Brand Positioning Coach + Ghostwriter helping your skills and ideas find their unique space through strategy and content." [ref=f26e976] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/zaids
+                            - heading "Zaid 💡 S. • 3rd+" [level=3] [ref=f26e977]:
+                              - generic [ref=f26e978]: Zaid 💡 S.
+                              - generic [ref=f26e979]:
+                                - img [ref=f26e980]
+                                - text: • 3rd+
+                            - generic [ref=f26e982]: Brand Positioning Coach + Ghostwriter helping your skills and ideas find their unique space through strategy and content.
+                        - generic [ref=f26e983]:
+                          - time [ref=f26e984]: 2y
+                          - button "Open options for Zaid 💡 S.’s comment" [ref=f26e987] [cursor=pointer]:
+                            - img "Open options for Zaid 💡 S.’s comment" [ref=f26e988]
+                      - generic [ref=f26e990]:
+                        - button [ref=f26e991] [cursor=pointer]
+                        - generic [ref=f26e998]:
+                          - text: Love the pallete
+                          - link "Rohit Virkud" [ref=f26e1000] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                      - generic [ref=f26e1001]:
+                        - generic [ref=f26e1002]:
+                          - button [ref=f26e1003] [cursor=pointer]
+                          - generic [ref=f26e1005]:
+                            - generic [ref=f26e1006]:
+                              - generic [ref=f26e1007]:
+                                - button "React Like to Zaid 💡 S.’s comment" [ref=f26e1008] [cursor=pointer]:
+                                  - generic [ref=f26e1011]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1013] [cursor=pointer]
+                              - generic [ref=f26e1015]: ·
+                              - button "2 Reactions on Zaid 💡 S.’s comment" [ref=f26e1016] [cursor=pointer]:
+                                - img "like" [ref=f26e1017]
+                                - generic [ref=f26e1018]: "2"
+                            - generic [ref=f26e1020]:
+                              - button "Reply to Zaid 💡 S.’s comment" [ref=f26e1021] [cursor=pointer]:
+                                - generic [ref=f26e1023]: Reply
+                              - generic [ref=f26e1024]: ·
+                              - generic [ref=f26e1025]: 1 reply
+                              - generic [ref=f26e1026]: 1 Comment on Zaid 💡 S.’s comment
+                        - generic [ref=f26e1028]:
+                          - button [ref=f26e1029] [cursor=pointer]
+                          - article [ref=f26e1031]:
+                            - generic [ref=f26e1032]:
+                              - generic [ref=f26e1033]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e1034] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e1037]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e1038] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e1039]:
+                                    - generic [ref=f26e1040]: Rohit Virkud
+                                    - img [ref=f26e1042]
+                                    - generic [ref=f26e1044]: Author
+                                  - generic [ref=f26e1045]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e1046]:
+                                - time [ref=f26e1047]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e1050] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e1051]
+                            - generic [ref=f26e1061]:
+                              - link "Zaid 💡 S." [ref=f26e1063] [cursor=pointer]:
+                                - /url: /in/zaids/
+                              - text: Thanks
+                            - generic [ref=f26e1068]:
+                              - generic [ref=f26e1070]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e1071] [cursor=pointer]:
+                                  - generic [ref=f26e1074]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1076] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e1080] [cursor=pointer]:
+                                - generic [ref=f26e1082]: Reply
+                    - article [ref=f26e1084]:
+                      - generic [ref=f26e1085]:
+                        - generic [ref=f26e1086]:
+                          - link "View Masud Rana’s graphic link" [ref=f26e1087] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/masudthewebwise
+                            - img "View Masud Rana’s graphic link" [ref=f26e1090]
+                          - 'link "View: Masud Rana • 3rd+ I help businesses and individuals build visually stunning functional websites that work as sales machines | Passionate Web Designer &amp; Developer" [ref=f26e1091] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/masudthewebwise
+                            - heading "Masud Rana • 3rd+" [level=3] [ref=f26e1092]:
+                              - generic [ref=f26e1093]: Masud Rana
+                              - generic [ref=f26e1094]: • 3rd+
+                            - generic [ref=f26e1095]: I help businesses and individuals build visually stunning functional websites that work as sales machines | Passionate Web Designer & Developer
+                        - generic [ref=f26e1096]:
+                          - time [ref=f26e1097]: 2y
+                          - button "Open options for Masud Rana’s comment" [ref=f26e1100] [cursor=pointer]:
+                            - img "Open options for Masud Rana’s comment" [ref=f26e1101]
+                      - generic [ref=f26e1103]:
+                        - button [ref=f26e1104] [cursor=pointer]
+                        - generic [ref=f26e1108]:
+                          - generic [ref=f26e1111]:
+                            - text: This update is a breath of fresh air!
+                            - text: It feels familiar, but way more polished.
+                            - text: The message is clear as day, and it's presented beautifully.
+                            - text: Awesome job!
+                            - link "Rohit Virkud" [ref=f26e1113] [cursor=pointer]:
+                              - /url: /in/rohitvirkud/
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=f26e1114] [cursor=pointer]:
+                            - generic [ref=f26e1115]: …more
+                      - generic [ref=f26e1116]:
+                        - generic [ref=f26e1117]:
+                          - button [ref=f26e1118] [cursor=pointer]
+                          - generic [ref=f26e1120]:
+                            - generic [ref=f26e1121]:
+                              - generic [ref=f26e1122]:
+                                - button "React Like to Masud Rana’s comment" [ref=f26e1123] [cursor=pointer]:
+                                  - generic [ref=f26e1126]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1128] [cursor=pointer]
+                              - generic [ref=f26e1130]: ·
+                              - button "2 Reactions on Masud Rana’s comment" [ref=f26e1131] [cursor=pointer]:
+                                - img "like" [ref=f26e1132]
+                                - generic [ref=f26e1133]: "2"
+                            - generic [ref=f26e1135]:
+                              - button "Reply to Masud Rana’s comment" [ref=f26e1136] [cursor=pointer]:
+                                - generic [ref=f26e1138]: Reply
+                              - generic [ref=f26e1139]: ·
+                              - generic [ref=f26e1140]: 1 reply
+                              - generic [ref=f26e1141]: 1 Comment on Masud Rana’s comment
+                        - generic [ref=f26e1143]:
+                          - button [ref=f26e1144] [cursor=pointer]
+                          - article [ref=f26e1146]:
+                            - generic [ref=f26e1147]:
+                              - generic [ref=f26e1148]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e1149] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e1152]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e1153] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e1154]:
+                                    - generic [ref=f26e1155]: Rohit Virkud
+                                    - img [ref=f26e1157]
+                                    - generic [ref=f26e1159]: Author
+                                  - generic [ref=f26e1160]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e1161]:
+                                - time [ref=f26e1162]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e1165] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e1166]
+                            - generic [ref=f26e1176]:
+                              - link "Masud Rana" [ref=f26e1178] [cursor=pointer]:
+                                - /url: /in/masudthewebwise/
+                              - text: Thank you so much
+                            - generic [ref=f26e1183]:
+                              - generic [ref=f26e1184]:
+                                - generic [ref=f26e1185]:
+                                  - button "React Like to Rohit Virkud’s comment" [ref=f26e1186] [cursor=pointer]:
+                                    - generic [ref=f26e1189]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f26e1191] [cursor=pointer]
+                                - generic [ref=f26e1193]: ·
+                                - button "1 Reaction on Rohit Virkud’s comment" [ref=f26e1194] [cursor=pointer]:
+                                  - img "love" [ref=f26e1195]
+                                  - generic [ref=f26e1196]: "1"
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e1199] [cursor=pointer]:
+                                - generic [ref=f26e1201]: Reply
+                    - article [ref=f26e1203]:
+                      - generic [ref=f26e1204]:
+                        - generic [ref=f26e1205]:
+                          - link "View Arooj Shahid’s graphic link" [ref=f26e1206] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/aroojshahid14
+                            - img "View Arooj Shahid’s graphic link" [ref=f26e1209]
+                          - 'link "View: Arooj Shahid • 3rd+ Boosting Businesses of Founders and Brand Owners upto 60%🔥 by creating Captivating Designs🚀" [ref=f26e1210] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/aroojshahid14
+                            - heading "Arooj Shahid • 3rd+" [level=3] [ref=f26e1211]:
+                              - generic [ref=f26e1212]: Arooj Shahid
+                              - generic [ref=f26e1213]: • 3rd+
+                            - generic [ref=f26e1214]: Boosting Businesses of Founders and Brand Owners upto 60%🔥 by creating Captivating Designs🚀
+                        - generic [ref=f26e1215]:
+                          - time [ref=f26e1216]: 2y
+                          - button "Open options for Arooj Shahid’s comment" [ref=f26e1219] [cursor=pointer]:
+                            - img "Open options for Arooj Shahid’s comment" [ref=f26e1220]
+                      - generic [ref=f26e1222]:
+                        - button [ref=f26e1223] [cursor=pointer]
+                        - generic [ref=f26e1230]: It's like you really transformed his Life😃🔥
+                      - generic [ref=f26e1231]:
+                        - generic [ref=f26e1232]:
+                          - button [ref=f26e1233] [cursor=pointer]
+                          - generic [ref=f26e1235]:
+                            - generic [ref=f26e1236]:
+                              - generic [ref=f26e1237]:
+                                - button "React Like to Arooj Shahid’s comment" [ref=f26e1238] [cursor=pointer]:
+                                  - generic [ref=f26e1241]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1243] [cursor=pointer]
+                              - generic [ref=f26e1245]: ·
+                              - button "2 Reactions on Arooj Shahid’s comment" [ref=f26e1246] [cursor=pointer]:
+                                - img "like" [ref=f26e1247]
+                                - generic [ref=f26e1248]: "2"
+                            - generic [ref=f26e1250]:
+                              - button "Reply to Arooj Shahid’s comment" [ref=f26e1251] [cursor=pointer]:
+                                - generic [ref=f26e1253]: Reply
+                              - generic [ref=f26e1254]: ·
+                              - generic [ref=f26e1255]: 1 reply
+                              - generic [ref=f26e1256]: 1 Comment on Arooj Shahid’s comment
+                        - generic [ref=f26e1258]:
+                          - button [ref=f26e1259] [cursor=pointer]
+                          - article [ref=f26e1261]:
+                            - generic [ref=f26e1262]:
+                              - generic [ref=f26e1263]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e1264] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e1267]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e1268] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e1269]:
+                                    - generic [ref=f26e1270]: Rohit Virkud
+                                    - img [ref=f26e1272]
+                                    - generic [ref=f26e1274]: Author
+                                  - generic [ref=f26e1275]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e1276]:
+                                - time [ref=f26e1277]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e1280] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e1281]
+                            - generic [ref=f26e1291]:
+                              - link "Arooj Shahid" [ref=f26e1293] [cursor=pointer]:
+                                - /url: /in/aroojshahid14/
+                              - text: haha not life yet maybe in future it will
+                            - generic [ref=f26e1298]:
+                              - generic [ref=f26e1299]:
+                                - generic [ref=f26e1300]:
+                                  - button "React Like to Rohit Virkud’s comment" [ref=f26e1301] [cursor=pointer]:
+                                    - generic [ref=f26e1304]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f26e1306] [cursor=pointer]
+                                - generic [ref=f26e1308]: ·
+                                - button "1 Reaction on Rohit Virkud’s comment" [ref=f26e1309] [cursor=pointer]:
+                                  - img "funny" [ref=f26e1310]
+                                  - generic [ref=f26e1311]: "1"
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e1314] [cursor=pointer]:
+                                - generic [ref=f26e1316]: Reply
+                    - article [ref=f26e1318]:
+                      - generic [ref=f26e1319]:
+                        - generic [ref=f26e1320]:
+                          - link "View Hina (Hinu)’s graphic link" [ref=f26e1321] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/hina-hinu-740524211
+                            - img "View Hina (Hinu)’s graphic link" [ref=f26e1324]
+                          - 'link "View: Hina (Hinu) • 3rd+ Helping to build personal brand and trust worthy community. Over the last 3 years built from 25k to 40k community on IG and 0 to 5k community on LinkedIn in 8 months" [ref=f26e1325] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/hina-hinu-740524211
+                            - heading "Hina (Hinu) • 3rd+" [level=3] [ref=f26e1326]:
+                              - generic [ref=f26e1327]: Hina (Hinu)
+                              - generic [ref=f26e1328]: • 3rd+
+                            - generic [ref=f26e1329]: Helping to build personal brand and trust worthy community. Over the last 3 years built from 25k to 40k community on IG and 0 to 5k community on LinkedIn in 8 months
+                        - generic [ref=f26e1330]:
+                          - time [ref=f26e1331]: 2y
+                          - button "Open options for Hina (Hinu)’s comment" [ref=f26e1334] [cursor=pointer]:
+                            - img "Open options for Hina (Hinu)’s comment" [ref=f26e1335]
+                      - generic [ref=f26e1337]:
+                        - button [ref=f26e1338] [cursor=pointer]
+                        - generic [ref=f26e1345]: These banner looks great ☺️
+                      - generic [ref=f26e1346]:
+                        - generic [ref=f26e1347]:
+                          - button [ref=f26e1348] [cursor=pointer]
+                          - generic [ref=f26e1350]:
+                            - generic [ref=f26e1351]:
+                              - generic [ref=f26e1352]:
+                                - button "React Like to Hina (Hinu)’s comment" [ref=f26e1353] [cursor=pointer]:
+                                  - generic [ref=f26e1356]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1358] [cursor=pointer]
+                              - generic [ref=f26e1360]: ·
+                              - button "2 Reactions on Hina (Hinu)’s comment" [ref=f26e1361] [cursor=pointer]:
+                                - img "like" [ref=f26e1362]
+                                - generic [ref=f26e1363]: "2"
+                            - generic [ref=f26e1365]:
+                              - button "Reply to Hina (Hinu)’s comment" [ref=f26e1366] [cursor=pointer]:
+                                - generic [ref=f26e1368]: Reply
+                              - generic [ref=f26e1369]: ·
+                              - generic [ref=f26e1370]: 1 reply
+                              - generic [ref=f26e1371]: 1 Comment on Hina (Hinu)’s comment
+                        - generic [ref=f26e1373]:
+                          - button [ref=f26e1374] [cursor=pointer]
+                          - article [ref=f26e1376]:
+                            - generic [ref=f26e1377]:
+                              - generic [ref=f26e1378]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e1379] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e1382]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e1383] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e1384]:
+                                    - generic [ref=f26e1385]: Rohit Virkud
+                                    - img [ref=f26e1387]
+                                    - generic [ref=f26e1389]: Author
+                                  - generic [ref=f26e1390]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e1391]:
+                                - time [ref=f26e1392]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e1395] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e1396]
+                            - generic [ref=f26e1406]: Thanks
+                            - generic [ref=f26e1411]:
+                              - generic [ref=f26e1413]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e1414] [cursor=pointer]:
+                                  - generic [ref=f26e1417]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1419] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e1423] [cursor=pointer]:
+                                - generic [ref=f26e1425]: Reply
+                    - article [ref=f26e1427]:
+                      - generic [ref=f26e1428]:
+                        - generic [ref=f26e1429]:
+                          - link "View Vaibhavi Kubetkar’s graphic link" [ref=f26e1430] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/thevaibhavik
+                            - img "View Vaibhavi Kubetkar’s graphic link" [ref=f26e1433]
+                          - 'link "View: Vaibhavi Kubetkar • 3rd+ Founders: Turn LinkedIn into Your #1 Client Acquisition Engine | Modern Founder OS | Helped 35+ Founders | Founder @ VK Media" [ref=f26e1434] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/thevaibhavik
+                            - heading "Vaibhavi Kubetkar • 3rd+" [level=3] [ref=f26e1435]:
+                              - generic [ref=f26e1436]: Vaibhavi Kubetkar
+                              - generic [ref=f26e1437]:
+                                - img [ref=f26e1438]:
+                                  - img [ref=f26e1439]
+                                - text: • 3rd+
+                            - generic [ref=f26e1441]: "Founders: Turn LinkedIn into Your #1 Client Acquisition Engine | Modern Founder OS | Helped 35+ Founders | Founder @ VK Media"
+                        - generic [ref=f26e1442]:
+                          - generic [ref=f26e1443]: (edited)
+                          - time [ref=f26e1444]: 2y
+                          - button "Open options for Vaibhavi Kubetkar’s comment" [ref=f26e1447] [cursor=pointer]:
+                            - img "Open options for Vaibhavi Kubetkar’s comment" [ref=f26e1448]
+                      - generic [ref=f26e1450]:
+                        - button [ref=f26e1451] [cursor=pointer]
+                        - generic [ref=f26e1458]:
+                          - text: How many times are you going to wow people?
+                          - link "Rohit Virkud" [ref=f26e1460] [cursor=pointer]:
+                            - /url: /in/rohitvirkud/
+                      - generic [ref=f26e1461]:
+                        - generic [ref=f26e1462]:
+                          - button [ref=f26e1463] [cursor=pointer]
+                          - generic [ref=f26e1465]:
+                            - generic [ref=f26e1466]:
+                              - generic [ref=f26e1467]:
+                                - button "React Like to Vaibhavi Kubetkar’s comment" [ref=f26e1468] [cursor=pointer]:
+                                  - generic [ref=f26e1471]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1473] [cursor=pointer]
+                              - generic [ref=f26e1475]: ·
+                              - button "2 Reactions on Vaibhavi Kubetkar’s comment" [ref=f26e1476] [cursor=pointer]:
+                                - img "like" [ref=f26e1477]
+                                - generic [ref=f26e1478]: "2"
+                            - generic [ref=f26e1480]:
+                              - button "Reply to Vaibhavi Kubetkar’s comment" [ref=f26e1481] [cursor=pointer]:
+                                - generic [ref=f26e1483]: Reply
+                              - generic [ref=f26e1484]: ·
+                              - generic [ref=f26e1485]: 1 reply
+                              - generic [ref=f26e1486]: 1 Comment on Vaibhavi Kubetkar’s comment
+                        - generic [ref=f26e1488]:
+                          - button [ref=f26e1489] [cursor=pointer]
+                          - article [ref=f26e1491]:
+                            - generic [ref=f26e1492]:
+                              - generic [ref=f26e1493]:
+                                - link "View Rohit Virkud’s graphic link" [ref=f26e1494] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - img "View Rohit Virkud’s graphic link" [ref=f26e1497]
+                                - 'link "View: Rohit Virkud Author, I help independent CFPs build brand &amp; business on LinkedIn" [ref=f26e1498] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/rohitvirkud
+                                  - heading "Rohit Virkud Author" [level=3] [ref=f26e1499]:
+                                    - generic [ref=f26e1500]: Rohit Virkud
+                                    - img [ref=f26e1502]
+                                    - generic [ref=f26e1504]: Author
+                                  - generic [ref=f26e1505]: I help independent CFPs build brand & business on LinkedIn
+                              - generic [ref=f26e1506]:
+                                - time [ref=f26e1507]: 2y
+                                - button "Open options for Rohit Virkud’s comment" [ref=f26e1510] [cursor=pointer]:
+                                  - img "Open options for Rohit Virkud’s comment" [ref=f26e1511]
+                            - generic [ref=f26e1521]:
+                              - link "Vaibhavi Kubetkar" [ref=f26e1523] [cursor=pointer]:
+                                - /url: /in/thevaibhavik/
+                              - text: goal is to do it everyday but not possible haha
+                            - generic [ref=f26e1528]:
+                              - generic [ref=f26e1530]:
+                                - button "React Like to Rohit Virkud’s comment" [ref=f26e1531] [cursor=pointer]:
+                                  - generic [ref=f26e1534]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f26e1536] [cursor=pointer]
+                              - button "Reply to Rohit Virkud’s comment" [ref=f26e1540] [cursor=pointer]:
+                                - generic [ref=f26e1542]: Reply
+                  - generic [ref=f26e1543]:
+                    - button "Load more comments" [ref=f26e1544] [cursor=pointer]:
+                      - img [ref=f26e1545]
+                    - button "Load more comments" [ref=f26e1548] [cursor=pointer]:
+                      - generic [ref=f26e1549]: Load more comments
+      - complementary "Advertisement and similar pages" [ref=f26e1550]:
+        - generic [ref=f26e1552]:
+          - iframe [ref=f26e1554]:
+            - link "Advertise on LinkedIn" [ref=f28e4] [cursor=pointer]:
+              - /url: https://www.linkedin.com/jobs/?trk=li_FA_global_careers_jobsgtm_jsFA_v1&mcid=6899045044465016833
+              - img "Advertise on LinkedIn" [ref=f28e5]
+          - generic "LinkedIn Footer Content" [ref=f26e1555]:
+            - generic [ref=f26e1556]:
+              - list [ref=f26e1557]:
+                - listitem [ref=f26e1558]:
+                  - link "About" [ref=f26e1559] [cursor=pointer]:
+                    - /url: https://about.linkedin.com/
+                    - generic [ref=f26e1560]: About
+                - listitem [ref=f26e1561]:
+                  - link "Accessibility" [ref=f26e1562] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/accessibility
+                    - generic [ref=f26e1563]: Accessibility
+                - listitem [ref=f26e1564]:
+                  - link "Help Center" [ref=f26e1565] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin?trk=footer_d_flagship3_detail_base
+                    - generic [ref=f26e1566]: Help Center
+                - listitem [ref=f26e1567]:
+                  - button "Privacy & Terms" [ref=f26e1569] [cursor=pointer]:
+                    - generic [ref=f26e1571]:
+                      - text: Privacy & Terms
+                      - img [ref=f26e1572]
+                - listitem [ref=f26e1574]:
+                  - link "Ad Choices" [ref=f26e1575] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin/answer/62931
+                    - generic [ref=f26e1576]: Ad Choices
+                - listitem [ref=f26e1577]:
+                  - link "Advertising" [ref=f26e1578] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/ad/start?trk=n_nav_ads_rr
+                    - generic [ref=f26e1579]: Advertising
+                - listitem [ref=f26e1580]:
+                  - button "Business Services" [ref=f26e1582] [cursor=pointer]:
+                    - generic [ref=f26e1584]:
+                      - text: Business Services
+                      - img [ref=f26e1585]
+                - listitem [ref=f26e1587]:
+                  - button "Get the LinkedIn app" [ref=f26e1590] [cursor=pointer]
+                - listitem [ref=f26e1591]:
+                  - button "More options" [ref=f26e1592] [cursor=pointer]: More
+              - generic [ref=f26e1593]:
+                - img "LinkedIn" [ref=f26e1594]:
+                  - img [ref=f26e1595]
+                - text: LinkedIn Corporation © 2026
+    - generic:
+      - generic:
+        - complementary:
+          - generic [ref=f26e1598]:
+            - generic [ref=f26e1600] [cursor=pointer]:
+              - generic [ref=f26e1601]:
+                - img "Brian Huntington" [ref=f26e1602]
+                - generic [ref=f26e1604]: Status is online
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=f26e1605]:
+                - generic [ref=f26e1606]:
+                  - generic [ref=f26e1607]: Messaging
+                  - generic [ref=f26e1608]: You are on the messaging overlay. Press enter to open the list of conversations.
+            - generic [ref=f26e1609]:
+              - button "Open messenger dropdown menu" [ref=f26e1611] [cursor=pointer]:
+                - img "Open messenger dropdown menu" [ref=f26e1612]
+              - button "Compose message" [ref=f26e1615] [cursor=pointer]:
+                - img [ref=f26e1616]
+                - generic [ref=f26e1618]: Compose message
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=f26e1619] [cursor=pointer]:
+                - img [ref=f26e1620]
+                - generic [ref=f26e1622]: You are on the messaging overlay. Press enter to open the list of conversations.
+        - complementary "AI-powered assistant to get help with your career, jobs etc"

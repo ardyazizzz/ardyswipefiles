@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: Swipe.ardy
+        - generic [ref=e7]: 0 swipes
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - button "Posts" [ref=e10] [cursor=pointer]
+          - button "Creators" [ref=e11] [cursor=pointer]
+          - button "Websites" [ref=e12] [cursor=pointer]
+          - button "Snippets" [ref=e13] [cursor=pointer]
+        - button "" [ref=e14] [cursor=pointer]:
+          - generic [ref=e15]: 
+        - generic [ref=e16]:
+          - generic [ref=e17]: 
+          - textbox "Search swipes..." [ref=e18]
+        - button " Manage filters" [ref=e19] [cursor=pointer]:
+          - generic [ref=e20]: 
+          - text: Manage filters
+        - button " Add swipe" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: 
+          - text: Add swipe
+    - generic [ref=e23]:
+      - button "Unsaved view " [ref=e25] [cursor=pointer]:
+        - text: Unsaved view
+        - generic [ref=e26]: 
+      - button "Category " [ref=e29] [cursor=pointer]:
+        - text: Category
+        - generic [ref=e30]: 
+      - button "Format " [ref=e32] [cursor=pointer]:
+        - text: Format
+        - generic [ref=e33]: 
+      - generic [ref=e34]:
+        - generic [ref=e35]: Engagement
+        - spinbutton "Min" [ref=e37]
+        - generic [ref=e38]: —
+        - spinbutton "Max" [ref=e39]
+      - combobox [ref=e41] [cursor=pointer]:
+        - option "Newest added" [selected]
+        - option "Oldest added"
+        - option "Most engagements"
+        - option "Least engagements"
+        - option "Most likes"
+        - option "Least likes"
+        - option "Most comments"
+        - option "Least comments"
+        - option "Most reposts"
+        - option "Least reposts"
+        - option "Longest read"
+        - option "Quickest read"
+        - option "Has media first"
+      - button "" [ref=e42] [cursor=pointer]:
+        - generic [ref=e43]: 
+      - button "" [ref=e44] [cursor=pointer]:
+        - generic [ref=e45]: 
+    - paragraph [ref=e48]: Loading swipes...
+  - text:       

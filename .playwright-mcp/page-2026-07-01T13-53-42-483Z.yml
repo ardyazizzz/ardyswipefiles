@@ -1,0 +1,1085 @@
+- generic [active] [ref=f64e1]:
+  - generic:
+    - region "Toast message":
+      - heading "0 notifications total" [level=2] [ref=f64e3]
+      - alert
+  - generic [ref=f64e4]:
+    - generic [ref=f64e6]:
+      - button "Skip to search" [ref=f64e7] [cursor=pointer]:
+        - generic [ref=f64e8]: Skip to search
+      - button "Skip to main content" [ref=f64e9] [cursor=pointer]:
+        - generic [ref=f64e10]: Skip to main content
+      - button "Keyboard shortcuts" [ref=f64e11] [cursor=pointer]:
+        - generic [ref=f64e12]: Keyboard shortcuts
+      - button "Close jump menu" [ref=f64e13] [cursor=pointer]:
+        - img [ref=f64e14]
+        - generic [ref=f64e16]: Close jump menu
+    - banner "Global Navigation" [ref=f64e17]:
+      - generic [ref=f64e18]:
+        - link "LinkedIn" [ref=f64e19] [cursor=pointer]:
+          - /url: https://www.linkedin.com/feed/?nis=true
+          - img "LinkedIn" [ref=f64e22]:
+            - img [ref=f64e23]
+        - button "Click to start a search" [ref=f64e27] [cursor=pointer]:
+          - img [ref=f64e29]
+          - generic [ref=f64e31]: Search
+        - navigation "Primary Navigation" [ref=f64e32]:
+          - list [ref=f64e33]:
+            - listitem [ref=f64e34]:
+              - link "new feed updates notifications Home" [ref=f64e35] [cursor=pointer]:
+                - /url: https://www.linkedin.com/feed/?nis=true&
+                - generic [ref=f64e36]:
+                  - generic [ref=f64e39]: new feed updates notifications
+                  - img [ref=f64e43]
+                - generic "Home" [ref=f64e45]
+            - listitem [ref=f64e46]:
+              - link "My Network" [ref=f64e47] [cursor=pointer]:
+                - /url: https://www.linkedin.com/mynetwork/?
+                - img [ref=f64e51]
+                - generic "My Network" [ref=f64e53]
+            - listitem [ref=f64e54]:
+              - link "Jobs" [ref=f64e55] [cursor=pointer]:
+                - /url: https://www.linkedin.com/jobs/?
+                - img [ref=f64e59]
+                - generic "Jobs" [ref=f64e61]
+            - listitem [ref=f64e62]:
+              - link "Messaging" [ref=f64e63] [cursor=pointer]:
+                - /url: https://www.linkedin.com/messaging/?
+                - img [ref=f64e67]
+                - generic "Messaging" [ref=f64e69]
+            - listitem [ref=f64e70]:
+              - link "1 new notification Notifications" [ref=f64e1442] [cursor=pointer]:
+                - /url: https://www.linkedin.com/notifications/?
+                - generic [ref=f64e72]:
+                  - generic [ref=f64e1443]:
+                    - generic [ref=f64e1444]: "1"
+                    - generic [ref=f64e1445]: 1 new notification
+                  - img [ref=f64e76]
+                - generic "Notifications" [ref=f64e78]
+            - listitem [ref=f64e79]:
+              - button "Brian Huntington Me" [ref=f64e81] [cursor=pointer]:
+                - img "Brian Huntington" [ref=f64e82]
+                - generic [ref=f64e83]:
+                  - text: Me
+                  - img [ref=f64e84]
+            - listitem [ref=f64e86]:
+              - button "For Business" [ref=f64e88] [cursor=pointer]:
+                - img [ref=f64e92]
+                - generic "For Business" [ref=f64e94]:
+                  - text: For Business
+                  - img [ref=f64e95]
+            - listitem [ref=f64e97]:
+              - link "Try Premium for €0" [ref=f64e99] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=f64e100]:
+                  - img [ref=f64e101]
+                  - generic [ref=f64e103]: Try Premium for €0
+    - generic [ref=f64e109]:
+      - complementary "User profile" [ref=f64e110]:
+        - generic [ref=f64e112]:
+          - generic [ref=f64e113]:
+            - link "Default background" [ref=f64e1446] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+            - link "Photo of Brian Huntington" [ref=f64e1448] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+              - img "Photo of Brian Huntington" [ref=f64e1449]
+            - generic [ref=f64e1450]:
+              - link "Brian Huntington Student at Dublin City University Dundalk, County Louth" [ref=f64e1451] [cursor=pointer]:
+                - /url: /in/brian-huntington-11820b2a4/
+                - heading "Brian Huntington" [level=3] [ref=f64e1453]
+                - paragraph [ref=f64e1454]: Student at Dublin City University
+                - paragraph [ref=f64e1455]: Dundalk, County Louth
+              - button "Add Experience" [ref=f64e1456] [cursor=pointer]:
+                - generic [ref=f64e1457]:
+                  - img [ref=f64e1458]
+                  - generic [ref=f64e1460]: Experience
+          - link "Access exclusive tools & insights Try Premium for €0" [ref=f64e1462] [cursor=pointer]:
+            - /url: http://www.linkedin.com/premium/products/?upsellOrderOrigin=Tracking%3Av1%3Apremium_homepage_identity_upsell%3ANav%3AIn-Product&referenceId=pwq6NuwpR3G3t4j%2BB7xQ6g%3D%3D&isSS=true&upsellSlotId=IDENTITY_MODULE&destRedirectURL=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fjanivrancsik_content-priority-score-4-tier-content-share-7478055277200740352-9awK%2F
+            - heading "Access exclusive tools & insights" [level=3] [ref=f64e1463]
+            - generic [ref=f64e1464]:
+              - img [ref=f64e1465]
+              - generic [ref=f64e1467]: Try Premium for €0
+          - list [ref=f64e1471]:
+            - listitem [ref=f64e1472]:
+              - link "Connections Grow your network Grow your network by adding connections." [ref=f64e1473] [cursor=pointer]:
+                - /url: /mynetwork/
+                - generic [ref=f64e1474]:
+                  - generic [ref=f64e1475]:
+                    - generic [ref=f64e1476]: Connections
+                    - generic [ref=f64e1477]: Grow your network
+                  - img "Grow your network by adding connections." [ref=f64e1479]
+      - main "Feed detail update" [ref=f64e131]:
+        - heading "Feed detail update" [level=1] [ref=f64e132]
+        - generic "Update container" [ref=f64e133]:
+          - article [ref=f64e137]:
+            - generic [ref=f64e139]:
+              - heading "Feed post" [level=2] [ref=f64e140]
+              - generic [ref=f64e141]:
+                - generic [ref=f64e142]:
+                  - generic [ref=f64e143]:
+                    - generic [ref=f64e144]:
+                      - link "View Jani Vrancsik’s graphic link" [ref=f64e145] [cursor=pointer]:
+                        - /url: https://www.linkedin.com/in/janivrancsik?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAAyVlXMBT484Y_KLDJqBYrRXUvNb9emEq9I
+                        - img "View Jani Vrancsik’s graphic link" [ref=f64e149]
+                      - generic [ref=f64e150]:
+                        - 'link "View: Jani Vrancsik Premium • 3rd+ Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e151] [cursor=pointer]':
+                          - /url: https://www.linkedin.com/in/janivrancsik?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAAyVlXMBT484Y_KLDJqBYrRXUvNb9emEq9I
+                          - generic [ref=f64e152]:
+                            - generic [ref=f64e155]: Jani Vrancsik
+                            - generic [ref=f64e157]:
+                              - img [ref=f64e158]:
+                                - img [ref=f64e159]
+                              - text: • 3rd+
+                          - generic [ref=f64e162]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                        - link "Book an appointment" [ref=f64e163] [cursor=pointer]:
+                          - /url: https://calendly.com/growth-today/intro-meeting
+                          - generic [ref=f64e164]: Book an appointment
+                        - generic [ref=f64e166]:
+                          - text: 1h •
+                          - img [ref=f64e169]
+                    - button "Follow Jani Vrancsik" [ref=f64e171] [cursor=pointer]:
+                      - img [ref=f64e172]
+                      - generic [ref=f64e174]: Follow
+                  - button "Open control menu for post by Jani Vrancsik" [ref=f64e177] [cursor=pointer]:
+                    - img [ref=f64e178]
+                - generic [ref=f64e184]:
+                  - text: "1 ToF post for reach. 3 MoF posts to prove it. 1 BoF post to convert. Here is the weekly content score we run, mapped to the tiered outbound strategy:"
+                  - text: Most teams treat content and outbound as two separate jobs.
+                  - text: We combine them instead.
+                  - text: A post is not just a reach. It is a signal. The tier of the post, and how someone engages with it, decides who we reach out to + when + what we say.
+                  - text: "Here’s how:"
+                  - text: TIER 3, BoF, convert
+                  - text: "↳ a real asset: a lead magnet, a case study result, a teardown with proof"
+                  - text: ↳ With the highest intent, the people who engage here raised their hand
+                  - text: "↳ The DM it earns: reach out within a day, name the thing they grabbed or if it’s not relevant, just keep your outreach short + sweet"
+                  - text: TIER 2, MoF, prove
+                  - text: ↳ How you think, how you solve a problem, a contrarian take with a method
+                  - text: ↳ This is the workhorse; it makes the reader think you know your stuff
+                  - text: "↳ The DM it earns: a personal note that references their comment, no pitch yet"
+                  - text: TIER 1, ToF, reach
+                  - text: ↳ a story or a stat that attracts and pulls a broader audience
+                  - text: ↳ grows the top, new followers, future pipeline
+                  - text: "↳ The DM it earns: none yet, a like is not a buying signal"
+                  - text: TIER 0, skip
+                  - text: ↳ posting for the sake of posting, no point of view, no asset
+                  - text: ↳ it fills the feed and trains the algorithm on weak engagement
+                  - text: The trap is not knowing your ICP enough. If that’s the case, it is very easy to spend creating content (in any format), chasing vanity metrics, and nothing is going to
+                  - text: 1)drive inbound pipeline
+                  - text: 2)speed up closing due to increased trust and education
+                  - text: 3)attract talent, investors, and partners based on your goals
+                  - text: "So we run a weekly split: mostly MoF to prove it, one ToF for reach, one BoF to convert. Then the engagement on each post feeds the same signal score our SDR is using for outbound, supported by GTM engineers."
+                  - text: Content and outbound are not two jobs.
+                  - text: They compound when they work together.
+                  - text: What share of your posts last month were just reach?
+                  - text: Comment SCORE, and I will send you the 4-tier framework we use for both.
+                  - text: P.S. We build signal-based GTM engines for B2B teams, where content, ads, and outbound run on one score. If that is the motion you want, book a call through the site or DM me.
+                - generic [ref=f64e186]:
+                  - button "Activate to view larger image, No alternative text description for this image" [ref=f64e188] [cursor=pointer]:
+                    - generic [ref=f64e189]: Activate to view larger image,
+                    - img "No alternative text description for this image" [ref=f64e192]
+                  - generic [ref=f64e193]: Activate to view larger image,
+                - generic [ref=f64e194]:
+                  - list [ref=f64e198]:
+                    - listitem [ref=f64e199]:
+                      - button "34 reactions" [ref=f64e200] [cursor=pointer]:
+                        - img "like" [ref=f64e201]
+                        - img "insightful" [ref=f64e202]
+                        - img "love" [ref=f64e203]
+                        - generic [ref=f64e204]: "34"
+                    - listitem [ref=f64e205]:
+                      - list [ref=f64e206]:
+                        - listitem [ref=f64e207]:
+                          - button "65 comments on Jani Vrancsik’s post" [ref=f64e208] [cursor=pointer]:
+                            - generic [ref=f64e209]: 65 comments
+                          - text: ·
+                        - listitem [ref=f64e210]:
+                          - button "2 reposts of Jani Vrancsik’s post" [ref=f64e211] [cursor=pointer]:
+                            - generic [ref=f64e212]: 2 reposts
+                  - generic [ref=f64e1481]:
+                    - heading "Reactions" [level=3] [ref=f64e1482]
+                    - list "Reactions" [ref=f64e1483]:
+                      - listitem [ref=f64e1484]:
+                        - link "View Kashan Siddique’s graphic link, reacted with LIKE, graphic" [ref=f64e1485] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAFjiWxMByxn5EcKsvfDqYu0pUajRR79StlY
+                          - generic [ref=f64e1487]:
+                            - img "View Kashan Siddique’s graphic link" [ref=f64e1490]
+                            - img "like" [ref=f64e1491]
+                      - listitem [ref=f64e1492]:
+                        - link "View Natasha Odeyemi’s graphic link, reacted with LIKE, graphic" [ref=f64e1493] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAD4z8S0Br4ta15t1V-x0Sdwegy-E-GM-bms
+                          - generic [ref=f64e1495]:
+                            - img "View Natasha Odeyemi’s graphic link" [ref=f64e1498]
+                            - img "like" [ref=f64e1499]
+                      - listitem [ref=f64e1500]:
+                        - link "View Ruslan Kosinov ⚡️’s graphic link, reacted with LIKE, graphic" [ref=f64e1501] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAEYSkaAB6t6bWaf2uJpiKd2xAnOkkpfCshQ
+                          - generic [ref=f64e1503]:
+                            - img "View Ruslan Kosinov ⚡️’s graphic link" [ref=f64e1506]
+                            - img "like" [ref=f64e1507]
+                      - listitem [ref=f64e1508]:
+                        - link "View Joel Worthington, CFE’s graphic link, reacted with LIKE, graphic" [ref=f64e1509] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAAChjbgB4tZ1OalyQR7SFNBEp5i9EVHIDaE
+                          - generic [ref=f64e1511]:
+                            - img "View Joel Worthington, CFE’s graphic link" [ref=f64e1514]
+                            - img "like" [ref=f64e1515]
+                      - listitem [ref=f64e1516]:
+                        - link "View David Azaraf’s graphic link, reacted with LIKE, graphic" [ref=f64e1517] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAABVv9FoBoJSrzzDde077QCuHKWXMGne-aT4
+                          - generic [ref=f64e1519]:
+                            - img "View David Azaraf’s graphic link" [ref=f64e1522]
+                            - img "like" [ref=f64e1523]
+                      - listitem [ref=f64e1524]:
+                        - button "See 29 more reactions" [ref=f64e1525] [cursor=pointer]: "+29"
+                  - generic [ref=f64e213]:
+                    - generic [ref=f64e214]:
+                      - button "React Like" [ref=f64e215] [cursor=pointer]:
+                        - img [ref=f64e218]
+                      - button "Open reactions menu":
+                        - img [ref=f64e221] [cursor=pointer]
+                    - button "Comment" [ref=f64e225] [cursor=pointer]:
+                      - img [ref=f64e226]
+                    - button [ref=f64e230] [cursor=pointer]:
+                      - img [ref=f64e231]
+                    - button "Send in a private message" [ref=f64e235] [cursor=pointer]:
+                      - img [ref=f64e236]
+              - generic [ref=f64e239]:
+                - generic [ref=f64e241]:
+                  - img "Brian Huntington" [ref=f64e243]
+                  - generic [ref=f64e246]:
+                    - generic [ref=f64e250]:
+                      - textbox "Text editor for creating content" [ref=f64e252]:
+                        - paragraph [ref=f64e253]
+                        - text: Add a comment…
+                      - generic [ref=f64e254]: Add a comment…
+                    - generic [ref=f64e256]:
+                      - button "Open Emoji Keyboard" [ref=f64e259] [cursor=pointer]:
+                        - img
+                        - generic [ref=f64e260]: Open Emoji Keyboard
+                      - button "Add a photo" [ref=f64e262] [cursor=pointer]:
+                        - img [ref=f64e263]
+                - button "Current selected sort order is Most relevant" [ref=f64e268] [cursor=pointer]:
+                  - generic [ref=f64e269]: Current selected sort order is Most relevant
+                  - generic [ref=f64e270]:
+                    - text: Most relevant
+                    - img [ref=f64e271]
+                - generic [ref=f64e273]:
+                  - generic [ref=f64e276]:
+                    - article [ref=f64e278]:
+                      - generic [ref=f64e279]:
+                        - generic [ref=f64e280]:
+                          - link "View Alejandro Obregon’s graphic link" [ref=f64e281] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/alejandroobregon19
+                            - img "View Alejandro Obregon’s graphic link" [ref=f64e284]
+                          - 'link "View: Alejandro Obregon • 3rd+ AI GTM Operator @ Growth Today | Building AI-native GTM engines that compound revenue | Outbound, Content &amp; Paid Ads as one allbound motion | growthtoday.co" [ref=f64e285] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/alejandroobregon19
+                            - heading "Alejandro Obregon • 3rd+" [level=3] [ref=f64e286]:
+                              - generic [ref=f64e287]: Alejandro Obregon
+                              - generic [ref=f64e288]:
+                                - img [ref=f64e289]
+                                - text: • 3rd+
+                            - generic [ref=f64e291]: AI GTM Operator @ Growth Today | Building AI-native GTM engines that compound revenue | Outbound, Content & Paid Ads as one allbound motion | growthtoday.co
+                        - generic [ref=f64e292]:
+                          - time [ref=f64e293]: 1h
+                          - button "Open options for Alejandro Obregon’s comment" [ref=f64e296] [cursor=pointer]:
+                            - img "Open options for Alejandro Obregon’s comment" [ref=f64e297]
+                      - generic [ref=f64e299]:
+                        - button [ref=f64e300] [cursor=pointer]
+                        - generic [ref=f64e307]: I have seen that people stop at “get engagement" and this is clearly the missing layer after
+                      - generic [ref=f64e308]:
+                        - generic [ref=f64e309]:
+                          - button [ref=f64e310] [cursor=pointer]
+                          - generic [ref=f64e312]:
+                            - generic [ref=f64e313]:
+                              - generic [ref=f64e314]:
+                                - button "React Like to Alejandro Obregon’s comment" [ref=f64e315] [cursor=pointer]:
+                                  - generic [ref=f64e318]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e320] [cursor=pointer]
+                              - generic [ref=f64e322]: ·
+                              - button "2 Reactions on Alejandro Obregon’s comment" [ref=f64e323] [cursor=pointer]:
+                                - img "like" [ref=f64e324]
+                                - generic [ref=f64e325]: "2"
+                            - generic [ref=f64e327]:
+                              - button "Reply to Alejandro Obregon’s comment" [ref=f64e328] [cursor=pointer]:
+                                - generic [ref=f64e330]: Reply
+                              - generic [ref=f64e331]: ·
+                              - generic [ref=f64e332]: 1 reply
+                              - generic [ref=f64e333]: 1 Comment on Alejandro Obregon’s comment
+                        - generic [ref=f64e335]:
+                          - button [ref=f64e336] [cursor=pointer]
+                          - article [ref=f64e338]:
+                            - generic [ref=f64e339]:
+                              - generic [ref=f64e340]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e341] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e344]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e345] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e346]:
+                                    - generic [ref=f64e347]: Jani Vrancsik
+                                    - img [ref=f64e349]:
+                                      - img [ref=f64e350]
+                                    - generic [ref=f64e352]: Author
+                                  - generic [ref=f64e353]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e354]:
+                                - time [ref=f64e355]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e358] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e359]
+                            - generic [ref=f64e369]:
+                              - link "Alejandro Obregon" [ref=f64e371] [cursor=pointer]:
+                                - /url: /in/alejandroobregon19/
+                              - text: Yeah, that’s the missing layer most teams ignore.
+                            - generic [ref=f64e376]:
+                              - generic [ref=f64e378]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e379] [cursor=pointer]:
+                                  - generic [ref=f64e382]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e384] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e388] [cursor=pointer]:
+                                - generic [ref=f64e390]: Reply
+                    - article [ref=f64e392]:
+                      - generic [ref=f64e393]:
+                        - generic [ref=f64e394]:
+                          - link "View Travis Moh☘️’s graphic link" [ref=f64e395] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/travis-moh
+                            - img "View Travis Moh☘️’s graphic link" [ref=f64e398]
+                          - 'link "View: Travis Moh☘️ • 3rd+ I help 7-8 figure course creators &amp; coaches scale profitably with Meta Ads | $60M+ in tracked revenue ∣ 4.6x ROAS average | Founder @AdPush Media" [ref=f64e399] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/travis-moh
+                            - heading "Travis Moh☘️ • 3rd+" [level=3] [ref=f64e400]:
+                              - generic [ref=f64e401]: Travis Moh☘️
+                              - generic [ref=f64e402]:
+                                - img [ref=f64e403]:
+                                  - img [ref=f64e404]
+                                - text: • 3rd+
+                            - generic [ref=f64e406]: I help 7-8 figure course creators & coaches scale profitably with Meta Ads | $60M+ in tracked revenue ∣ 4.6x ROAS average | Founder @AdPush Media
+                        - generic [ref=f64e407]:
+                          - time [ref=f64e408]: 1h
+                          - button "Open options for Travis Moh☘️’s comment" [ref=f64e411] [cursor=pointer]:
+                            - img "Open options for Travis Moh☘️’s comment" [ref=f64e412]
+                      - generic [ref=f64e414]:
+                        - button [ref=f64e415] [cursor=pointer]
+                        - generic [ref=f64e422]: SCORE
+                      - generic [ref=f64e423]:
+                        - generic [ref=f64e424]:
+                          - button [ref=f64e425] [cursor=pointer]
+                          - generic [ref=f64e427]:
+                            - generic [ref=f64e428]:
+                              - generic [ref=f64e429]:
+                                - button "React Like to Travis Moh☘️’s comment" [ref=f64e430] [cursor=pointer]:
+                                  - generic [ref=f64e433]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e435] [cursor=pointer]
+                              - generic [ref=f64e437]: ·
+                              - button "2 Reactions on Travis Moh☘️’s comment" [ref=f64e438] [cursor=pointer]:
+                                - img "like" [ref=f64e439]
+                                - generic [ref=f64e440]: "2"
+                            - generic [ref=f64e442]:
+                              - button "Reply to Travis Moh☘️’s comment" [ref=f64e443] [cursor=pointer]:
+                                - generic [ref=f64e445]: Reply
+                              - generic [ref=f64e446]: ·
+                              - generic [ref=f64e447]: 1 reply
+                              - generic [ref=f64e448]: 1 Comment on Travis Moh☘️’s comment
+                        - generic [ref=f64e450]:
+                          - button [ref=f64e451] [cursor=pointer]
+                          - article [ref=f64e453]:
+                            - generic [ref=f64e454]:
+                              - generic [ref=f64e455]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e456] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e459]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e460] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e461]:
+                                    - generic [ref=f64e462]: Jani Vrancsik
+                                    - img [ref=f64e464]:
+                                      - img [ref=f64e465]
+                                    - generic [ref=f64e467]: Author
+                                  - generic [ref=f64e468]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e469]:
+                                - time [ref=f64e470]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e473] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e474]
+                            - generic [ref=f64e484]:
+                              - link "Travis Moh☘️" [ref=f64e486] [cursor=pointer]:
+                                - /url: /in/travis-moh/
+                              - text: Got you, sending shortly.
+                            - generic [ref=f64e491]:
+                              - generic [ref=f64e493]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e494] [cursor=pointer]:
+                                  - generic [ref=f64e497]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e499] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e503] [cursor=pointer]:
+                                - generic [ref=f64e505]: Reply
+                    - article [ref=f64e507]:
+                      - generic [ref=f64e508]:
+                        - generic [ref=f64e509]:
+                          - link "View Josh Crouch 🐂🎯’s graphic link" [ref=f64e510] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/josh-crouch
+                            - img "View Josh Crouch 🐂🎯’s graphic link" [ref=f64e513]
+                          - 'link "View: Josh Crouch 🐂🎯 • 3rd+ Founder &amp; CEO at Relentless Digital | Home Services Marketing" [ref=f64e514] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/josh-crouch
+                            - heading "Josh Crouch 🐂🎯 • 3rd+" [level=3] [ref=f64e515]:
+                              - generic [ref=f64e516]: Josh Crouch 🐂🎯
+                              - generic [ref=f64e517]:
+                                - img [ref=f64e518]:
+                                  - img [ref=f64e519]
+                                - text: • 3rd+
+                            - generic [ref=f64e521]: Founder & CEO at Relentless Digital | Home Services Marketing
+                        - generic [ref=f64e522]:
+                          - time [ref=f64e523]: 1h
+                          - button "Open options for Josh Crouch 🐂🎯’s comment" [ref=f64e526] [cursor=pointer]:
+                            - img "Open options for Josh Crouch 🐂🎯’s comment" [ref=f64e527]
+                      - generic [ref=f64e529]:
+                        - button [ref=f64e530] [cursor=pointer]
+                        - generic [ref=f64e537]: SCORE
+                      - generic [ref=f64e538]:
+                        - generic [ref=f64e539]:
+                          - button [ref=f64e540] [cursor=pointer]
+                          - generic [ref=f64e542]:
+                            - generic [ref=f64e543]:
+                              - generic [ref=f64e544]:
+                                - button "React Like to Josh Crouch 🐂🎯’s comment" [ref=f64e545] [cursor=pointer]:
+                                  - generic [ref=f64e548]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e550] [cursor=pointer]
+                              - generic [ref=f64e552]: ·
+                              - button "2 Reactions on Josh Crouch 🐂🎯’s comment" [ref=f64e553] [cursor=pointer]:
+                                - img "like" [ref=f64e554]
+                                - generic [ref=f64e555]: "2"
+                            - generic [ref=f64e557]:
+                              - button "Reply to Josh Crouch 🐂🎯’s comment" [ref=f64e558] [cursor=pointer]:
+                                - generic [ref=f64e560]: Reply
+                              - generic [ref=f64e561]: ·
+                              - generic [ref=f64e562]: 1 reply
+                              - generic [ref=f64e563]: 1 Comment on Josh Crouch 🐂🎯’s comment
+                        - generic [ref=f64e565]:
+                          - button [ref=f64e566] [cursor=pointer]
+                          - article [ref=f64e568]:
+                            - generic [ref=f64e569]:
+                              - generic [ref=f64e570]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e571] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e574]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e575] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e576]:
+                                    - generic [ref=f64e577]: Jani Vrancsik
+                                    - img [ref=f64e579]:
+                                      - img [ref=f64e580]
+                                    - generic [ref=f64e582]: Author
+                                  - generic [ref=f64e583]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e584]:
+                                - time [ref=f64e585]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e588] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e589]
+                            - generic [ref=f64e599]:
+                              - link "Josh Crouch 🐂🎯" [ref=f64e601] [cursor=pointer]:
+                                - /url: /in/josh-crouch/
+                              - text: Sending it over.
+                            - generic [ref=f64e606]:
+                              - generic [ref=f64e608]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e609] [cursor=pointer]:
+                                  - generic [ref=f64e612]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e614] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e618] [cursor=pointer]:
+                                - generic [ref=f64e620]: Reply
+                    - article [ref=f64e622]:
+                      - generic [ref=f64e623]:
+                        - generic [ref=f64e624]:
+                          - link "View Brigitta Ruha’s graphic link" [ref=f64e625] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/brigittaruha
+                            - img "View Brigitta Ruha’s graphic link" [ref=f64e628]
+                          - 'link "View: Brigitta Ruha • 3rd+ Co-Founder @ Growth Today | Content, Outbound &amp; Ads as one allbound motion | AI-native GTM engine for B2B teams | growthtoday.co" [ref=f64e629] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/brigittaruha
+                            - heading "Brigitta Ruha • 3rd+" [level=3] [ref=f64e630]:
+                              - generic [ref=f64e631]: Brigitta Ruha
+                              - generic [ref=f64e632]:
+                                - img [ref=f64e633]
+                                - text: • 3rd+
+                            - generic [ref=f64e635]: Co-Founder @ Growth Today | Content, Outbound & Ads as one allbound motion | AI-native GTM engine for B2B teams | growthtoday.co
+                        - generic [ref=f64e636]:
+                          - time [ref=f64e637]: 1h
+                          - button "Open options for Brigitta Ruha’s comment" [ref=f64e640] [cursor=pointer]:
+                            - img "Open options for Brigitta Ruha’s comment" [ref=f64e641]
+                      - generic [ref=f64e643]:
+                        - button [ref=f64e644] [cursor=pointer]
+                        - generic [ref=f64e651]: It's a good reminder for people to keep in mind that a like is not a buying signal. This should definitely be pinned on every sales team wall
+                      - generic [ref=f64e652]:
+                        - generic [ref=f64e653]:
+                          - button [ref=f64e654] [cursor=pointer]
+                          - generic [ref=f64e656]:
+                            - generic [ref=f64e657]:
+                              - generic [ref=f64e658]:
+                                - button "React Like to Brigitta Ruha’s comment" [ref=f64e659] [cursor=pointer]:
+                                  - generic [ref=f64e662]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e664] [cursor=pointer]
+                              - generic [ref=f64e666]: ·
+                              - button "2 Reactions on Brigitta Ruha’s comment" [ref=f64e667] [cursor=pointer]:
+                                - img "like" [ref=f64e668]
+                                - generic [ref=f64e669]: "2"
+                            - generic [ref=f64e671]:
+                              - button "Reply to Brigitta Ruha’s comment" [ref=f64e672] [cursor=pointer]:
+                                - generic [ref=f64e674]: Reply
+                              - generic [ref=f64e675]: ·
+                              - generic [ref=f64e676]: 1 reply
+                              - generic [ref=f64e677]: 1 Comment on Brigitta Ruha’s comment
+                        - generic [ref=f64e679]:
+                          - button [ref=f64e680] [cursor=pointer]
+                          - article [ref=f64e682]:
+                            - generic [ref=f64e683]:
+                              - generic [ref=f64e684]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e685] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e688]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e689] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e690]:
+                                    - generic [ref=f64e691]: Jani Vrancsik
+                                    - img [ref=f64e693]:
+                                      - img [ref=f64e694]
+                                    - generic [ref=f64e696]: Author
+                                  - generic [ref=f64e697]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e698]:
+                                - time [ref=f64e699]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e702] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e703]
+                            - generic [ref=f64e713]:
+                              - link "Brigitta Ruha" [ref=f64e715] [cursor=pointer]:
+                                - /url: /in/brigittaruha/
+                              - text: 100%. Likes feel good, but they don’t move pipeline.
+                            - generic [ref=f64e720]:
+                              - generic [ref=f64e722]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e723] [cursor=pointer]:
+                                  - generic [ref=f64e726]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e728] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e732] [cursor=pointer]:
+                                - generic [ref=f64e734]: Reply
+                    - article [ref=f64e736]:
+                      - generic [ref=f64e737]:
+                        - generic [ref=f64e738]:
+                          - link "View Prosper Okechukwu’s graphic link" [ref=f64e739] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/peokechukwu
+                            - img "View Prosper Okechukwu’s graphic link" [ref=f64e742]
+                          - 'link "View: Prosper Okechukwu • 3rd+ GTM Engineer | Building AI-Native Revenue Systems That Compound | Clay Creator | Outbound × Automation × RevOps" [ref=f64e743] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/peokechukwu
+                            - heading "Prosper Okechukwu • 3rd+" [level=3] [ref=f64e744]:
+                              - generic [ref=f64e745]: Prosper Okechukwu
+                              - generic [ref=f64e746]:
+                                - img [ref=f64e747]
+                                - text: • 3rd+
+                            - generic [ref=f64e749]: GTM Engineer | Building AI-Native Revenue Systems That Compound | Clay Creator | Outbound × Automation × RevOps
+                        - generic [ref=f64e750]:
+                          - time [ref=f64e751]: 1h
+                          - button "Open options for Prosper Okechukwu’s comment" [ref=f64e754] [cursor=pointer]:
+                            - img "Open options for Prosper Okechukwu’s comment" [ref=f64e755]
+                      - generic [ref=f64e757]:
+                        - button [ref=f64e758] [cursor=pointer]
+                        - generic [ref=f64e765]: Cool breakdown of why not all engagement deserves the same response! I also think that posting without knowing the follow-up motion is such a waste
+                      - generic [ref=f64e766]:
+                        - generic [ref=f64e767]:
+                          - button [ref=f64e768] [cursor=pointer]
+                          - generic [ref=f64e770]:
+                            - generic [ref=f64e771]:
+                              - generic [ref=f64e772]:
+                                - button "React Like to Prosper Okechukwu’s comment" [ref=f64e773] [cursor=pointer]:
+                                  - generic [ref=f64e776]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e778] [cursor=pointer]
+                              - generic [ref=f64e780]: ·
+                              - button "1 Reaction on Prosper Okechukwu’s comment" [ref=f64e781] [cursor=pointer]:
+                                - img "like" [ref=f64e782]
+                                - generic [ref=f64e783]: "1"
+                            - generic [ref=f64e785]:
+                              - button "Reply to Prosper Okechukwu’s comment" [ref=f64e786] [cursor=pointer]:
+                                - generic [ref=f64e788]: Reply
+                              - generic [ref=f64e789]: ·
+                              - generic [ref=f64e790]: 1 reply
+                              - generic [ref=f64e791]: 1 Comment on Prosper Okechukwu’s comment
+                        - generic [ref=f64e793]:
+                          - button [ref=f64e794] [cursor=pointer]
+                          - article [ref=f64e796]:
+                            - generic [ref=f64e797]:
+                              - generic [ref=f64e798]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e799] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e802]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e803] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e804]:
+                                    - generic [ref=f64e805]: Jani Vrancsik
+                                    - img [ref=f64e807]:
+                                      - img [ref=f64e808]
+                                    - generic [ref=f64e810]: Author
+                                  - generic [ref=f64e811]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e812]:
+                                - time [ref=f64e813]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e816] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e817]
+                            - generic [ref=f64e827]:
+                              - link "Prosper Okechukwu" [ref=f64e829] [cursor=pointer]:
+                                - /url: /in/peokechukwu/
+                              - text: Yeah, that’s exactly it.
+                            - generic [ref=f64e834]:
+                              - generic [ref=f64e836]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e837] [cursor=pointer]:
+                                  - generic [ref=f64e840]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e842] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e846] [cursor=pointer]:
+                                - generic [ref=f64e848]: Reply
+                    - article [ref=f64e850]:
+                      - generic [ref=f64e851]:
+                        - generic [ref=f64e852]:
+                          - link "View Christian Oland’s graphic link" [ref=f64e853] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/c-oland
+                            - img "View Christian Oland’s graphic link" [ref=f64e856]
+                          - 'link "View: Christian Oland • 3rd+ Founder of Revenue.inc | Helping businesses unlock 10x growth through growth hacking and AI" [ref=f64e857] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/c-oland
+                            - heading "Christian Oland • 3rd+" [level=3] [ref=f64e858]:
+                              - generic [ref=f64e859]: Christian Oland
+                              - generic [ref=f64e860]:
+                                - img [ref=f64e861]
+                                - text: • 3rd+
+                            - generic [ref=f64e863]: Founder of Revenue.inc | Helping businesses unlock 10x growth through growth hacking and AI
+                        - generic [ref=f64e864]:
+                          - time [ref=f64e865]: 1h
+                          - button "Open options for Christian Oland’s comment" [ref=f64e868] [cursor=pointer]:
+                            - img "Open options for Christian Oland’s comment" [ref=f64e869]
+                      - generic [ref=f64e871]:
+                        - button [ref=f64e872] [cursor=pointer]
+                        - generic [ref=f64e879]: I like the idea of matching outreach to intent. Someone downloading a case study deserves a very different follow-up than someone who just liked a post.
+                      - generic [ref=f64e880]:
+                        - generic [ref=f64e881]:
+                          - button [ref=f64e882] [cursor=pointer]
+                          - generic [ref=f64e884]:
+                            - generic [ref=f64e885]:
+                              - generic [ref=f64e886]:
+                                - button "React Like to Christian Oland’s comment" [ref=f64e887] [cursor=pointer]:
+                                  - generic [ref=f64e890]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e892] [cursor=pointer]
+                              - generic [ref=f64e894]: ·
+                              - button "1 Reaction on Christian Oland’s comment" [ref=f64e895] [cursor=pointer]:
+                                - img "like" [ref=f64e896]
+                                - generic [ref=f64e897]: "1"
+                            - generic [ref=f64e899]:
+                              - button "Reply to Christian Oland’s comment" [ref=f64e900] [cursor=pointer]:
+                                - generic [ref=f64e902]: Reply
+                              - generic [ref=f64e903]: ·
+                              - generic [ref=f64e904]: 1 reply
+                              - generic [ref=f64e905]: 1 Comment on Christian Oland’s comment
+                        - generic [ref=f64e907]:
+                          - button [ref=f64e908] [cursor=pointer]
+                          - article [ref=f64e910]:
+                            - generic [ref=f64e911]:
+                              - generic [ref=f64e912]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e913] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e916]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e917] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e918]:
+                                    - generic [ref=f64e919]: Jani Vrancsik
+                                    - img [ref=f64e921]:
+                                      - img [ref=f64e922]
+                                    - generic [ref=f64e924]: Author
+                                  - generic [ref=f64e925]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e926]:
+                                - time [ref=f64e927]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e930] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e931]
+                            - generic [ref=f64e941]:
+                              - link "Christian Oland" [ref=f64e943] [cursor=pointer]:
+                                - /url: /in/c-oland/
+                              - text: Yeah, that’s the real difference.
+                            - generic [ref=f64e948]:
+                              - generic [ref=f64e950]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e951] [cursor=pointer]:
+                                  - generic [ref=f64e954]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e956] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e960] [cursor=pointer]:
+                                - generic [ref=f64e962]: Reply
+                    - article [ref=f64e964]:
+                      - generic [ref=f64e965]:
+                        - generic [ref=f64e966]:
+                          - link "View Vanessa E.’s graphic link" [ref=f64e967] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/mojoyin-erinle
+                            - img "View Vanessa E.’s graphic link" [ref=f64e970]
+                          - 'link "View: Vanessa E. • 3rd+ Virtual Assistant | LinkedIn Manager helping Founders, Coaches, CEOs &amp; Creators stay visible on LinkedIn through management, engagement &amp; admin support" [ref=f64e971] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/mojoyin-erinle
+                            - heading "Vanessa E. • 3rd+" [level=3] [ref=f64e972]:
+                              - generic [ref=f64e973]: Vanessa E.
+                              - generic [ref=f64e974]: • 3rd+
+                            - generic [ref=f64e975]: Virtual Assistant | LinkedIn Manager helping Founders, Coaches, CEOs & Creators stay visible on LinkedIn through management, engagement & admin support
+                        - generic [ref=f64e976]:
+                          - time [ref=f64e977]: 1h
+                          - button "Open options for Vanessa E.’s comment" [ref=f64e980] [cursor=pointer]:
+                            - img "Open options for Vanessa E.’s comment" [ref=f64e981]
+                      - generic [ref=f64e983]:
+                        - button [ref=f64e984] [cursor=pointer]
+                        - generic [ref=f64e991]:
+                          - text: Most teams miss that content isn’t just reach, it’s a signal layer that should directly shape who gets contacted and when.
+                          - link "Jani" [ref=f64e993] [cursor=pointer]:
+                            - /url: /in/janivrancsik/
+                      - generic [ref=f64e994]:
+                        - generic [ref=f64e995]:
+                          - button [ref=f64e996] [cursor=pointer]
+                          - generic [ref=f64e998]:
+                            - generic [ref=f64e999]:
+                              - generic [ref=f64e1000]:
+                                - button "React Like to Vanessa E.’s comment" [ref=f64e1001] [cursor=pointer]:
+                                  - generic [ref=f64e1004]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1006] [cursor=pointer]
+                              - generic [ref=f64e1008]: ·
+                              - button "1 Reaction on Vanessa E.’s comment" [ref=f64e1009] [cursor=pointer]:
+                                - img "like" [ref=f64e1010]
+                                - generic [ref=f64e1011]: "1"
+                            - generic [ref=f64e1013]:
+                              - button "Reply to Vanessa E.’s comment" [ref=f64e1014] [cursor=pointer]:
+                                - generic [ref=f64e1016]: Reply
+                              - generic [ref=f64e1017]: ·
+                              - generic [ref=f64e1018]: 1 reply
+                              - generic [ref=f64e1019]: 1 Comment on Vanessa E.’s comment
+                        - generic [ref=f64e1021]:
+                          - button [ref=f64e1022] [cursor=pointer]
+                          - article [ref=f64e1024]:
+                            - generic [ref=f64e1025]:
+                              - generic [ref=f64e1026]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e1027] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e1030]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e1031] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e1032]:
+                                    - generic [ref=f64e1033]: Jani Vrancsik
+                                    - img [ref=f64e1035]:
+                                      - img [ref=f64e1036]
+                                    - generic [ref=f64e1038]: Author
+                                  - generic [ref=f64e1039]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e1040]:
+                                - time [ref=f64e1041]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e1044] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e1045]
+                            - generic [ref=f64e1055]:
+                              - link "Vanessa E." [ref=f64e1057] [cursor=pointer]:
+                                - /url: /in/mojoyin-erinle/
+                              - text: Yeah, this is the missing piece most people don’t connect yet.
+                            - generic [ref=f64e1062]:
+                              - generic [ref=f64e1064]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e1065] [cursor=pointer]:
+                                  - generic [ref=f64e1068]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1070] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e1074] [cursor=pointer]:
+                                - generic [ref=f64e1076]: Reply
+                    - article [ref=f64e1078]:
+                      - generic [ref=f64e1079]:
+                        - generic [ref=f64e1080]:
+                          - link "View Justin Hardy’s graphic link" [ref=f64e1081] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/justinhardy4
+                            - img "View Justin Hardy’s graphic link" [ref=f64e1084]
+                          - 'link "View: Justin Hardy • 3rd+ AI CMO For AI Startups &amp; Agencies (2 client spot left)… I help marketers + startups thrive in the AI clone wars 🤖💀" [ref=f64e1085] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/justinhardy4
+                            - heading "Justin Hardy • 3rd+" [level=3] [ref=f64e1086]:
+                              - generic [ref=f64e1087]: Justin Hardy
+                              - generic [ref=f64e1088]:
+                                - img [ref=f64e1089]
+                                - text: • 3rd+
+                            - generic [ref=f64e1091]: AI CMO For AI Startups & Agencies (2 client spot left)… I help marketers + startups thrive in the AI clone wars 🤖💀
+                        - generic [ref=f64e1092]:
+                          - time [ref=f64e1093]: 1h
+                          - button "Open options for Justin Hardy’s comment" [ref=f64e1096] [cursor=pointer]:
+                            - img "Open options for Justin Hardy’s comment" [ref=f64e1097]
+                      - generic [ref=f64e1099]:
+                        - button [ref=f64e1100] [cursor=pointer]
+                        - generic [ref=f64e1107]: Score
+                      - generic [ref=f64e1108]:
+                        - generic [ref=f64e1109]:
+                          - button [ref=f64e1110] [cursor=pointer]
+                          - generic [ref=f64e1112]:
+                            - generic [ref=f64e1113]:
+                              - generic [ref=f64e1114]:
+                                - button "React Like to Justin Hardy’s comment" [ref=f64e1115] [cursor=pointer]:
+                                  - generic [ref=f64e1118]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1120] [cursor=pointer]
+                              - generic [ref=f64e1122]: ·
+                              - button "1 Reaction on Justin Hardy’s comment" [ref=f64e1123] [cursor=pointer]:
+                                - img "like" [ref=f64e1124]
+                                - generic [ref=f64e1125]: "1"
+                            - generic [ref=f64e1127]:
+                              - button "Reply to Justin Hardy’s comment" [ref=f64e1128] [cursor=pointer]:
+                                - generic [ref=f64e1130]: Reply
+                              - generic [ref=f64e1131]: ·
+                              - generic [ref=f64e1132]: 1 reply
+                              - generic [ref=f64e1133]: 1 Comment on Justin Hardy’s comment
+                        - generic [ref=f64e1135]:
+                          - button [ref=f64e1136] [cursor=pointer]
+                          - article [ref=f64e1138]:
+                            - generic [ref=f64e1139]:
+                              - generic [ref=f64e1140]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e1141] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e1144]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e1145] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e1146]:
+                                    - generic [ref=f64e1147]: Jani Vrancsik
+                                    - img [ref=f64e1149]:
+                                      - img [ref=f64e1150]
+                                    - generic [ref=f64e1152]: Author
+                                  - generic [ref=f64e1153]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e1154]:
+                                - time [ref=f64e1155]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e1158] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e1159]
+                            - generic [ref=f64e1169]:
+                              - link "Justin Hardy" [ref=f64e1171] [cursor=pointer]:
+                                - /url: /in/justinhardy4/
+                              - text: On it.
+                            - generic [ref=f64e1176]:
+                              - generic [ref=f64e1177]:
+                                - generic [ref=f64e1178]:
+                                  - button "React Like to Jani Vrancsik’s comment" [ref=f64e1179] [cursor=pointer]:
+                                    - generic [ref=f64e1182]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f64e1184] [cursor=pointer]
+                                - generic [ref=f64e1186]: ·
+                                - button "1 Reaction on Jani Vrancsik’s comment" [ref=f64e1187] [cursor=pointer]:
+                                  - img "like" [ref=f64e1188]
+                                  - generic [ref=f64e1189]: "1"
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e1192] [cursor=pointer]:
+                                - generic [ref=f64e1194]: Reply
+                    - article [ref=f64e1196]:
+                      - generic [ref=f64e1197]:
+                        - generic [ref=f64e1198]:
+                          - link "View Craig Taylor’s graphic link" [ref=f64e1199] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/taylorcraig
+                            - img "View Craig Taylor’s graphic link" [ref=f64e1202]
+                          - 'link "View: Craig Taylor • 3rd+ CEO @ROMI | We build demand engines for B2B tech, consulting &amp; IT services firms" [ref=f64e1203] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/taylorcraig
+                            - heading "Craig Taylor • 3rd+" [level=3] [ref=f64e1204]:
+                              - generic [ref=f64e1205]: Craig Taylor
+                              - generic [ref=f64e1206]:
+                                - img [ref=f64e1207]:
+                                  - img [ref=f64e1208]
+                                - text: • 3rd+
+                            - generic [ref=f64e1210]: CEO @ROMI | We build demand engines for B2B tech, consulting & IT services firms
+                        - generic [ref=f64e1211]:
+                          - time [ref=f64e1212]: 1h
+                          - button "Open options for Craig Taylor’s comment" [ref=f64e1215] [cursor=pointer]:
+                            - img "Open options for Craig Taylor’s comment" [ref=f64e1216]
+                      - generic [ref=f64e1218]:
+                        - button [ref=f64e1219] [cursor=pointer]
+                        - generic [ref=f64e1226]: score
+                      - generic [ref=f64e1227]:
+                        - generic [ref=f64e1228]:
+                          - button [ref=f64e1229] [cursor=pointer]
+                          - generic [ref=f64e1231]:
+                            - generic [ref=f64e1232]:
+                              - generic [ref=f64e1233]:
+                                - button "React Like to Craig Taylor’s comment" [ref=f64e1234] [cursor=pointer]:
+                                  - generic [ref=f64e1237]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1239] [cursor=pointer]
+                              - generic [ref=f64e1241]: ·
+                              - button "1 Reaction on Craig Taylor’s comment" [ref=f64e1242] [cursor=pointer]:
+                                - img "like" [ref=f64e1243]
+                                - generic [ref=f64e1244]: "1"
+                            - generic [ref=f64e1246]:
+                              - button "Reply to Craig Taylor’s comment" [ref=f64e1247] [cursor=pointer]:
+                                - generic [ref=f64e1249]: Reply
+                              - generic [ref=f64e1250]: ·
+                              - generic [ref=f64e1251]: 1 reply
+                              - generic [ref=f64e1252]: 1 Comment on Craig Taylor’s comment
+                        - generic [ref=f64e1254]:
+                          - button [ref=f64e1255] [cursor=pointer]
+                          - article [ref=f64e1257]:
+                            - generic [ref=f64e1258]:
+                              - generic [ref=f64e1259]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e1260] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e1263]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e1264] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e1265]:
+                                    - generic [ref=f64e1266]: Jani Vrancsik
+                                    - img [ref=f64e1268]:
+                                      - img [ref=f64e1269]
+                                    - generic [ref=f64e1271]: Author
+                                  - generic [ref=f64e1272]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e1273]:
+                                - time [ref=f64e1274]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e1277] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e1278]
+                            - generic [ref=f64e1288]:
+                              - link "Craig Taylor" [ref=f64e1290] [cursor=pointer]:
+                                - /url: /in/taylorcraig/
+                              - text: On it.
+                            - generic [ref=f64e1295]:
+                              - generic [ref=f64e1297]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e1298] [cursor=pointer]:
+                                  - generic [ref=f64e1301]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1303] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e1307] [cursor=pointer]:
+                                - generic [ref=f64e1309]: Reply
+                    - article [ref=f64e1311]:
+                      - generic [ref=f64e1312]:
+                        - generic [ref=f64e1313]:
+                          - link "View Raouf Lemouchi’s graphic link" [ref=f64e1314] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/raouf-lemouchi
+                            - img "View Raouf Lemouchi’s graphic link" [ref=f64e1317]
+                          - 'link "View: Raouf Lemouchi • 3rd+ Matcha Best Salesman 🍵 | 2x Founder | GTM Expert" [ref=f64e1318] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/raouf-lemouchi
+                            - heading "Raouf Lemouchi • 3rd+" [level=3] [ref=f64e1319]:
+                              - generic [ref=f64e1320]: Raouf Lemouchi
+                              - generic [ref=f64e1321]:
+                                - img [ref=f64e1322]:
+                                  - img [ref=f64e1323]
+                                - text: • 3rd+
+                            - generic [ref=f64e1325]: Matcha Best Salesman 🍵 | 2x Founder | GTM Expert
+                        - generic [ref=f64e1326]:
+                          - time [ref=f64e1327]: 1h
+                          - button "Open options for Raouf Lemouchi’s comment" [ref=f64e1330] [cursor=pointer]:
+                            - img "Open options for Raouf Lemouchi’s comment" [ref=f64e1331]
+                      - generic [ref=f64e1333]:
+                        - button [ref=f64e1334] [cursor=pointer]
+                        - generic [ref=f64e1341]: SCORE
+                      - generic [ref=f64e1342]:
+                        - generic [ref=f64e1343]:
+                          - button [ref=f64e1344] [cursor=pointer]
+                          - generic [ref=f64e1346]:
+                            - generic [ref=f64e1347]:
+                              - generic [ref=f64e1348]:
+                                - button "React Like to Raouf Lemouchi’s comment" [ref=f64e1349] [cursor=pointer]:
+                                  - generic [ref=f64e1352]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1354] [cursor=pointer]
+                              - generic [ref=f64e1356]: ·
+                              - button "1 Reaction on Raouf Lemouchi’s comment" [ref=f64e1357] [cursor=pointer]:
+                                - img "like" [ref=f64e1358]
+                                - generic [ref=f64e1359]: "1"
+                            - generic [ref=f64e1361]:
+                              - button "Reply to Raouf Lemouchi’s comment" [ref=f64e1362] [cursor=pointer]:
+                                - generic [ref=f64e1364]: Reply
+                              - generic [ref=f64e1365]: ·
+                              - generic [ref=f64e1366]: 1 reply
+                              - generic [ref=f64e1367]: 1 Comment on Raouf Lemouchi’s comment
+                        - generic [ref=f64e1369]:
+                          - button [ref=f64e1370] [cursor=pointer]
+                          - article [ref=f64e1372]:
+                            - generic [ref=f64e1373]:
+                              - generic [ref=f64e1374]:
+                                - link "View Jani Vrancsik’s graphic link" [ref=f64e1375] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - img "View Jani Vrancsik’s graphic link" [ref=f64e1378]
+                                - 'link "View: Jani Vrancsik Author, Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound &amp; ABM Ads as one allbound motion | growthtoday.co" [ref=f64e1379] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/janivrancsik
+                                  - heading "Jani Vrancsik Author" [level=3] [ref=f64e1380]:
+                                    - generic [ref=f64e1381]: Jani Vrancsik
+                                    - img [ref=f64e1383]:
+                                      - img [ref=f64e1384]
+                                    - generic [ref=f64e1386]: Author
+                                  - generic [ref=f64e1387]: Co-Founder @ Growth Today | We build AI-native GTM engines that compound | Content, Outbound & ABM Ads as one allbound motion | growthtoday.co
+                              - generic [ref=f64e1388]:
+                                - time [ref=f64e1389]: 1h
+                                - button "Open options for Jani Vrancsik’s comment" [ref=f64e1392] [cursor=pointer]:
+                                  - img "Open options for Jani Vrancsik’s comment" [ref=f64e1393]
+                            - generic [ref=f64e1399]:
+                              - generic [ref=f64e1403]:
+                                - link "Raouf Lemouchi" [ref=f64e1405] [cursor=pointer]:
+                                  - /url: /in/raouf-lemouchi/
+                                - text: Got you.
+                              - button "Show translation of this comment" [ref=f64e1407] [cursor=pointer]:
+                                - generic [ref=f64e1408]: Show translation
+                                - generic [ref=f64e1409]: Show translation of this comment
+                            - generic [ref=f64e1414]:
+                              - generic [ref=f64e1416]:
+                                - button "React Like to Jani Vrancsik’s comment" [ref=f64e1417] [cursor=pointer]:
+                                  - generic [ref=f64e1420]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f64e1422] [cursor=pointer]
+                              - button "Reply to Jani Vrancsik’s comment" [ref=f64e1426] [cursor=pointer]:
+                                - generic [ref=f64e1428]: Reply
+                  - generic [ref=f64e1429]:
+                    - button "Load more comments" [ref=f64e1430] [cursor=pointer]:
+                      - img [ref=f64e1431]
+                    - button "Load more comments" [ref=f64e1434] [cursor=pointer]:
+                      - generic [ref=f64e1435]: Load more comments
+      - complementary "Advertisement and similar pages" [ref=f64e1436]:
+        - generic [ref=f64e1438]:
+          - iframe [ref=f64e1527]:
+            - link "Advertise on LinkedIn" [ref=f65e4] [cursor=pointer]:
+              - /url: https://www.linkedin.com/jobs/?trk=li_FA_global_careers_jobsgtm_jsFA_v1&mcid=6899045044465016833
+              - img "Advertise on LinkedIn" [ref=f65e5]
+          - generic "LinkedIn Footer Content" [ref=f64e1439]:
+            - generic [ref=f64e1440]:
+              - list [ref=f64e1528]:
+                - listitem [ref=f64e1529]:
+                  - link "About" [ref=f64e1530] [cursor=pointer]:
+                    - /url: https://about.linkedin.com/
+                    - generic [ref=f64e1531]: About
+                - listitem [ref=f64e1532]:
+                  - link "Accessibility" [ref=f64e1533] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/accessibility
+                    - generic [ref=f64e1534]: Accessibility
+                - listitem [ref=f64e1535]:
+                  - link "Help Center" [ref=f64e1536] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin?trk=footer_d_flagship3_detail_base
+                    - generic [ref=f64e1537]: Help Center
+                - listitem [ref=f64e1538]:
+                  - button "Privacy & Terms" [ref=f64e1540] [cursor=pointer]:
+                    - generic [ref=f64e1542]:
+                      - text: Privacy & Terms
+                      - img [ref=f64e1543]
+                - listitem [ref=f64e1545]:
+                  - link "Ad Choices" [ref=f64e1546] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin/answer/62931
+                    - generic [ref=f64e1547]: Ad Choices
+                - listitem [ref=f64e1548]:
+                  - link "Advertising" [ref=f64e1549] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/ad/start?trk=n_nav_ads_rr
+                    - generic [ref=f64e1550]: Advertising
+                - listitem [ref=f64e1551]:
+                  - button "Business Services" [ref=f64e1553] [cursor=pointer]:
+                    - generic [ref=f64e1555]:
+                      - text: Business Services
+                      - img [ref=f64e1556]
+                - listitem [ref=f64e1558]:
+                  - button "Get the LinkedIn app" [ref=f64e1561] [cursor=pointer]
+                - listitem [ref=f64e1562]:
+                  - button "More options" [ref=f64e1563] [cursor=pointer]: More
+              - generic [ref=f64e1564]:
+                - img "LinkedIn" [ref=f64e1565]:
+                  - img [ref=f64e1566]
+                - text: LinkedIn Corporation © 2026
+    - generic:
+      - generic:
+        - complementary:
+          - generic [ref=f64e1569]:
+            - generic [ref=f64e1571] [cursor=pointer]:
+              - generic [ref=f64e1572]:
+                - img "Brian Huntington" [ref=f64e1573]
+                - generic [ref=f64e1575]: Status is online
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=f64e1576]:
+                - generic [ref=f64e1577]:
+                  - generic [ref=f64e1578]: Messaging
+                  - generic [ref=f64e1579]: You are on the messaging overlay. Press enter to open the list of conversations.
+            - generic [ref=f64e1580]:
+              - button "Open messenger dropdown menu" [ref=f64e1582] [cursor=pointer]:
+                - img "Open messenger dropdown menu" [ref=f64e1583]
+              - button "Compose message" [ref=f64e1586] [cursor=pointer]:
+                - img [ref=f64e1587]
+                - generic [ref=f64e1589]: Compose message
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=f64e1590] [cursor=pointer]:
+                - img [ref=f64e1591]
+                - generic [ref=f64e1593]: You are on the messaging overlay. Press enter to open the list of conversations.
+        - complementary "AI-powered assistant to get help with your career, jobs etc"
+  - region [ref=f64e1441]

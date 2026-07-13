@@ -1,0 +1,75 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e2]:
+    - generic [ref=f2e3]:
+      - generic [ref=f2e4]:
+        - generic [ref=f2e6]: Swipe.ardy
+        - generic [ref=f2e7]: 0 swipes
+      - generic [ref=f2e8]:
+        - generic [ref=f2e9]:
+          - button "Posts" [ref=f2e10] [cursor=pointer]
+          - button "Creators" [ref=f2e11] [cursor=pointer]
+          - button "Websites" [ref=f2e12] [cursor=pointer]
+          - button "Snippets" [ref=f2e13] [cursor=pointer]
+        - button "" [ref=f2e14] [cursor=pointer]:
+          - generic [ref=f2e15]: 
+        - generic [ref=f2e16]:
+          - generic [ref=f2e17]: 
+          - textbox "Search swipes..." [ref=f2e18]
+        - button " Manage filters" [ref=f2e19] [cursor=pointer]:
+          - generic [ref=f2e20]: 
+          - text: Manage filters
+        - button " Add swipe" [ref=f2e21] [cursor=pointer]:
+          - generic [ref=f2e22]: 
+          - text: Add swipe
+    - generic [ref=f2e23]:
+      - generic [ref=f2e24]:
+        - button "Unsaved view " [ref=f2e25] [cursor=pointer]:
+          - text: Unsaved view
+          - generic [ref=f2e26]: 
+        - text:    
+      - button "Format " [ref=f2e29] [cursor=pointer]:
+        - text: Format
+        - generic [ref=f2e30]: 
+      - button "Niche " [ref=f2e32] [cursor=pointer]:
+        - text: Niche
+        - generic [ref=f2e33]: 
+      - button "Assets " [ref=f2e35] [cursor=pointer]:
+        - text: Assets
+        - generic [ref=f2e36]: 
+      - button "Platform " [ref=f2e38] [cursor=pointer]:
+        - text: Platform
+        - generic [ref=f2e39]: 
+      - button "Attention " [ref=f2e41] [cursor=pointer]:
+        - text: Attention
+        - generic [ref=f2e42]: 
+      - button "Framework " [ref=f2e44] [cursor=pointer]:
+        - text: Framework
+        - generic [ref=f2e45]: 
+      - button "Inspiration " [ref=f2e47] [cursor=pointer]:
+        - text: Inspiration
+        - generic [ref=f2e48]: 
+      - generic [ref=f2e49]:
+        - generic [ref=f2e50]: Engagement
+        - spinbutton "Min" [ref=f2e52]
+        - generic [ref=f2e53]: —
+        - spinbutton "Max" [ref=f2e54]
+      - combobox [ref=f2e56] [cursor=pointer]:
+        - option "Newest added" [selected]
+        - option "Oldest added"
+        - option "Most engagements"
+        - option "Least engagements"
+        - option "Most likes"
+        - option "Least likes"
+        - option "Most comments"
+        - option "Least comments"
+        - option "Most reposts"
+        - option "Least reposts"
+        - option "Longest read"
+        - option "Quickest read"
+        - option "Has media first"
+      - button "" [ref=f2e57] [cursor=pointer]:
+        - generic [ref=f2e58]: 
+      - button "" [ref=f2e59] [cursor=pointer]:
+        - generic [ref=f2e60]: 
+    - paragraph [ref=f2e63]: Loading swipes...
+  - text:       

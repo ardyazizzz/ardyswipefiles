@@ -1,0 +1,1047 @@
+- generic [active] [ref=f38e1]:
+  - generic:
+    - region "Toast message":
+      - heading "0 notifications total" [level=2] [ref=f38e3]
+      - alert
+  - generic [ref=f38e4]:
+    - generic [ref=f38e6]:
+      - button "Skip to search" [ref=f38e7] [cursor=pointer]:
+        - generic [ref=f38e8]: Skip to search
+      - button "Skip to main content" [ref=f38e9] [cursor=pointer]:
+        - generic [ref=f38e10]: Skip to main content
+      - button "Keyboard shortcuts" [ref=f38e11] [cursor=pointer]:
+        - generic [ref=f38e12]: Keyboard shortcuts
+      - button "Close jump menu" [ref=f38e13] [cursor=pointer]:
+        - img [ref=f38e14]
+        - generic [ref=f38e16]: Close jump menu
+    - banner "Global Navigation" [ref=f38e17]:
+      - generic [ref=f38e18]:
+        - link "LinkedIn" [ref=f38e19] [cursor=pointer]:
+          - /url: https://www.linkedin.com/feed/?nis=true
+          - img "LinkedIn" [ref=f38e22]:
+            - img [ref=f38e23]
+        - generic [ref=f38e27]:
+          - combobox "Search" [ref=f38e28]
+          - generic:
+            - img
+        - navigation "Primary Navigation" [ref=f38e29]:
+          - list [ref=f38e30]:
+            - listitem [ref=f38e31]:
+              - link "new feed updates notifications Home" [ref=f38e32] [cursor=pointer]:
+                - /url: https://www.linkedin.com/feed/?nis=true&
+                - generic [ref=f38e33]:
+                  - generic [ref=f38e36]: new feed updates notifications
+                  - img [ref=f38e40]
+                - generic "Home" [ref=f38e42]
+            - listitem [ref=f38e43]:
+              - link "My Network" [ref=f38e44] [cursor=pointer]:
+                - /url: https://www.linkedin.com/mynetwork/?
+                - img [ref=f38e48]
+                - generic "My Network" [ref=f38e50]
+            - listitem [ref=f38e51]:
+              - link "Jobs" [ref=f38e52] [cursor=pointer]:
+                - /url: https://www.linkedin.com/jobs/?
+                - img [ref=f38e56]
+                - generic "Jobs" [ref=f38e58]
+            - listitem [ref=f38e59]:
+              - link "Messaging" [ref=f38e60] [cursor=pointer]:
+                - /url: https://www.linkedin.com/messaging/?
+                - img [ref=f38e64]
+                - generic "Messaging" [ref=f38e66]
+            - listitem [ref=f38e67]:
+              - link "1 new notification Notifications" [ref=f38e68] [cursor=pointer]:
+                - /url: https://www.linkedin.com/notifications/?
+                - generic [ref=f38e69]:
+                  - generic [ref=f38e70]:
+                    - generic [ref=f38e71]: "1"
+                    - generic [ref=f38e72]: 1 new notification
+                  - img [ref=f38e76]
+                - generic "Notifications" [ref=f38e78]
+            - listitem [ref=f38e79]:
+              - button "Brian Huntington Me" [ref=f38e81] [cursor=pointer]:
+                - img "Brian Huntington" [ref=f38e82]
+                - generic [ref=f38e83]:
+                  - text: Me
+                  - img [ref=f38e84]
+            - listitem [ref=f38e86]:
+              - button "For Business" [ref=f38e88] [cursor=pointer]:
+                - img [ref=f38e92]
+                - generic "For Business" [ref=f38e94]:
+                  - text: For Business
+                  - img [ref=f38e95]
+            - listitem [ref=f38e97]:
+              - link "Try Premium for €0" [ref=f38e99] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=f38e100]:
+                  - img [ref=f38e101]
+                  - generic [ref=f38e103]: Try Premium for €0
+    - generic [ref=f38e110]:
+      - complementary "User profile" [ref=f38e111]
+      - main "Feed detail update" [ref=f38e132]:
+        - heading "Feed detail update" [level=1] [ref=f38e133]
+        - generic "Update container" [ref=f38e134]:
+          - article [ref=f38e138]:
+            - generic [ref=f38e140]:
+              - heading "Feed post" [level=2] [ref=f38e141]
+              - generic [ref=f38e142]:
+                - generic [ref=f38e143]:
+                  - generic [ref=f38e144]:
+                    - generic [ref=f38e145]:
+                      - link "View Nick Broekema’s graphic link" [ref=f38e146] [cursor=pointer]:
+                        - /url: https://www.linkedin.com/in/nbroekema?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAA4ZpPsBfXKOWfmw6uBMtWd-t9NmEzUWkUQ
+                        - img "View Nick Broekema’s graphic link" [ref=f38e150]
+                      - generic [ref=f38e151]:
+                        - 'link "View: Nick Broekema Premium • 3rd+ You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities" [ref=f38e152] [cursor=pointer]':
+                          - /url: https://www.linkedin.com/in/nbroekema?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAA4ZpPsBfXKOWfmw6uBMtWd-t9NmEzUWkUQ
+                          - generic [ref=f38e153]:
+                            - generic [ref=f38e156]: Nick Broekema
+                            - generic [ref=f38e158]:
+                              - img [ref=f38e159]:
+                                - img [ref=f38e160]
+                              - text: • 3rd+
+                          - generic [ref=f38e163]: You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities
+                        - link "Visit my website" [ref=f38e164] [cursor=pointer]:
+                          - /url: https://nick-broekema.kit.com/1e2270d030
+                          - generic [ref=f38e165]: Visit my website
+                        - generic [ref=f38e167]:
+                          - text: 1yr •
+                          - img [ref=f38e170]
+                    - button "Follow Nick Broekema" [ref=f38e172] [cursor=pointer]:
+                      - img [ref=f38e173]
+                      - generic [ref=f38e175]: Follow
+                  - button "Open control menu for post by Nick Broekema" [ref=f38e178] [cursor=pointer]:
+                    - img [ref=f38e179]
+                - generic [ref=f38e185]:
+                  - text: How to create carousels that attract clients ↓
+                  - text: (And grow your audience while you're at it)
+                - generic [ref=f38e187]:
+                  - alert [ref=f38e188]: Your document has finished loading
+                  - iframe [ref=f38e189]:
+                    - main [ref=f39e4]:
+                      - generic [ref=f39e8]:
+                        - generic [ref=f39e9]: How to create carousels
+                        - generic [ref=f39e10]: •
+                        - generic [ref=f39e11]: 15 pages
+                      - list [ref=f39e29]:
+                        - listitem [ref=f39e30]
+                        - listitem [ref=f39e31]
+                        - listitem [ref=f39e32]
+                        - listitem [ref=f39e33]
+                        - listitem [ref=f39e34]
+                        - listitem [ref=f39e35]
+                        - listitem [ref=f39e36]
+                        - listitem [ref=f39e37]
+                        - listitem [ref=f39e38]
+                        - listitem [ref=f39e39]
+                        - listitem [ref=f39e40]
+                        - listitem [ref=f39e41]
+                        - listitem [ref=f39e42]
+                        - listitem [ref=f39e43]
+                        - listitem [ref=f39e44]
+                      - button "Go to next page of document" [ref=f39e46] [cursor=pointer]:
+                        - img [ref=f39e48]
+                        - generic [ref=f39e50]: Go to next page of document
+                      - img [ref=f39e53]
+                      - generic [ref=f39e57]:
+                        - generic [ref=f39e59]:
+                          - generic [ref=f39e60]:
+                            - generic [ref=f39e61]: Current page
+                            - generic [ref=f39e62]: "1"
+                          - text: /
+                          - generic [ref=f39e63]:
+                            - generic [ref=f39e64]: Total pages
+                            - text: "15"
+                        - progressbar "Progress bar Slide 1/15" [ref=f39e66] [cursor=pointer]
+                        - button "Enter full screen. An accessible version of the document is available in full screen mode." [ref=f39e71] [cursor=pointer]:
+                          - img [ref=f39e73]
+                          - generic [ref=f39e75]: Enter full screen. An accessible version of the document is available in full screen mode.
+                - generic [ref=f38e190]:
+                  - list [ref=f38e194]:
+                    - listitem [ref=f38e195]:
+                      - button "833 reactions" [ref=f38e196] [cursor=pointer]:
+                        - img "like" [ref=f38e197]
+                        - img "love" [ref=f38e198]
+                        - img "insightful" [ref=f38e199]
+                        - generic [ref=f38e200]: "833"
+                    - listitem [ref=f38e201]:
+                      - list [ref=f38e202]:
+                        - listitem [ref=f38e203]:
+                          - button "370 comments on Nick Broekema’s post" [ref=f38e204] [cursor=pointer]:
+                            - generic [ref=f38e205]: 370 comments
+                          - text: ·
+                        - listitem [ref=f38e206]:
+                          - button "37 reposts of Nick Broekema’s post" [ref=f38e207] [cursor=pointer]:
+                            - generic [ref=f38e208]: 37 reposts
+                  - generic [ref=f38e209]:
+                    - generic [ref=f38e210]:
+                      - button "React Like" [ref=f38e211] [cursor=pointer]:
+                        - generic [ref=f38e213]:
+                          - img [ref=f38e214]
+                          - generic [ref=f38e216]: Like
+                      - button "Open reactions menu":
+                        - img [ref=f38e218] [cursor=pointer]
+                    - button "Comment" [ref=f38e222] [cursor=pointer]:
+                      - img [ref=f38e223]
+                      - generic [ref=f38e225]: Comment
+                    - button "Repost" [ref=f38e228] [cursor=pointer]:
+                      - img [ref=f38e229]
+                      - generic [ref=f38e231]: Repost
+                    - button "Send in a private message" [ref=f38e234] [cursor=pointer]:
+                      - img [ref=f38e235]
+                      - generic [ref=f38e238]: Send
+              - generic [ref=f38e240]:
+                - generic [ref=f38e242]:
+                  - img "Brian Huntington" [ref=f38e244]
+                  - generic [ref=f38e247]:
+                    - generic [ref=f38e251]:
+                      - textbox "Text editor for creating content" [ref=f38e253]:
+                        - paragraph [ref=f38e254]
+                        - text: Add a comment…
+                      - generic [ref=f38e255]: Add a comment…
+                    - generic [ref=f38e257]:
+                      - button "Open Emoji Keyboard" [ref=f38e260] [cursor=pointer]:
+                        - img
+                        - generic [ref=f38e261]: Open Emoji Keyboard
+                      - button "Add a photo" [ref=f38e263] [cursor=pointer]:
+                        - img [ref=f38e264]
+                - button "Current selected sort order is Most relevant" [ref=f38e269] [cursor=pointer]:
+                  - generic [ref=f38e270]: Current selected sort order is Most relevant
+                  - generic [ref=f38e271]:
+                    - text: Most relevant
+                    - img [ref=f38e272]
+                - generic [ref=f38e274]:
+                  - generic [ref=f38e277]:
+                    - article [ref=f38e279]:
+                      - generic [ref=f38e280]:
+                        - generic [ref=f38e281]:
+                          - link "View Jasmin Alić’s graphic link" [ref=f38e282] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/alicjasmin
+                            - img "View Jasmin Alić’s graphic link" [ref=f38e285]
+                          - 'link "View: Jasmin Alić • 3rd+ Award-winning coach | Founder, Link Up Community (1,000+ members in 80+ countries) | Building world-class personal brands &amp; businesses | LinkedIn Learning Instructor | International keynote speaker (40x Best Speaker)" [ref=f38e286] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/alicjasmin
+                            - heading "Jasmin Alić • 3rd+" [level=3] [ref=f38e287]:
+                              - generic [ref=f38e288]: Jasmin Alić
+                              - generic [ref=f38e289]:
+                                - img [ref=f38e290]:
+                                  - img [ref=f38e291]
+                                - text: • 3rd+
+                            - generic [ref=f38e293]: Award-winning coach | Founder, Link Up Community (1,000+ members in 80+ countries) | Building world-class personal brands & businesses | LinkedIn Learning Instructor | International keynote speaker (40x Best Speaker)
+                        - generic [ref=f38e294]:
+                          - time [ref=f38e295]: 1y
+                          - button "Open options for Jasmin Alić’s comment" [ref=f38e298] [cursor=pointer]:
+                            - img "Open options for Jasmin Alić’s comment" [ref=f38e299]
+                      - generic [ref=f38e301]:
+                        - button [ref=f38e302] [cursor=pointer]
+                        - generic [ref=f38e309]:
+                          - text: I need to get back on the carousel train.
+                          - text: Haven't posted one in 18 months! 🤯
+                      - generic [ref=f38e310]:
+                        - generic [ref=f38e311]:
+                          - button [ref=f38e312] [cursor=pointer]
+                          - generic [ref=f38e314]:
+                            - generic [ref=f38e315]:
+                              - generic [ref=f38e316]:
+                                - button "React Like to Jasmin Alić’s comment" [ref=f38e317] [cursor=pointer]:
+                                  - generic [ref=f38e320]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e322] [cursor=pointer]
+                              - generic [ref=f38e324]: ·
+                              - button "9 Reactions on Jasmin Alić’s comment" [ref=f38e325] [cursor=pointer]:
+                                - img "like" [ref=f38e326]
+                                - img "love" [ref=f38e327]
+                                - img "insightful" [ref=f38e328]
+                                - generic [ref=f38e329]: "9"
+                            - generic [ref=f38e331]:
+                              - button "Reply to Jasmin Alić’s comment" [ref=f38e332] [cursor=pointer]:
+                                - generic [ref=f38e334]: Reply
+                              - generic [ref=f38e335]: ·
+                              - generic [ref=f38e336]: 4 replies
+                              - generic [ref=f38e337]: 4 Replies on Jasmin Alić’s comment
+                        - generic [ref=f38e338]:
+                          - generic [ref=f38e339]:
+                            - button [ref=f38e340] [cursor=pointer]
+                            - button "Load previous replies on Jasmin Alić’s comment" [ref=f38e343] [cursor=pointer]:
+                              - generic [ref=f38e344]: See previous replies
+                          - generic [ref=f38e345]:
+                            - button [ref=f38e346] [cursor=pointer]
+                            - article [ref=f38e348]:
+                              - generic [ref=f38e349]:
+                                - generic [ref=f38e350]:
+                                  - link "View Muhammad A.’s graphic link" [ref=f38e351] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/muhammadali-haq
+                                    - img "View Muhammad A.’s graphic link" [ref=f38e354]
+                                  - 'link "View: Muhammad A. • 3rd+ Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver" [ref=f38e355] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/muhammadali-haq
+                                    - heading "Muhammad A. • 3rd+" [level=3] [ref=f38e356]:
+                                      - generic [ref=f38e357]: Muhammad A.
+                                      - generic [ref=f38e358]:
+                                        - img [ref=f38e359]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e361]: Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver
+                                - generic [ref=f38e362]:
+                                  - time [ref=f38e363]: 1y
+                                  - button "Open options for Muhammad A.’s comment" [ref=f38e366] [cursor=pointer]:
+                                    - img "Open options for Muhammad A.’s comment" [ref=f38e367]
+                              - generic [ref=f38e373]:
+                                - generic [ref=f38e377]:
+                                  - link "Jasmin Alić" [ref=f38e379] [cursor=pointer]:
+                                    - /url: /in/alicjasmin/
+                                  - text: "!"
+                                - link "Comment image, no alternative text available" [ref=f38e381] [cursor=pointer]:
+                                  - /url: "#"
+                                  - img "Comment image, no alternative text available" [ref=f38e384]
+                              - generic [ref=f38e389]:
+                                - generic [ref=f38e390]:
+                                  - generic [ref=f38e391]:
+                                    - button "React Like to Muhammad A.’s comment" [ref=f38e392] [cursor=pointer]:
+                                      - generic [ref=f38e395]: Like
+                                    - button "Open reactions menu":
+                                      - img [ref=f38e397] [cursor=pointer]
+                                  - generic [ref=f38e399]: ·
+                                  - button "1 Reaction on Muhammad A.’s comment" [ref=f38e400] [cursor=pointer]:
+                                    - img "like" [ref=f38e401]
+                                    - generic [ref=f38e402]: "1"
+                                - button "Reply to Muhammad A.’s comment" [ref=f38e405] [cursor=pointer]:
+                                  - generic [ref=f38e407]: Reply
+                    - article [ref=f38e409]:
+                      - generic [ref=f38e410]:
+                        - generic [ref=f38e411]:
+                          - link "View Bilal Alam’s graphic link" [ref=f38e412] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/mbilalalam
+                            - img "View Bilal Alam’s graphic link" [ref=f38e415]
+                          - 'link "View: Bilal Alam • 3rd+ Busy Founders &amp; Coaches → Stand Out. Build Authority. Save Time - LinkedIn Profile &amp; Content Designer For Busy Founders and Coaches" [ref=f38e416] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/mbilalalam
+                            - heading "Bilal Alam • 3rd+" [level=3] [ref=f38e417]:
+                              - generic [ref=f38e418]: Bilal Alam
+                              - generic [ref=f38e419]: • 3rd+
+                            - generic [ref=f38e420]: Busy Founders & Coaches → Stand Out. Build Authority. Save Time - LinkedIn Profile & Content Designer For Busy Founders and Coaches
+                        - generic [ref=f38e421]:
+                          - time [ref=f38e422]: 1y
+                          - button "Open options for Bilal Alam’s comment" [ref=f38e425] [cursor=pointer]:
+                            - img "Open options for Bilal Alam’s comment" [ref=f38e426]
+                      - generic [ref=f38e428]:
+                        - button [ref=f38e429] [cursor=pointer]
+                        - generic [ref=f38e433]:
+                          - generic [ref=f38e436]:
+                            - text: OG of content design,
+                            - link "Nick" [ref=f38e438] [cursor=pointer]:
+                              - /url: /in/nbroekema/
+                            - text: "!🙌"
+                            - text: P.S. Can you please review my latest carousel and provide your honest feedback? It would mean a lot to me!
+                            - text: Thanks in advance!💚
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=f38e439] [cursor=pointer]:
+                            - generic [ref=f38e440]: …more
+                      - generic [ref=f38e441]:
+                        - generic [ref=f38e442]:
+                          - button [ref=f38e443] [cursor=pointer]
+                          - generic [ref=f38e445]:
+                            - generic [ref=f38e446]:
+                              - generic [ref=f38e447]:
+                                - button "React Like to Bilal Alam’s comment" [ref=f38e448] [cursor=pointer]:
+                                  - generic [ref=f38e451]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e453] [cursor=pointer]
+                              - generic [ref=f38e455]: ·
+                              - button "2 Reactions on Bilal Alam’s comment" [ref=f38e456] [cursor=pointer]:
+                                - img "like" [ref=f38e457]
+                                - generic [ref=f38e458]: "2"
+                            - generic [ref=f38e460]:
+                              - button "Reply to Bilal Alam’s comment" [ref=f38e461] [cursor=pointer]:
+                                - generic [ref=f38e463]: Reply
+                              - generic [ref=f38e464]: ·
+                              - generic [ref=f38e465]: 4 replies
+                              - generic [ref=f38e466]: 4 Replies on Bilal Alam’s comment
+                        - generic [ref=f38e467]:
+                          - generic [ref=f38e468]:
+                            - button [ref=f38e469] [cursor=pointer]
+                            - button "Load previous replies on Bilal Alam’s comment" [ref=f38e472] [cursor=pointer]:
+                              - generic [ref=f38e473]: See previous replies
+                          - generic [ref=f38e474]:
+                            - button [ref=f38e475] [cursor=pointer]
+                            - article [ref=f38e477]:
+                              - generic [ref=f38e478]:
+                                - generic [ref=f38e479]:
+                                  - link "View Bilal Alam’s graphic link" [ref=f38e480] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/mbilalalam
+                                    - img "View Bilal Alam’s graphic link" [ref=f38e483]
+                                  - 'link "View: Bilal Alam • 3rd+ Busy Founders &amp; Coaches → Stand Out. Build Authority. Save Time - LinkedIn Profile &amp; Content Designer For Busy Founders and Coaches" [ref=f38e484] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/mbilalalam
+                                    - heading "Bilal Alam • 3rd+" [level=3] [ref=f38e485]:
+                                      - generic [ref=f38e486]: Bilal Alam
+                                      - generic [ref=f38e487]: • 3rd+
+                                    - generic [ref=f38e488]: Busy Founders & Coaches → Stand Out. Build Authority. Save Time - LinkedIn Profile & Content Designer For Busy Founders and Coaches
+                                - generic [ref=f38e489]:
+                                  - time [ref=f38e490]: 1y
+                                  - button "Open options for Bilal Alam’s comment" [ref=f38e493] [cursor=pointer]:
+                                    - img "Open options for Bilal Alam’s comment" [ref=f38e494]
+                              - generic [ref=f38e504]:
+                                - link "Nick" [ref=f38e506] [cursor=pointer]:
+                                  - /url: /in/nbroekema/
+                                - text: "- Thanks, Legend!💚"
+                              - generic [ref=f38e511]:
+                                - generic [ref=f38e513]:
+                                  - button "React Like to Bilal Alam’s comment" [ref=f38e514] [cursor=pointer]:
+                                    - generic [ref=f38e517]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e519] [cursor=pointer]
+                                - button "Reply to Bilal Alam’s comment" [ref=f38e523] [cursor=pointer]:
+                                  - generic [ref=f38e525]: Reply
+                    - article [ref=f38e527]:
+                      - generic [ref=f38e528]:
+                        - generic [ref=f38e529]:
+                          - link "View Ky-Nam 🧑‍🚀’s graphic link" [ref=f38e530] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/withkynam
+                            - img "View Ky-Nam 🧑‍🚀’s graphic link" [ref=f38e533]
+                          - 'link "View: Ky-Nam 🧑‍🚀 • 3rd+ 25 y/o tech founder flowser.ai | 1m view/week | 3x Majors CS, Econ, Politic | 30 startup comp wins | Creator of flowser.ai - own agents with computers to scale your business GTM ⬇️" [ref=f38e534] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/withkynam
+                            - heading "Ky-Nam 🧑‍🚀 • 3rd+" [level=3] [ref=f38e535]:
+                              - generic [ref=f38e536]: Ky-Nam 🧑‍🚀
+                              - generic [ref=f38e537]:
+                                - img [ref=f38e538]
+                                - text: • 3rd+
+                            - generic [ref=f38e540]: 25 y/o tech founder flowser.ai | 1m view/week | 3x Majors CS, Econ, Politic | 30 startup comp wins | Creator of flowser.ai - own agents with computers to scale your business GTM ⬇️
+                        - generic [ref=f38e541]:
+                          - time [ref=f38e542]: 1y
+                          - button "Open options for Ky-Nam 🧑‍🚀’s comment" [ref=f38e545] [cursor=pointer]:
+                            - img "Open options for Ky-Nam 🧑‍🚀’s comment" [ref=f38e546]
+                      - generic [ref=f38e548]:
+                        - button [ref=f38e549] [cursor=pointer]
+                        - generic [ref=f38e556]: Great insights, Nick! Carousels are like the Swiss Army knives of LinkedIn—versatile and effective. 🎨 Just when you think you’ve seen it all, there’s always a new slide to keep us hooked. Can’t wait to see how your tips transform our feeds into client magnets! Keep those creative juices flowing! 💡
+                      - generic [ref=f38e557]:
+                        - generic [ref=f38e558]:
+                          - button [ref=f38e559] [cursor=pointer]
+                          - generic [ref=f38e561]:
+                            - generic [ref=f38e562]:
+                              - generic [ref=f38e563]:
+                                - button "React Like to Ky-Nam 🧑‍🚀’s comment" [ref=f38e564] [cursor=pointer]:
+                                  - generic [ref=f38e567]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e569] [cursor=pointer]
+                              - generic [ref=f38e571]: ·
+                              - button "2 Reactions on Ky-Nam 🧑‍🚀’s comment" [ref=f38e572] [cursor=pointer]:
+                                - img "like" [ref=f38e573]
+                                - generic [ref=f38e574]: "2"
+                            - generic [ref=f38e576]:
+                              - button "Reply to Ky-Nam 🧑‍🚀’s comment" [ref=f38e577] [cursor=pointer]:
+                                - generic [ref=f38e579]: Reply
+                              - generic [ref=f38e580]: ·
+                              - generic [ref=f38e581]: 5 replies
+                              - generic [ref=f38e582]: 5 Replies on Ky-Nam 🧑‍🚀’s comment
+                        - generic [ref=f38e583]:
+                          - generic [ref=f38e584]:
+                            - button [ref=f38e585] [cursor=pointer]
+                            - button "Load previous replies on Ky-Nam 🧑‍🚀’s comment" [ref=f38e588] [cursor=pointer]:
+                              - generic [ref=f38e589]: See previous replies
+                          - generic [ref=f38e590]:
+                            - button [ref=f38e591] [cursor=pointer]
+                            - article [ref=f38e593]:
+                              - generic [ref=f38e594]:
+                                - generic [ref=f38e595]:
+                                  - link "View Nick Broekema’s graphic link" [ref=f38e596] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/nbroekema
+                                    - img "View Nick Broekema’s graphic link" [ref=f38e599]
+                                  - 'link "View: Nick Broekema Author, You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities" [ref=f38e600] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/nbroekema
+                                    - heading "Nick Broekema Author" [level=3] [ref=f38e601]:
+                                      - generic [ref=f38e602]: Nick Broekema
+                                      - img [ref=f38e604]:
+                                        - img [ref=f38e605]
+                                      - generic [ref=f38e607]: Author
+                                    - generic [ref=f38e608]: You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities
+                                - generic [ref=f38e609]:
+                                  - time [ref=f38e610]: 1y
+                                  - button "Open options for Nick Broekema’s comment" [ref=f38e613] [cursor=pointer]:
+                                    - img "Open options for Nick Broekema’s comment" [ref=f38e614]
+                              - generic [ref=f38e624]:
+                                - link "✪ Ardy W." [ref=f38e626] [cursor=pointer]:
+                                  - /url: /in/%E2%9C%AA-ardy-w-a9b6711b3/
+                                - text: That super accurate and made me lol
+                              - generic [ref=f38e631]:
+                                - generic [ref=f38e633]:
+                                  - button "React Like to Nick Broekema’s comment" [ref=f38e634] [cursor=pointer]:
+                                    - generic [ref=f38e637]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e639] [cursor=pointer]
+                                - button "Reply to Nick Broekema’s comment" [ref=f38e643] [cursor=pointer]:
+                                  - generic [ref=f38e645]: Reply
+                    - article [ref=f38e647]:
+                      - generic [ref=f38e648]:
+                        - generic [ref=f38e649]:
+                          - link "View Ioana Hardy’s graphic link" [ref=f38e650] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/ioana-hardy
+                            - img "View Ioana Hardy’s graphic link" [ref=f38e653]
+                          - 'link "View: Ioana Hardy • 3rd+ Founder 🌿 Helping impact-led founders turn their expertise into irresistible offers and consistent &amp; aligned clients - without the marketing and sales overwhelm I B CORP I LinkedIn Top Voice 2024 / 2025" [ref=f38e654] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/ioana-hardy
+                            - heading "Ioana Hardy • 3rd+" [level=3] [ref=f38e655]:
+                              - generic [ref=f38e656]: Ioana Hardy
+                              - generic [ref=f38e657]:
+                                - img [ref=f38e658]:
+                                  - img [ref=f38e659]
+                                - text: • 3rd+
+                            - generic [ref=f38e661]: Founder 🌿 Helping impact-led founders turn their expertise into irresistible offers and consistent & aligned clients - without the marketing and sales overwhelm I B CORP I LinkedIn Top Voice 2024 / 2025
+                        - generic [ref=f38e662]:
+                          - time [ref=f38e663]: 1y
+                          - button "Open options for Ioana Hardy’s comment" [ref=f38e666] [cursor=pointer]:
+                            - img "Open options for Ioana Hardy’s comment" [ref=f38e667]
+                      - generic [ref=f38e669]:
+                        - button [ref=f38e670] [cursor=pointer]
+                        - generic [ref=f38e677]:
+                          - text: I just so love how you manage to condense a one hour masterclass into a carousel! As usual - so much value!
+                          - text: And yes to less ai 🤖 comments !!
+                      - generic [ref=f38e678]:
+                        - generic [ref=f38e679]:
+                          - button [ref=f38e680] [cursor=pointer]
+                          - generic [ref=f38e682]:
+                            - generic [ref=f38e683]:
+                              - generic [ref=f38e684]:
+                                - button "React Like to Ioana Hardy’s comment" [ref=f38e685] [cursor=pointer]:
+                                  - generic [ref=f38e688]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e690] [cursor=pointer]
+                              - generic [ref=f38e692]: ·
+                              - button "2 Reactions on Ioana Hardy’s comment" [ref=f38e693] [cursor=pointer]:
+                                - img "like" [ref=f38e694]
+                                - generic [ref=f38e695]: "2"
+                            - generic [ref=f38e697]:
+                              - button "Reply to Ioana Hardy’s comment" [ref=f38e698] [cursor=pointer]:
+                                - generic [ref=f38e700]: Reply
+                              - generic [ref=f38e701]: ·
+                              - generic [ref=f38e702]: 3 replies
+                              - generic [ref=f38e703]: 3 Replies on Ioana Hardy’s comment
+                        - generic [ref=f38e704]:
+                          - generic [ref=f38e705]:
+                            - button [ref=f38e706] [cursor=pointer]
+                            - button "Load previous replies on Ioana Hardy’s comment" [ref=f38e709] [cursor=pointer]:
+                              - generic [ref=f38e710]: See previous replies
+                          - generic [ref=f38e711]:
+                            - button [ref=f38e712] [cursor=pointer]
+                            - article [ref=f38e714]:
+                              - generic [ref=f38e715]:
+                                - generic [ref=f38e716]:
+                                  - link "View Ioana Hardy’s graphic link" [ref=f38e717] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/ioana-hardy
+                                    - img "View Ioana Hardy’s graphic link" [ref=f38e720]
+                                  - 'link "View: Ioana Hardy • 3rd+ Founder 🌿 Helping impact-led founders turn their expertise into irresistible offers and consistent &amp; aligned clients - without the marketing and sales overwhelm I B CORP I LinkedIn Top Voice 2024 / 2025" [ref=f38e721] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/ioana-hardy
+                                    - heading "Ioana Hardy • 3rd+" [level=3] [ref=f38e722]:
+                                      - generic [ref=f38e723]: Ioana Hardy
+                                      - generic [ref=f38e724]:
+                                        - img [ref=f38e725]:
+                                          - img [ref=f38e726]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e728]: Founder 🌿 Helping impact-led founders turn their expertise into irresistible offers and consistent & aligned clients - without the marketing and sales overwhelm I B CORP I LinkedIn Top Voice 2024 / 2025
+                                - generic [ref=f38e729]:
+                                  - time [ref=f38e730]: 1y
+                                  - button "Open options for Ioana Hardy’s comment" [ref=f38e733] [cursor=pointer]:
+                                    - img "Open options for Ioana Hardy’s comment" [ref=f38e734]
+                              - generic [ref=f38e744]:
+                                - link "Nick Broekema" [ref=f38e746] [cursor=pointer]:
+                                  - /url: /in/nbroekema/
+                                - text: I never know if to answer (so the algorithm picks up on the "engagement") or to just ignore them (hoping that they'll disappear. I reach out to those who comment?
+                              - generic [ref=f38e751]:
+                                - generic [ref=f38e753]:
+                                  - button "React Like to Ioana Hardy’s comment" [ref=f38e754] [cursor=pointer]:
+                                    - generic [ref=f38e757]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e759] [cursor=pointer]
+                                - button "Reply to Ioana Hardy’s comment" [ref=f38e763] [cursor=pointer]:
+                                  - generic [ref=f38e765]: Reply
+                    - article [ref=f38e767]:
+                      - generic [ref=f38e768]:
+                        - generic [ref=f38e769]:
+                          - link "View Muhammad A.’s graphic link" [ref=f38e770] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/muhammadali-haq
+                            - img "View Muhammad A.’s graphic link" [ref=f38e773]
+                          - 'link "View: Muhammad A. • 3rd+ Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver" [ref=f38e774] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/muhammadali-haq
+                            - heading "Muhammad A. • 3rd+" [level=3] [ref=f38e775]:
+                              - generic [ref=f38e776]: Muhammad A.
+                              - generic [ref=f38e777]:
+                                - img [ref=f38e778]
+                                - text: • 3rd+
+                            - generic [ref=f38e780]: Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver
+                        - generic [ref=f38e781]:
+                          - time [ref=f38e782]: 1y
+                          - button "Open options for Muhammad A.’s comment" [ref=f38e785] [cursor=pointer]:
+                            - img "Open options for Muhammad A.’s comment" [ref=f38e786]
+                      - generic [ref=f38e788]:
+                        - button [ref=f38e789] [cursor=pointer]
+                        - generic [ref=f38e796]:
+                          - text: Worth saving the carousel format,
+                          - link "Nick Broekema" [ref=f38e798] [cursor=pointer]:
+                            - /url: /in/nbroekema/
+                          - text: "!"
+                          - text: Gonna try and then I'll tell you how it went for me, right after 15 days. Catch you up soon 🙌🏻
+                      - generic [ref=f38e799]:
+                        - generic [ref=f38e800]:
+                          - button [ref=f38e801] [cursor=pointer]
+                          - generic [ref=f38e803]:
+                            - generic [ref=f38e804]:
+                              - generic [ref=f38e805]:
+                                - button "React Like to Muhammad A.’s comment" [ref=f38e806] [cursor=pointer]:
+                                  - generic [ref=f38e809]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e811] [cursor=pointer]
+                              - generic [ref=f38e813]: ·
+                              - button "1 Reaction on Muhammad A.’s comment" [ref=f38e814] [cursor=pointer]:
+                                - img "like" [ref=f38e815]
+                                - generic [ref=f38e816]: "1"
+                            - generic [ref=f38e818]:
+                              - button "Reply to Muhammad A.’s comment" [ref=f38e819] [cursor=pointer]:
+                                - generic [ref=f38e821]: Reply
+                              - generic [ref=f38e822]: ·
+                              - generic [ref=f38e823]: 4 replies
+                              - generic [ref=f38e824]: 4 Replies on Muhammad A.’s comment
+                        - generic [ref=f38e825]:
+                          - generic [ref=f38e826]:
+                            - button [ref=f38e827] [cursor=pointer]
+                            - button "Load previous replies on Muhammad A.’s comment" [ref=f38e830] [cursor=pointer]:
+                              - generic [ref=f38e831]: See previous replies
+                          - generic [ref=f38e832]:
+                            - button [ref=f38e833] [cursor=pointer]
+                            - article [ref=f38e835]:
+                              - generic [ref=f38e836]:
+                                - generic [ref=f38e837]:
+                                  - link "View Muhammad A.’s graphic link" [ref=f38e838] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/muhammadali-haq
+                                    - img "View Muhammad A.’s graphic link" [ref=f38e841]
+                                  - 'link "View: Muhammad A. • 3rd+ Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver" [ref=f38e842] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/muhammadali-haq
+                                    - heading "Muhammad A. • 3rd+" [level=3] [ref=f38e843]:
+                                      - generic [ref=f38e844]: Muhammad A.
+                                      - generic [ref=f38e845]:
+                                        - img [ref=f38e846]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e848]: Building Integrated Business Infrastructure in 60 Days | CS Major - The Weaver
+                                - generic [ref=f38e849]:
+                                  - time [ref=f38e850]: 1y
+                                  - button "Open options for Muhammad A.’s comment" [ref=f38e853] [cursor=pointer]:
+                                    - img "Open options for Muhammad A.’s comment" [ref=f38e854]
+                              - generic [ref=f38e864]:
+                                - text: Yes it does, and I'm gonna figure it out.
+                                - text: Thanks for sharing man 🙌🏻
+                                - link "Nick Broekema" [ref=f38e866] [cursor=pointer]:
+                                  - /url: /in/nbroekema/
+                              - generic [ref=f38e871]:
+                                - generic [ref=f38e873]:
+                                  - button "React Like to Muhammad A.’s comment" [ref=f38e874] [cursor=pointer]:
+                                    - generic [ref=f38e877]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e879] [cursor=pointer]
+                                - button "Reply to Muhammad A.’s comment" [ref=f38e883] [cursor=pointer]:
+                                  - generic [ref=f38e885]: Reply
+                    - article [ref=f38e887]:
+                      - generic [ref=f38e888]:
+                        - generic [ref=f38e889]:
+                          - link "View Hristo Butchvarov’s graphic link" [ref=f38e890] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/hristo-butchvarov
+                            - img "View Hristo Butchvarov’s graphic link" [ref=f38e893]
+                          - 'link "View: Hristo Butchvarov • 3rd+ Stop looking DIY on LinkedIn. I redesign profiles into premium brands." [ref=f38e894] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/hristo-butchvarov
+                            - heading "Hristo Butchvarov • 3rd+" [level=3] [ref=f38e895]:
+                              - generic [ref=f38e896]: Hristo Butchvarov
+                              - generic [ref=f38e897]:
+                                - img [ref=f38e898]:
+                                  - img [ref=f38e899]
+                                - text: • 3rd+
+                            - generic [ref=f38e901]: Stop looking DIY on LinkedIn. I redesign profiles into premium brands.
+                        - generic [ref=f38e902]:
+                          - time [ref=f38e903]: 1y
+                          - button "Open options for Hristo Butchvarov’s comment" [ref=f38e906] [cursor=pointer]:
+                            - img "Open options for Hristo Butchvarov’s comment" [ref=f38e907]
+                      - generic [ref=f38e909]:
+                        - button [ref=f38e910] [cursor=pointer]
+                        - generic [ref=f38e917]: Let's see if you'll get less AI comments on this one 😅
+                      - generic [ref=f38e918]:
+                        - generic [ref=f38e919]:
+                          - button [ref=f38e920] [cursor=pointer]
+                          - generic [ref=f38e922]:
+                            - generic [ref=f38e923]:
+                              - generic [ref=f38e924]:
+                                - button "React Like to Hristo Butchvarov’s comment" [ref=f38e925] [cursor=pointer]:
+                                  - generic [ref=f38e928]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e930] [cursor=pointer]
+                              - generic [ref=f38e932]: ·
+                              - button "2 Reactions on Hristo Butchvarov’s comment" [ref=f38e933] [cursor=pointer]:
+                                - img "like" [ref=f38e934]
+                                - img "funny" [ref=f38e935]
+                                - generic [ref=f38e936]: "2"
+                            - generic [ref=f38e938]:
+                              - button "Reply to Hristo Butchvarov’s comment" [ref=f38e939] [cursor=pointer]:
+                                - generic [ref=f38e941]: Reply
+                              - generic [ref=f38e942]: ·
+                              - generic [ref=f38e943]: 6 replies
+                              - generic [ref=f38e944]: 6 Replies on Hristo Butchvarov’s comment
+                        - generic [ref=f38e945]:
+                          - generic [ref=f38e946]:
+                            - button [ref=f38e947] [cursor=pointer]
+                            - button "Load previous replies on Hristo Butchvarov’s comment" [ref=f38e950] [cursor=pointer]:
+                              - generic [ref=f38e951]: See previous replies
+                          - generic [ref=f38e952]:
+                            - button [ref=f38e953] [cursor=pointer]
+                            - article [ref=f38e955]:
+                              - generic [ref=f38e956]:
+                                - generic [ref=f38e957]:
+                                  - link "View Janett Niklas’ graphic link" [ref=f38e958] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/janett-niklas
+                                    - img "View Janett Niklas’ graphic link" [ref=f38e961]
+                                  - 'link "View: Janett Niklas • 3rd+ Product Manager / Product Owner bei OKM GmbH" [ref=f38e962] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/janett-niklas
+                                    - heading "Janett Niklas • 3rd+" [level=3] [ref=f38e963]:
+                                      - generic [ref=f38e964]: Janett Niklas
+                                      - generic [ref=f38e965]:
+                                        - img [ref=f38e966]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e968]: Product Manager / Product Owner bei OKM GmbH
+                                - generic [ref=f38e969]:
+                                  - time [ref=f38e970]: 1y
+                                  - button "Open options for Janett Niklas’ comment" [ref=f38e973] [cursor=pointer]:
+                                    - img "Open options for Janett Niklas’ comment" [ref=f38e974]
+                              - generic [ref=f38e984]: "obviously a very successful post: saved it and clicked \"follow\" 😅 great advice, thank you"
+                              - generic [ref=f38e989]:
+                                - generic [ref=f38e991]:
+                                  - button "React Like to Janett Niklas’ comment" [ref=f38e992] [cursor=pointer]:
+                                    - generic [ref=f38e995]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e997] [cursor=pointer]
+                                - button "Reply to Janett Niklas’ comment" [ref=f38e1001] [cursor=pointer]:
+                                  - generic [ref=f38e1003]: Reply
+                    - article [ref=f38e1005]:
+                      - generic [ref=f38e1006]:
+                        - generic [ref=f38e1007]:
+                          - link "View Hrabren Lindfors’ graphic link" [ref=f38e1008] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/marketingharry
+                            - img "View Hrabren Lindfors’ graphic link" [ref=f38e1011]
+                          - 'link "View: Hrabren Lindfors • 3rd+ Get your black belt in content marketing 🥷" [ref=f38e1012] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/marketingharry
+                            - heading "Hrabren Lindfors • 3rd+" [level=3] [ref=f38e1013]:
+                              - generic [ref=f38e1014]: Hrabren Lindfors
+                              - generic [ref=f38e1015]:
+                                - img [ref=f38e1016]
+                                - text: • 3rd+
+                            - generic [ref=f38e1018]: Get your black belt in content marketing 🥷
+                        - generic [ref=f38e1019]:
+                          - time [ref=f38e1020]: 1y
+                          - button "Open options for Hrabren Lindfors’ comment" [ref=f38e1023] [cursor=pointer]:
+                            - img "Open options for Hrabren Lindfors’ comment" [ref=f38e1024]
+                      - generic [ref=f38e1026]:
+                        - button [ref=f38e1027] [cursor=pointer]
+                        - generic [ref=f38e1034]: Freaking love carousels. I call them Funnel Chameleons as they are the only format that enables you to combine attraction, trust and conversions in a single post. Been using them for years on Instagram, recently, they’ve been performing great on Threads as well
+                      - generic [ref=f38e1035]:
+                        - generic [ref=f38e1036]:
+                          - button [ref=f38e1037] [cursor=pointer]
+                          - generic [ref=f38e1039]:
+                            - generic [ref=f38e1040]:
+                              - generic [ref=f38e1041]:
+                                - button "React Like to Hrabren Lindfors’ comment" [ref=f38e1042] [cursor=pointer]:
+                                  - generic [ref=f38e1045]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e1047] [cursor=pointer]
+                              - generic [ref=f38e1049]: ·
+                              - button "7 Reactions on Hrabren Lindfors’ comment" [ref=f38e1050] [cursor=pointer]:
+                                - img "like" [ref=f38e1051]
+                                - img "love" [ref=f38e1052]
+                                - generic [ref=f38e1053]: "7"
+                            - generic [ref=f38e1055]:
+                              - button "Reply to Hrabren Lindfors’ comment" [ref=f38e1056] [cursor=pointer]:
+                                - generic [ref=f38e1058]: Reply
+                              - generic [ref=f38e1059]: ·
+                              - generic [ref=f38e1060]: 1 reply
+                              - generic [ref=f38e1061]: 1 Comment on Hrabren Lindfors’ comment
+                        - generic [ref=f38e1063]:
+                          - button [ref=f38e1064] [cursor=pointer]
+                          - article [ref=f38e1066]:
+                            - generic [ref=f38e1067]:
+                              - generic [ref=f38e1068]:
+                                - link "View Nick Broekema’s graphic link" [ref=f38e1069] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/nbroekema
+                                  - img "View Nick Broekema’s graphic link" [ref=f38e1072]
+                                - 'link "View: Nick Broekema Author, You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities" [ref=f38e1073] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/nbroekema
+                                  - heading "Nick Broekema Author" [level=3] [ref=f38e1074]:
+                                    - generic [ref=f38e1075]: Nick Broekema
+                                    - img [ref=f38e1077]:
+                                      - img [ref=f38e1078]
+                                    - generic [ref=f38e1080]: Author
+                                  - generic [ref=f38e1081]: You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities
+                              - generic [ref=f38e1082]:
+                                - time [ref=f38e1083]: 1y
+                                - button "Open options for Nick Broekema’s comment" [ref=f38e1086] [cursor=pointer]:
+                                  - img "Open options for Nick Broekema’s comment" [ref=f38e1087]
+                            - generic [ref=f38e1097]:
+                              - link "Hrabren Lindfors" [ref=f38e1099] [cursor=pointer]:
+                                - /url: /in/marketingharry/
+                              - text: haha funnel chameleons is a great label to slap on it. Glad to hear theyve done well for you man
+                            - generic [ref=f38e1104]:
+                              - generic [ref=f38e1105]:
+                                - generic [ref=f38e1106]:
+                                  - button "React Like to Nick Broekema’s comment" [ref=f38e1107] [cursor=pointer]:
+                                    - generic [ref=f38e1110]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e1112] [cursor=pointer]
+                                - generic [ref=f38e1114]: ·
+                                - button "1 Reaction on Nick Broekema’s comment" [ref=f38e1115] [cursor=pointer]:
+                                  - img "like" [ref=f38e1116]
+                                  - generic [ref=f38e1117]: "1"
+                              - button "Reply to Nick Broekema’s comment" [ref=f38e1120] [cursor=pointer]:
+                                - generic [ref=f38e1122]: Reply
+                    - article [ref=f38e1124]:
+                      - generic [ref=f38e1125]:
+                        - generic [ref=f38e1126]:
+                          - link "View Michael Helbock Jr.’s graphic link" [ref=f38e1127] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/michaelhelbock
+                            - img "View Michael Helbock Jr.’s graphic link" [ref=f38e1130]
+                          - 'link "View: Michael Helbock Jr. • 3rd+ 20+ yrs Helping B2B Marketing leaders communicate their unique value, supported by Frost &amp; Sullivan’s credibility, and deliver it to the right audience." [ref=f38e1131] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/michaelhelbock
+                            - heading "Michael Helbock Jr. • 3rd+" [level=3] [ref=f38e1132]:
+                              - generic [ref=f38e1133]: Michael Helbock Jr.
+                              - generic [ref=f38e1134]:
+                                - img [ref=f38e1135]:
+                                  - img [ref=f38e1136]
+                                - text: • 3rd+
+                            - generic [ref=f38e1138]: 20+ yrs Helping B2B Marketing leaders communicate their unique value, supported by Frost & Sullivan’s credibility, and deliver it to the right audience.
+                        - generic [ref=f38e1139]:
+                          - time [ref=f38e1140]: 1y
+                          - button "Open options for Michael Helbock Jr.’s comment" [ref=f38e1143] [cursor=pointer]:
+                            - img "Open options for Michael Helbock Jr.’s comment" [ref=f38e1144]
+                      - generic [ref=f38e1146]:
+                        - button [ref=f38e1147] [cursor=pointer]
+                        - generic [ref=f38e1151]:
+                          - generic [ref=f38e1154]: Thank you for sharing your insights! It's helpful for those of us needing to improve our content game (I'm at the top of that list 🤣). I'm planning to use my first carousel in an upcoming post. Do you have any experience or recommendations regarding color choices that tend to perform better... For example, have you noticed if bright colors are more effective than darker tones?
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=f38e1155] [cursor=pointer]:
+                            - generic [ref=f38e1156]: …more
+                      - generic [ref=f38e1157]:
+                        - generic [ref=f38e1158]:
+                          - button [ref=f38e1159] [cursor=pointer]
+                          - generic [ref=f38e1161]:
+                            - generic [ref=f38e1162]:
+                              - generic [ref=f38e1163]:
+                                - button "React Like to Michael Helbock Jr.’s comment" [ref=f38e1164] [cursor=pointer]:
+                                  - generic [ref=f38e1167]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e1169] [cursor=pointer]
+                              - generic [ref=f38e1171]: ·
+                              - button "4 Reactions on Michael Helbock Jr.’s comment" [ref=f38e1172] [cursor=pointer]:
+                                - img "like" [ref=f38e1173]
+                                - generic [ref=f38e1174]: "4"
+                            - generic [ref=f38e1176]:
+                              - button "Reply to Michael Helbock Jr.’s comment" [ref=f38e1177] [cursor=pointer]:
+                                - generic [ref=f38e1179]: Reply
+                              - generic [ref=f38e1180]: ·
+                              - generic [ref=f38e1181]: 2 replies
+                              - generic [ref=f38e1182]: 2 Replies on Michael Helbock Jr.’s comment
+                        - generic [ref=f38e1183]:
+                          - generic [ref=f38e1184]:
+                            - button [ref=f38e1185] [cursor=pointer]
+                            - button "Load previous replies on Michael Helbock Jr.’s comment" [ref=f38e1188] [cursor=pointer]:
+                              - generic [ref=f38e1189]: See previous replies
+                          - generic [ref=f38e1190]:
+                            - button [ref=f38e1191] [cursor=pointer]
+                            - article [ref=f38e1193]:
+                              - generic [ref=f38e1194]:
+                                - generic [ref=f38e1195]:
+                                  - link "View Michael Helbock Jr.’s graphic link" [ref=f38e1196] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/michaelhelbock
+                                    - img "View Michael Helbock Jr.’s graphic link" [ref=f38e1199]
+                                  - 'link "View: Michael Helbock Jr. • 3rd+ 20+ yrs Helping B2B Marketing leaders communicate their unique value, supported by Frost &amp; Sullivan’s credibility, and deliver it to the right audience." [ref=f38e1200] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/michaelhelbock
+                                    - heading "Michael Helbock Jr. • 3rd+" [level=3] [ref=f38e1201]:
+                                      - generic [ref=f38e1202]: Michael Helbock Jr.
+                                      - generic [ref=f38e1203]:
+                                        - img [ref=f38e1204]:
+                                          - img [ref=f38e1205]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e1207]: 20+ yrs Helping B2B Marketing leaders communicate their unique value, supported by Frost & Sullivan’s credibility, and deliver it to the right audience.
+                                - generic [ref=f38e1208]:
+                                  - time [ref=f38e1209]: 1y
+                                  - button "Open options for Michael Helbock Jr.’s comment" [ref=f38e1212] [cursor=pointer]:
+                                    - img "Open options for Michael Helbock Jr.’s comment" [ref=f38e1213]
+                              - generic [ref=f38e1223]: Thank you for the quick response and I really appreciate you sharing your suggestions! First carousel coming soon! 😄
+                              - generic [ref=f38e1228]:
+                                - generic [ref=f38e1230]:
+                                  - button "React Like to Michael Helbock Jr.’s comment" [ref=f38e1231] [cursor=pointer]:
+                                    - generic [ref=f38e1234]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e1236] [cursor=pointer]
+                                - button "Reply to Michael Helbock Jr.’s comment" [ref=f38e1240] [cursor=pointer]:
+                                  - generic [ref=f38e1242]: Reply
+                    - article [ref=f38e1244]:
+                      - generic [ref=f38e1245]:
+                        - generic [ref=f38e1246]:
+                          - link "View Charlie Hills 🦩’s graphic link" [ref=f38e1247] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/charlie-hills
+                            - img "View Charlie Hills 🦩’s graphic link" [ref=f38e1250]
+                          - 'link "View: Charlie Hills 🦩 • 3rd+ I help you (actually) use AI." [ref=f38e1251] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/charlie-hills
+                            - heading "Charlie Hills 🦩 • 3rd+" [level=3] [ref=f38e1252]:
+                              - generic [ref=f38e1253]: Charlie Hills 🦩
+                              - generic [ref=f38e1254]:
+                                - img [ref=f38e1255]:
+                                  - img [ref=f38e1256]
+                                - text: • 3rd+
+                            - generic [ref=f38e1258]: I help you (actually) use AI.
+                        - generic [ref=f38e1259]:
+                          - time [ref=f38e1260]: 1y
+                          - button "Open options for Charlie Hills 🦩’s comment" [ref=f38e1263] [cursor=pointer]:
+                            - img "Open options for Charlie Hills 🦩’s comment" [ref=f38e1264]
+                      - generic [ref=f38e1266]:
+                        - button [ref=f38e1267] [cursor=pointer]
+                        - generic [ref=f38e1274]:
+                          - text: So many ppl ask me how to make carousels, I'm gonna send them this masterpiece,
+                          - link "Nick" [ref=f38e1276] [cursor=pointer]:
+                            - /url: /in/nbroekema/
+                          - text: .
+                      - generic [ref=f38e1277]:
+                        - generic [ref=f38e1278]:
+                          - button [ref=f38e1279] [cursor=pointer]
+                          - generic [ref=f38e1281]:
+                            - generic [ref=f38e1282]:
+                              - generic [ref=f38e1283]:
+                                - button "React Like to Charlie Hills 🦩’s comment" [ref=f38e1284] [cursor=pointer]:
+                                  - generic [ref=f38e1287]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e1289] [cursor=pointer]
+                              - generic [ref=f38e1291]: ·
+                              - button "5 Reactions on Charlie Hills 🦩’s comment" [ref=f38e1292] [cursor=pointer]:
+                                - img "like" [ref=f38e1293]
+                                - img "love" [ref=f38e1294]
+                                - generic [ref=f38e1295]: "5"
+                            - generic [ref=f38e1297]:
+                              - button "Reply to Charlie Hills 🦩’s comment" [ref=f38e1298] [cursor=pointer]:
+                                - generic [ref=f38e1300]: Reply
+                              - generic [ref=f38e1301]: ·
+                              - generic [ref=f38e1302]: 1 reply
+                              - generic [ref=f38e1303]: 1 Comment on Charlie Hills 🦩’s comment
+                        - generic [ref=f38e1305]:
+                          - button [ref=f38e1306] [cursor=pointer]
+                          - article [ref=f38e1308]:
+                            - generic [ref=f38e1309]:
+                              - generic [ref=f38e1310]:
+                                - link "View Nick Broekema’s graphic link" [ref=f38e1311] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/nbroekema
+                                  - img "View Nick Broekema’s graphic link" [ref=f38e1314]
+                                - 'link "View: Nick Broekema Author, You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities" [ref=f38e1315] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/nbroekema
+                                  - heading "Nick Broekema Author" [level=3] [ref=f38e1316]:
+                                    - generic [ref=f38e1317]: Nick Broekema
+                                    - img [ref=f38e1319]:
+                                      - img [ref=f38e1320]
+                                    - generic [ref=f38e1322]: Author
+                                  - generic [ref=f38e1323]: You’re sitting on 10+ years of expertise. I help you package, position, and sell it as coaching, consulting, products, group programs, and/or communities
+                              - generic [ref=f38e1324]:
+                                - time [ref=f38e1325]: 1y
+                                - button "Open options for Nick Broekema’s comment" [ref=f38e1328] [cursor=pointer]:
+                                  - img "Open options for Nick Broekema’s comment" [ref=f38e1329]
+                            - generic [ref=f38e1339]:
+                              - link "Charlie Hills" [ref=f38e1341] [cursor=pointer]:
+                                - /url: /in/charlie-hills/
+                              - text: thanks bud! Your carousels crush
+                            - generic [ref=f38e1346]:
+                              - generic [ref=f38e1347]:
+                                - generic [ref=f38e1348]:
+                                  - button "React Like to Nick Broekema’s comment" [ref=f38e1349] [cursor=pointer]:
+                                    - generic [ref=f38e1352]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e1354] [cursor=pointer]
+                                - generic [ref=f38e1356]: ·
+                                - button "2 Reactions on Nick Broekema’s comment" [ref=f38e1357] [cursor=pointer]:
+                                  - img "like" [ref=f38e1358]
+                                  - generic [ref=f38e1359]: "2"
+                              - button "Reply to Nick Broekema’s comment" [ref=f38e1362] [cursor=pointer]:
+                                - generic [ref=f38e1364]: Reply
+                    - article [ref=f38e1366]:
+                      - generic [ref=f38e1367]:
+                        - generic [ref=f38e1368]:
+                          - link "View Vincent Pierri’s graphic link" [ref=f38e1369] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/vincent-angelo-coach
+                            - img "View Vincent Pierri’s graphic link" [ref=f38e1372]
+                          - 'link "View: Vincent Pierri • 3rd+ I turn your expertise into viral infographics &amp; visual frameworks. Content that drives authority + pipeline | $599 Cohort Starts August 5 — Read About Section" [ref=f38e1373] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/vincent-angelo-coach
+                            - heading "Vincent Pierri • 3rd+" [level=3] [ref=f38e1374]:
+                              - generic [ref=f38e1375]: Vincent Pierri
+                              - generic [ref=f38e1376]:
+                                - img [ref=f38e1377]:
+                                  - img [ref=f38e1378]
+                                - text: • 3rd+
+                            - generic [ref=f38e1380]: I turn your expertise into viral infographics & visual frameworks. Content that drives authority + pipeline | $599 Cohort Starts August 5 — Read About Section
+                        - generic [ref=f38e1381]:
+                          - time [ref=f38e1382]: 1y
+                          - button "Open options for Vincent Pierri’s comment" [ref=f38e1385] [cursor=pointer]:
+                            - img "Open options for Vincent Pierri’s comment" [ref=f38e1386]
+                      - generic [ref=f38e1388]:
+                        - button [ref=f38e1389] [cursor=pointer]
+                        - generic [ref=f38e1396]:
+                          - text: This comment is proof that I have notification turned on for you
+                          - link "Nick Broekema" [ref=f38e1398] [cursor=pointer]:
+                            - /url: /in/nbroekema/
+                          - text: ❤️
+                      - generic [ref=f38e1399]:
+                        - generic [ref=f38e1400]:
+                          - button [ref=f38e1401] [cursor=pointer]
+                          - generic [ref=f38e1403]:
+                            - generic [ref=f38e1404]:
+                              - generic [ref=f38e1405]:
+                                - button "React Like to Vincent Pierri’s comment" [ref=f38e1406] [cursor=pointer]:
+                                  - generic [ref=f38e1409]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=f38e1411] [cursor=pointer]
+                              - generic [ref=f38e1413]: ·
+                              - button "4 Reactions on Vincent Pierri’s comment" [ref=f38e1414] [cursor=pointer]:
+                                - img "like" [ref=f38e1415]
+                                - generic [ref=f38e1416]: "4"
+                            - generic [ref=f38e1418]:
+                              - button "Reply to Vincent Pierri’s comment" [ref=f38e1419] [cursor=pointer]:
+                                - generic [ref=f38e1421]: Reply
+                              - generic [ref=f38e1422]: ·
+                              - generic [ref=f38e1423]: 2 replies
+                              - generic [ref=f38e1424]: 2 Replies on Vincent Pierri’s comment
+                        - generic [ref=f38e1425]:
+                          - generic [ref=f38e1426]:
+                            - button [ref=f38e1427] [cursor=pointer]
+                            - button "Load previous replies on Vincent Pierri’s comment" [ref=f38e1430] [cursor=pointer]:
+                              - generic [ref=f38e1431]: See previous replies
+                          - generic [ref=f38e1432]:
+                            - button [ref=f38e1433] [cursor=pointer]
+                            - article [ref=f38e1435]:
+                              - generic [ref=f38e1436]:
+                                - generic [ref=f38e1437]:
+                                  - link "View Vincent Pierri’s graphic link" [ref=f38e1438] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/vincent-angelo-coach
+                                    - img "View Vincent Pierri’s graphic link" [ref=f38e1441]
+                                  - 'link "View: Vincent Pierri • 3rd+ I turn your expertise into viral infographics &amp; visual frameworks. Content that drives authority + pipeline | $599 Cohort Starts August 5 — Read About Section" [ref=f38e1442] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/vincent-angelo-coach
+                                    - heading "Vincent Pierri • 3rd+" [level=3] [ref=f38e1443]:
+                                      - generic [ref=f38e1444]: Vincent Pierri
+                                      - generic [ref=f38e1445]:
+                                        - img [ref=f38e1446]:
+                                          - img [ref=f38e1447]
+                                        - text: • 3rd+
+                                    - generic [ref=f38e1449]: I turn your expertise into viral infographics & visual frameworks. Content that drives authority + pipeline | $599 Cohort Starts August 5 — Read About Section
+                                - generic [ref=f38e1450]:
+                                  - time [ref=f38e1451]: 1y
+                                  - button "Open options for Vincent Pierri’s comment" [ref=f38e1454] [cursor=pointer]:
+                                    - img "Open options for Vincent Pierri’s comment" [ref=f38e1455]
+                              - generic [ref=f38e1465]:
+                                - link "Nick Broekema" [ref=f38e1467] [cursor=pointer]:
+                                  - /url: /in/nbroekema/
+                                - text: 😇😇😇
+                              - generic [ref=f38e1472]:
+                                - generic [ref=f38e1474]:
+                                  - button "React Like to Vincent Pierri’s comment" [ref=f38e1475] [cursor=pointer]:
+                                    - generic [ref=f38e1478]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=f38e1480] [cursor=pointer]
+                                - button "Reply to Vincent Pierri’s comment" [ref=f38e1484] [cursor=pointer]:
+                                  - generic [ref=f38e1486]: Reply
+                  - generic [ref=f38e1487]:
+                    - button "Load more comments" [ref=f38e1488] [cursor=pointer]:
+                      - img [ref=f38e1489]
+                    - button "Load more comments" [ref=f38e1492] [cursor=pointer]:
+                      - generic [ref=f38e1493]: Load more comments
+      - complementary "Advertisement and similar pages" [ref=f38e1494]:
+        - generic "LinkedIn Footer Content" [ref=f38e1497]
+    - generic:
+      - generic:
+        - complementary "AI-powered assistant to get help with your career, jobs etc"
+  - region [ref=f38e1499]

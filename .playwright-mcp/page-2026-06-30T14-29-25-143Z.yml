@@ -1,0 +1,905 @@
+- generic [ref=e1]:
+  - link [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+    - text: Skip to main content
+  - banner [ref=e3]:
+    - navigation [ref=e4]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /?trk=public_post_nav-header-logo
+        - generic [ref=e6]: LinkedIn
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link [ref=e10] [cursor=pointer]:
+            - /url: https://www.linkedin.com/top-content?trk=public_post_guest_nav_menu_topContent
+            - generic [ref=e12]: Top Content
+        - listitem [ref=e13]:
+          - link [ref=e14] [cursor=pointer]:
+            - /url: https://www.linkedin.com/pub/dir/+/+?trk=public_post_guest_nav_menu_people
+            - generic [ref=e16]: People
+        - listitem [ref=e17]:
+          - link [ref=e18] [cursor=pointer]:
+            - /url: https://www.linkedin.com/learning/search?trk=public_post_guest_nav_menu_learning
+            - generic [ref=e20]: Learning
+        - listitem [ref=e21]:
+          - link [ref=e22] [cursor=pointer]:
+            - /url: https://www.linkedin.com/jobs/search?trk=public_post_guest_nav_menu_jobs
+            - generic [ref=e24]: Jobs
+        - listitem [ref=e25]:
+          - link [ref=e26] [cursor=pointer]:
+            - /url: https://www.linkedin.com/games?trk=public_post_guest_nav_menu_games
+            - generic [ref=e28]: Games
+        - listitem [ref=e29]:
+          - link [ref=e30] [cursor=pointer]:
+            - /url: ms-windows-store://pdp/?ProductId=9WZDNCRFJ4Q7&mode=mini&cid=guest_nav_upsell&trk=public_post_guest_nav_menu_windows
+            - generic [ref=e32]: Get the app
+      - generic [ref=e33]:
+        - link [ref=e34] [cursor=pointer]:
+          - /url: https://www.linkedin.com/login?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&fromSignIn=true&trk=public_post_nav-header-signin
+          - text: Sign in
+        - link [ref=e35] [cursor=pointer]:
+          - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_nav-header-join
+          - text: Join now
+  - main [ref=e36]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading [level=1] [ref=e40]: Roelof Otten’s Post
+        - article [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e44]:
+              - link [ref=e45] [cursor=pointer]:
+                - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_feed-actor-image
+                - img [ref=e46]
+              - generic [ref=e47]:
+                - link [ref=e49] [cursor=pointer]:
+                  - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_feed-actor-name
+                  - text: Roelof Otten
+                - time [ref=e51]: 5mo
+            - button [ref=e54] [cursor=pointer]
+          - paragraph [ref=e56]: "\"My ICP isn't seeing my content anymore\" Here's a quick fix for that ↓ Last year, I was still fully focused on PLG My feed reflected that. I mainly saw posts from: SaaS founder PLG peers. But LinkedIn has introduced its own LLM called 360Brew. With that, it makes the feed behave more like a “For You” page. Quite similar to TikTok/Instagram/etc. So, because I've made the switch to helping B2B SaaS founders and consultants with LI. LI has placed me in a different bucket. The coaching bucket. And because of that, I don't see posts anymore from leading SaaS, and PLG creators. Instead, it shows me posts from: - Jasmin Alic - Lara Acosta - Nick Broekma - Daniel Korenblum Super valuable, but I still like to catch up on SaaS and PLG. Not only that. Many SaaS consultants (my ICP) are in that bucket, so I still want to interact with them. Here's how I fixed that: 1. Go to the person's profile 2. Click on the 2 bells in the top right corner 3. You see a pop-up: Manage notifications about [name] 4. Select 'Everything' 5. Save You can do this with your ICP and peers from people who aren't in your 'bucket' Interact with that post, and leave a valuable comment. The algorithm may not show your post to the right people. But your comments still can. When you comment, you can share value directly with your ICP. Try it out, and see your feed adapt."
+          - iframe [ref=e57]:
+            
+          - generic [ref=e58]:
+            - link [ref=e59] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_social-actions-reactions
+              - generic [ref=e60]: "84"
+            - link [ref=e61] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_social-actions-comments
+              - text: · 59 Comments
+          - generic [ref=e62]:
+            - link [ref=e63] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_like-cta
+              - generic [ref=e65]: Like
+            - link [ref=e66] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment-cta
+              - generic [ref=e68]: Comment
+            - button [ref=e70] [cursor=pointer]:
+              - generic [ref=e71]: Share
+          - generic [ref=e72]:
+            - link [ref=e74] [cursor=pointer]:
+              - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_comment_actor-image
+              - img [ref=e75]
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - link [ref=e79] [cursor=pointer]:
+                    - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_comment_actor-name
+                    - text: Roelof Otten
+                  - generic [ref=e80]: 5mo
+                  - button [ref=e83] [cursor=pointer]
+                - paragraph [ref=e85]: Another simple option. Bookmark your ICP and peers in a separate list. Go through that list every day. The reason I prefer notifications? It’s easier. I get a notification as soon as my ICP or a peer posts.
+                - list [ref=e86]:
+                  - listitem [ref=e87]:
+                    - img [ref=e89]
+              - generic [ref=e90]:
+                - link [ref=e91] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e93]: Like
+                - generic [ref=e94]: ·
+                - link [ref=e95] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e97]: Reply
+                - link [ref=e98] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 3 Reactions
+          - generic [ref=e99]:
+            - link [ref=e101] [cursor=pointer]:
+              - /url: https://bg.linkedin.com/in/hristo-butchvarov?trk=public_post_comment_actor-image
+              - img [ref=e102]
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - link [ref=e106] [cursor=pointer]:
+                    - /url: https://bg.linkedin.com/in/hristo-butchvarov?trk=public_post_comment_actor-name
+                    - text: Hristo Butchvarov
+                  - generic [ref=e107]: 5mo
+                  - button [ref=e110] [cursor=pointer]
+                - paragraph [ref=e112]: I'm using a different strategy because in the notification I can miss something. I make a custom feed bookmark. 1. Go to the LinkedIn Search Bar → Hit Enter (without typing anything). 2. Click Posts → Click All Filters. 3. Scroll to "From member" → Add 20-30 people (show results after each name) 4. Scroll to "Date posted" → Select Past 24 hours. 5. Click Show Results. 6. Bookmark this URL in your browser bar. Now you have a personalized feed showing only posts from people who you added.
+              - generic [ref=e113]:
+                - link [ref=e114] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e116]: Like
+                - generic [ref=e117]: ·
+                - link [ref=e118] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e120]: Reply
+                - link [ref=e121] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 2 Reactions
+          - generic [ref=e122]:
+            - link [ref=e124] [cursor=pointer]:
+              - /url: https://lt.linkedin.com/in/emanuel-bagerakis?trk=public_post_comment_actor-image
+              - img [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - link [ref=e129] [cursor=pointer]:
+                    - /url: https://lt.linkedin.com/in/emanuel-bagerakis?trk=public_post_comment_actor-name
+                    - text: Emanuel Bagerakis
+                  - generic [ref=e130]: 5mo
+                  - button [ref=e133] [cursor=pointer]
+                - paragraph [ref=e135]: I was talking about this with a prospect the other day. To add to your tip, what I told him was to start using a bit of warm outreach as well not to rely only on the content to reach his ICP. And use a new visual content system in the content to build authority assets for when the ICP notices his content
+              - generic [ref=e136]:
+                - link [ref=e137] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e139]: Like
+                - generic [ref=e140]: ·
+                - link [ref=e141] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e143]: Reply
+                - link [ref=e144] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 1 Reaction
+          - generic [ref=e145]:
+            - link [ref=e147] [cursor=pointer]:
+              - /url: https://pk.linkedin.com/in/fahadconverts?trk=public_post_comment_actor-image
+              - img [ref=e148]
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - link [ref=e152] [cursor=pointer]:
+                    - /url: https://pk.linkedin.com/in/fahadconverts?trk=public_post_comment_actor-name
+                    - text: Fahad Bin Qaiser
+                  - generic [ref=e153]: 5mo
+                  - button [ref=e156] [cursor=pointer]
+                - paragraph [ref=e158]:
+                  - text: Well I have this option enabled for you tbh 😂 That's why I come early to your posts. Btw I am in love with your content. Atleast not the same BS I watched in my feed a month ago.
+                  - link [ref=e159] [cursor=pointer]:
+                    - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_comment-text
+                    - text: Roelof Otten
+              - generic [ref=e160]:
+                - link [ref=e161] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e163]: Like
+                - generic [ref=e164]: ·
+                - link [ref=e165] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e167]: Reply
+                - link [ref=e168] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 2 Reactions
+          - generic [ref=e169]:
+            - link [ref=e171] [cursor=pointer]:
+              - /url: https://in.linkedin.com/in/aniketbendkoli?trk=public_post_comment_actor-image
+              - img [ref=e172]
+            - generic [ref=e173]:
+              - generic [ref=e174]:
+                - generic [ref=e175]:
+                  - link [ref=e176] [cursor=pointer]:
+                    - /url: https://in.linkedin.com/in/aniketbendkoli?trk=public_post_comment_actor-name
+                    - text: Aniket B.
+                  - generic [ref=e177]: 5mo
+                  - button [ref=e180] [cursor=pointer]
+                - paragraph [ref=e182]: Does that mean, if I’m engaging with my ICP’s they will also see my post, When i post on their FYP?
+              - generic [ref=e183]:
+                - link [ref=e184] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e186]: Like
+                - generic [ref=e187]: ·
+                - link [ref=e188] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e190]: Reply
+                - link [ref=e191] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 3 Reactions
+          - generic [ref=e192]:
+            - link [ref=e194] [cursor=pointer]:
+              - /url: https://in.linkedin.com/in/akash074?trk=public_post_comment_actor-image
+              - img [ref=e195]
+            - generic [ref=e196]:
+              - generic [ref=e197]:
+                - generic [ref=e198]:
+                  - link [ref=e199] [cursor=pointer]:
+                    - /url: https://in.linkedin.com/in/akash074?trk=public_post_comment_actor-name
+                    - text: Akash Upadhyay
+                  - generic [ref=e200]: 5mo
+                  - button [ref=e203] [cursor=pointer]
+                - paragraph [ref=e205]: Good reminder that adapting beats complaining when the feed changes.
+              - generic [ref=e206]:
+                - link [ref=e207] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e209]: Like
+                - generic [ref=e210]: ·
+                - link [ref=e211] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e213]: Reply
+                - link [ref=e214] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 1 Reaction
+          - generic [ref=e215]:
+            - link [ref=e217] [cursor=pointer]:
+              - /url: https://pk.linkedin.com/in/muniba-nawaz?trk=public_post_comment_actor-image
+              - img [ref=e218]
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]:
+                  - link [ref=e222] [cursor=pointer]:
+                    - /url: https://pk.linkedin.com/in/muniba-nawaz?trk=public_post_comment_actor-name
+                    - text: Muniba Nawaz
+                  - generic [ref=e223]: 5mo
+                  - button [ref=e226] [cursor=pointer]
+                - paragraph [ref=e228]: This is such an underrated point 👏 People obsess over reach, but comments still cut through the algorithm. Smart reminder that you can train your feed (and visibility) instead of fighting it. Definitely trying the bell + comment combo 🔔💬
+              - generic [ref=e229]:
+                - link [ref=e230] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e232]: Like
+                - generic [ref=e233]: ·
+                - link [ref=e234] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e236]: Reply
+                - link [ref=e237] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 1 Reaction
+          - generic [ref=e238]:
+            - link [ref=e240] [cursor=pointer]:
+              - /url: https://in.linkedin.com/in/shristi-growthmarketer?trk=public_post_comment_actor-image
+              - img [ref=e241]
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]:
+                  - link [ref=e245] [cursor=pointer]:
+                    - /url: https://in.linkedin.com/in/shristi-growthmarketer?trk=public_post_comment_actor-name
+                    - text: Shristi Gautam
+                  - generic [ref=e246]: 5mo
+                  - button [ref=e249] [cursor=pointer]
+                - paragraph [ref=e251]:
+                  - text: This is the same principle we apply at
+                  - link [ref=e252] [cursor=pointer]:
+                    - /url: https://in.linkedin.com/company/connecttly-growth?trk=public_post_comment-text
+                    - text: Connecttly
+                  - text: ", don’t wait to be shown to the right people, intentionally show up where they already are."
+              - generic [ref=e253]:
+                - link [ref=e254] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e256]: Like
+                - generic [ref=e257]: ·
+                - link [ref=e258] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e260]: Reply
+                - link [ref=e261] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 1 Reaction
+          - generic [ref=e262]:
+            - link [ref=e264] [cursor=pointer]:
+              - /url: https://www.linkedin.com/in/shane-elahi-22a46835?trk=public_post_comment_actor-image
+              - img [ref=e265]
+            - generic [ref=e266]:
+              - generic [ref=e267]:
+                - generic [ref=e268]:
+                  - link [ref=e269] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/shane-elahi-22a46835?trk=public_post_comment_actor-name
+                    - text: Shane Elahi
+                  - generic [ref=e270]: 5mo
+                  - button [ref=e273] [cursor=pointer]
+                - paragraph [ref=e275]: Feed relevance is no longer passive; creators must actively curate visibility through intentional engagement.
+              - generic [ref=e276]:
+                - link [ref=e277] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e279]: Like
+                - generic [ref=e280]: ·
+                - link [ref=e281] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e283]: Reply
+                - link [ref=e284] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 1 Reaction
+          - generic [ref=e285]:
+            - link [ref=e287] [cursor=pointer]:
+              - /url: https://es.linkedin.com/in/nbroekema?trk=public_post_comment_actor-image
+              - img [ref=e288]
+            - generic [ref=e289]:
+              - generic [ref=e290]:
+                - generic [ref=e291]:
+                  - link [ref=e292] [cursor=pointer]:
+                    - /url: https://es.linkedin.com/in/nbroekema?trk=public_post_comment_actor-name
+                    - text: Nick Broekema
+                  - generic [ref=e293]: 5mo
+                  - button [ref=e296] [cursor=pointer]
+                - paragraph [ref=e298]: Ngl I didn’t expect a typo in my name from you lol
+              - generic [ref=e299]:
+                - link [ref=e300] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_like
+                  - generic [ref=e302]: Like
+                - generic [ref=e303]: ·
+                - link [ref=e304] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reply
+                  - generic [ref=e306]: Reply
+                - link [ref=e307] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_comment_reactions
+                  - text: 2 Reactions
+          - link [ref=e308] [cursor=pointer]:
+            - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_see-more-comments
+            - text: See more comments
+          - paragraph [ref=e309]:
+            - text: To view or add a comment,
+            - link [ref=e310] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_feed-cta-banner-cta
+              - text: sign in
+      - generic [ref=e311]:
+        - heading [level=2] [ref=e312]: More Relevant Posts
+        - list [ref=e314]:
+          - listitem [ref=e315]:
+            - generic [ref=e316]:
+              - link [ref=e317] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/sajid-sial-6aa70530_casestudy-seoresults-authority-activity-7432320023307796480-ZnXf
+              - article [ref=e318]:
+                - generic [ref=e319]:
+                  - generic [ref=e321]:
+                    - link [ref=e322] [cursor=pointer]:
+                      - /url: https://pk.linkedin.com/in/sajid-sial-6aa70530?trk=public_post_feed-actor-image
+                      - img [ref=e323]
+                    - generic [ref=e324]:
+                      - link [ref=e326] [cursor=pointer]:
+                        - /url: https://pk.linkedin.com/in/sajid-sial-6aa70530?trk=public_post_feed-actor-name
+                        - text: Sajid Sial
+                      - time [ref=e328]: 4mo
+                  - button [ref=e331] [cursor=pointer]
+                - paragraph [ref=e333]:
+                  - text: "Mini Case Study Client: SaaS Startup Starting DR: 18 After 3 Months: 32 Organic Traffic: +70% What we did: • Competitor backlink gap analysis • Authority guest posting • Contextual anchor strategy • Monthly outreach campaigns No spam. No PBN. No shortcuts. Just smart, consistent link building. Results follow the strategy."
+                  - link [ref=e334] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fcasestudy&trk=public_post-text
+                    - text: "#CaseStudy"
+                  - link [ref=e335] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fseoresults&trk=public_post-text
+                    - text: "#SEOResults"
+                  - link [ref=e336] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fauthority&trk=public_post-text
+                    - text: "#Authority"
+                - link [ref=e338] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsajid-sial-6aa70530_casestudy-seoresults-authority-activity-7432320023307796480-ZnXf&trk=public_post_social-actions-reactions
+                  - generic [ref=e339]: "2"
+                - generic [ref=e340]:
+                  - link [ref=e341] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsajid-sial-6aa70530_casestudy-seoresults-authority-activity-7432320023307796480-ZnXf&trk=public_post_like-cta
+                    - generic [ref=e343]: Like
+                  - link [ref=e344] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsajid-sial-6aa70530_casestudy-seoresults-authority-activity-7432320023307796480-ZnXf&trk=public_post_comment-cta
+                    - generic [ref=e346]: Comment
+                  - button [ref=e348] [cursor=pointer]:
+                    - generic [ref=e349]: Share
+                - paragraph [ref=e350]:
+                  - text: To view or add a comment,
+                  - link [ref=e351] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsajid-sial-6aa70530_casestudy-seoresults-authority-activity-7432320023307796480-ZnXf&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e352]:
+            - generic [ref=e353]:
+              - link [ref=e354] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/vitalii-konosh-wmlinks_why-link-building-for-saas-is-a-different-activity-7432040910214864896-HB-l
+              - article [ref=e355]:
+                - generic [ref=e356]:
+                  - generic [ref=e358]:
+                    - link [ref=e359] [cursor=pointer]:
+                      - /url: https://ua.linkedin.com/in/vitalii-konosh-wmlinks?trk=public_post_feed-actor-image
+                      - img [ref=e360]
+                    - generic [ref=e361]:
+                      - link [ref=e363] [cursor=pointer]:
+                        - /url: https://ua.linkedin.com/in/vitalii-konosh-wmlinks?trk=public_post_feed-actor-name
+                        - text: Vitalii Konosh
+                      - time [ref=e365]: 4mo
+                  - button [ref=e368] [cursor=pointer]
+                - paragraph [ref=e370]: "Why Link Building for SaaS is a different beast Lately, I’ve been reflecting on why link building feels so much more high-stakes in the SaaS world. It’s not just about \"SEO juice\" or hitting a DR target-it’s literally a matter of survival and market reputation. The deeper I get into this, the clearer it becomes that generic approaches just don't cut it here. Here are my main takeaways: 1. Trust by Association. In SaaS, trust is the ultimate currency. A backlink from a reputable tech publication or an industry partner isn't just a link. It’s a professional \"vouch.\" It’s a signal to the market that your software is the real deal. 2. The Product Catalyst. You can ship brilliant features every week, but they mean nothing if they’re buried on page 10. Quality links are the engine that pulls a product out of invisibility and into the spotlight where the actual traffic lives. 3. Compounding ROI. Unlike performance ads that stop delivering the second you cut the budget, a solid backlink profile is a long-term asset. It builds authority that compounds over time, making it one of the most sustainable growth plays. I’m moving away from any \"generic\" outreach tactics. In this niche, if it’s not relevant and high-quality, it’s a waste of time. There is no middle ground in SaaS. To my fellow SEOs: What was your biggest \"aha!\" moment with SaaS link building? Any specific tactic that clicked for you when you least expected it? Let’s chat in the comments! 👇"
+                - link [ref=e372] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fvitalii-konosh-wmlinks_why-link-building-for-saas-is-a-different-activity-7432040910214864896-HB-l&trk=public_post_social-actions-reactions
+                  - generic [ref=e373]: "7"
+                - generic [ref=e374]:
+                  - link [ref=e375] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fvitalii-konosh-wmlinks_why-link-building-for-saas-is-a-different-activity-7432040910214864896-HB-l&trk=public_post_like-cta
+                    - generic [ref=e377]: Like
+                  - link [ref=e378] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fvitalii-konosh-wmlinks_why-link-building-for-saas-is-a-different-activity-7432040910214864896-HB-l&trk=public_post_comment-cta
+                    - generic [ref=e380]: Comment
+                  - button [ref=e382] [cursor=pointer]:
+                    - generic [ref=e383]: Share
+                - paragraph [ref=e384]:
+                  - text: To view or add a comment,
+                  - link [ref=e385] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fvitalii-konosh-wmlinks_why-link-building-for-saas-is-a-different-activity-7432040910214864896-HB-l&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e386]:
+            - generic [ref=e387]:
+              - link [ref=e388] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/harshdeep5inh_ive-built-50-saas-mvps-for-clients-only-activity-7430344046599880704-iFXA
+              - article [ref=e389]:
+                - generic [ref=e390]:
+                  - generic [ref=e392]:
+                    - link [ref=e393] [cursor=pointer]:
+                      - /url: https://in.linkedin.com/in/harshdeep5inh?trk=public_post_feed-actor-image
+                      - img [ref=e394]
+                    - generic [ref=e395]:
+                      - link [ref=e397] [cursor=pointer]:
+                        - /url: https://in.linkedin.com/in/harshdeep5inh?trk=public_post_feed-actor-name
+                        - text: Harsh S
+                      - time [ref=e399]: 4mo
+                  - button [ref=e402] [cursor=pointer]
+                - paragraph [ref=e404]: "I've built 50+ SaaS MVPs for clients. Only 28 survived. After watching the other 22 die, I finally understood what separates a SaaS that makes money from one that doesn't. It comes down to 3 types: 🥉 Type 1 — Saves Time Think tools like Postbridge or Publer. You have 10 social media accounts. Instead of posting one by one, you paste once and it goes everywhere. Saves you 30-60 mins a day. People pay for this. But here's the problem — the moment they're cutting costs, this is the first subscription they cancel. Why? Because they can live without it. It's a vitamin, not a painkiller. 🥈 Type 2 — Helps You Grow Think tools like Outranked (SEO) or SuperX (grow your X audience). These help you get more clients, more followers, more inbound. People pay more for these and cancel less. Because the ROI is visible. \"I paid $49. I got 2 new clients.\" Nobody cancels that. 🥇 Type 3 — Makes You Money Directly This is the holy grail. Not \"saves time.\" Not \"helps you grow.\" Actually puts money in your pocket. Think cold outreach tools that book meetings for you. Or a Reddit AI engine that turns comments into paying customers. When your tool IS the revenue source — people never cancel. Ever. The framework is simple: Saves time → people pay a little Helps you grow → people pay more Makes you money → people pay anything Before you build your next SaaS, ask yourself one question: \"Is my tool a vitamin or a painkiller?\" Vitamins are nice. Painkillers are necessary. Build the painkiller. I've seen 22 SaaS products die. Almost all of them were vitamins. Don't make the same mistake."
+                - list [ref=e405]:
+                  - listitem [ref=e406]:
+                    - img [ref=e407]
+                - link [ref=e409] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fharshdeep5inh_ive-built-50-saas-mvps-for-clients-only-activity-7430344046599880704-iFXA&trk=public_post_social-actions-reactions
+                  - generic [ref=e410]: "7"
+                - generic [ref=e411]:
+                  - link [ref=e412] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fharshdeep5inh_ive-built-50-saas-mvps-for-clients-only-activity-7430344046599880704-iFXA&trk=public_post_like-cta
+                    - generic [ref=e414]: Like
+                  - link [ref=e415] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fharshdeep5inh_ive-built-50-saas-mvps-for-clients-only-activity-7430344046599880704-iFXA&trk=public_post_comment-cta
+                    - generic [ref=e417]: Comment
+                  - button [ref=e419] [cursor=pointer]:
+                    - generic [ref=e420]: Share
+                - paragraph [ref=e421]:
+                  - text: To view or add a comment,
+                  - link [ref=e422] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fharshdeep5inh_ive-built-50-saas-mvps-for-clients-only-activity-7430344046599880704-iFXA&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e423]:
+            - generic [ref=e424]:
+              - link [ref=e425] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/muneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi
+              - article [ref=e426]:
+                - generic [ref=e427]:
+                  - generic [ref=e429]:
+                    - link [ref=e430] [cursor=pointer]:
+                      - /url: https://pk.linkedin.com/in/muneeb-developer?trk=public_post_feed-actor-image
+                      - img [ref=e431]
+                    - generic [ref=e432]:
+                      - link [ref=e434] [cursor=pointer]:
+                        - /url: https://pk.linkedin.com/in/muneeb-developer?trk=public_post_feed-actor-name
+                        - text: Malik Muneeb 🍁
+                      - time [ref=e436]: 5mo
+                  - button [ref=e439] [cursor=pointer]
+                - paragraph [ref=e441]:
+                  - link [ref=e442] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/alex-turnbull-1ab9992?trk=public_post-text
+                    - text: Alex Turnbull
+                  - text: "built two SaaS companies to $10M+ ARR. No co-founder. No funding. No ads. Just LinkedIn + daily posting. Here's his playbook: YEAR 1: Groove (customer support SaaS) → Built MVP solo → Posted build updates on LinkedIn → Hit $100K ARR (40% from LinkedIn organic) YEAR 2-5: Scaled Groove to $5M ARR → Posted every single day → Shared metrics, churn fixes, mistakes → Grew 42K followers (no ghostwriter) YEAR 6+: Launched SaaS Academy → Used same playbook → $5M ARR in 3 years → Combined: $10M+ ARR empire HIS Content Strategy: Posted 3 types: 1. Contrarian hooks (viral) \"I regret raising money\" Result: 500K views 2. Authority builders (trust) \"I scaled to $5M ARR. Here's how\" Result: Converted 20% to trials 3. Building in public (relatability) \"Last month we lost 50 customers. Here's why\" Result: Users said \"I bought because of your posts\" No Hacks. NO Tricks. Just consistent value + transparency. The Lesson: Distribution > Product quality. You can build the best SaaS in the world. If nobody knows you exist, you make $0. Alex's product was his content. His content sold his actual product. SaaS founders: Are you building in silence or building in public?"
+                  - link [ref=e443] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fpersonalbranding&trk=public_post-text
+                    - text: "#PersonalBranding"
+                  - link [ref=e444] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fsaas&trk=public_post-text
+                    - text: "#SaaS"
+                  - link [ref=e445] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fsaasfounders&trk=public_post-text
+                    - text: "#SaaSFounders"
+                - generic [ref=e446]:
+                  - link [ref=e447] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fmuneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi&trk=public_post_social-actions-reactions
+                    - generic [ref=e448]: "53"
+                  - link [ref=e449] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fmuneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi&trk=public_post_social-actions-comments
+                    - text: · 39 Comments
+                - generic [ref=e450]:
+                  - link [ref=e451] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fmuneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi&trk=public_post_like-cta
+                    - generic [ref=e453]: Like
+                  - link [ref=e454] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fmuneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi&trk=public_post_comment-cta
+                    - generic [ref=e456]: Comment
+                  - button [ref=e458] [cursor=pointer]:
+                    - generic [ref=e459]: Share
+                - paragraph [ref=e460]:
+                  - text: To view or add a comment,
+                  - link [ref=e461] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fmuneeb-developer_personalbranding-saas-saasfounders-activity-7422975107142213632-AcYi&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e462]:
+            - generic [ref=e463]:
+              - link [ref=e464] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/shaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k
+              - article [ref=e465]:
+                - generic [ref=e466]:
+                  - generic [ref=e468]:
+                    - link [ref=e469] [cursor=pointer]:
+                      - /url: https://uk.linkedin.com/in/shaurya-singh-b53613258?trk=public_post_feed-actor-image
+                      - img [ref=e470]
+                    - generic [ref=e471]:
+                      - link [ref=e473] [cursor=pointer]:
+                        - /url: https://uk.linkedin.com/in/shaurya-singh-b53613258?trk=public_post_feed-actor-name
+                        - text: Shaurya Singh
+                      - time [ref=e475]:
+                        - text: 4mo
+                        - generic [ref=e476]: ·
+                        - text: Edited
+                  - button [ref=e479] [cursor=pointer]
+                - paragraph [ref=e481]: "Our SaaS has a great product. So why isn’t organic traffic growing? Here’s the hard truth: In SaaS, link building isn’t a numbers game anymore. I’ve seen too many founders burn budgets on random guest posts, hoping Google will “notice.” Spoiler: It won’t. What actually creates the impact for SaaS companies- 1. Strategic placement over volume One link from G2, Capterra, or a trusted SaaS publication beats 50 links from generic blogs. 2. Relationships with SaaS communities Product Hunt features, SaaS newsletters, and integration partner pages don’t just build links they bring real users. 3. Link-worthy assets Original research, benchmarks, and comparison guides naturally attract backlinks from sites your audience already trusts. The difference? These links don’t just boost DA. They drive qualified traffic. They increase signups. They impact revenue. Because in SaaS, a link shouldn’t just exist. It should convert. Question for founders & marketers: What’s your biggest challenge with link building for your SaaS product?"
+                - generic [ref=e482]:
+                  - link [ref=e483] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k&trk=public_post_social-actions-reactions
+                    - generic [ref=e484]: "7"
+                  - link [ref=e485] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k&trk=public_post_social-actions-comments
+                    - text: · 1 Comment
+                - generic [ref=e486]:
+                  - link [ref=e487] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k&trk=public_post_like-cta
+                    - generic [ref=e489]: Like
+                  - link [ref=e490] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k&trk=public_post_comment-cta
+                    - generic [ref=e492]: Comment
+                  - button [ref=e494] [cursor=pointer]:
+                    - generic [ref=e495]: Share
+                - paragraph [ref=e496]:
+                  - text: To view or add a comment,
+                  - link [ref=e497] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_our-saas-has-a-great-product-so-why-isn-activity-7426966765986914304-3o1k&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e498]:
+            - generic [ref=e499]:
+              - link [ref=e500] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/tomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i
+              - article [ref=e501]:
+                - generic [ref=e502]:
+                  - generic [ref=e504]:
+                    - link [ref=e505] [cursor=pointer]:
+                      - /url: https://uk.linkedin.com/in/tomas-jones1?trk=public_post_feed-actor-image
+                      - img [ref=e506]
+                    - generic [ref=e507]:
+                      - link [ref=e509] [cursor=pointer]:
+                        - /url: https://uk.linkedin.com/in/tomas-jones1?trk=public_post_feed-actor-name
+                        - text: Tomas Jones
+                      - time [ref=e511]: 4mo
+                  - button [ref=e514] [cursor=pointer]
+                - paragraph [ref=e516]: "Day 1: Random SaaS idea in a Google Doc. Day 90: $8.2K+ in MRR, $300K+ valuation. SaaS doesn’t have to take years. And you definitely don’t need a huge team or piles of cash to make it work. I know that because I’ve done it personally: - Built the whole thing in 11 days - Landed paying users on day one. - Received a buyout offer within 45 days. Nothing crazy. No fancy tech. No secret network. Just a simple tool that solved a real problem, and one solid distribution channel behind it. Now I’m breaking down the exact system so you can replicate it. Inside the breakdown, you’ll learn: → How to validate SaaS ideas people will actually pay for. → How to ship fast (even if you’re starting from scratch). → The 3-step method we used to generate daily inbound leads. → Underrated marketing plays 80% of founders ignore. This works for any B2B offer that solves a real pain point. Want the full SaaS MRR Playbook? 1. Connect with me 2. Comment “MRR” And I’ll DM you the resource. P.S. Repost it for priority access to the resource!"
+                - list [ref=e517]:
+                  - listitem [ref=e518]:
+                    - img [ref=e519]
+                - generic [ref=e520]:
+                  - link [ref=e521] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Ftomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i&trk=public_post_social-actions-reactions
+                    - generic [ref=e522]: "201"
+                  - link [ref=e523] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Ftomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i&trk=public_post_social-actions-comments
+                    - text: · 602 Comments
+                - generic [ref=e524]:
+                  - link [ref=e525] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Ftomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i&trk=public_post_like-cta
+                    - generic [ref=e527]: Like
+                  - link [ref=e528] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Ftomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i&trk=public_post_comment-cta
+                    - generic [ref=e530]: Comment
+                  - button [ref=e532] [cursor=pointer]:
+                    - generic [ref=e533]: Share
+                - paragraph [ref=e534]:
+                  - text: To view or add a comment,
+                  - link [ref=e535] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Ftomas-jones1_day-1-random-saas-idea-in-a-google-doc-activity-7432047479866466305-_22i&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e536]:
+            - generic [ref=e537]:
+              - link [ref=e538] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/khushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3
+              - article [ref=e539]:
+                - generic [ref=e540]:
+                  - generic [ref=e542]:
+                    - link [ref=e543] [cursor=pointer]:
+                      - /url: https://in.linkedin.com/in/khushboo-gairola?trk=public_post_feed-actor-image
+                      - img [ref=e544]
+                    - generic [ref=e545]:
+                      - link [ref=e547] [cursor=pointer]:
+                        - /url: https://in.linkedin.com/in/khushboo-gairola?trk=public_post_feed-actor-name
+                        - text: Khushboo Gairola
+                      - time [ref=e549]: 5mo
+                  - button [ref=e552] [cursor=pointer]
+                - paragraph [ref=e554]: "I'm seeing a dangerous trend in SaaS link building. Companies are paying $200-500 per \"high-quality\" guest post. The articles get published. The links go live. Everyone celebrates. Then... crickets. No traffic. No signups. No movement in pipeline. Why? Because these posts live on generic marketing blogs that your actual buyers stopped reading in 2019. Meanwhile: A thoughtful comment in a B2B Slack community or a mention in a vertical-specific podcast generates actual conversations with prospects. The era of \"build links anywhere with high DR\" is over. If your link strategy isn't aligned with where your ICP spends time, you're just burning budget."
+                - generic [ref=e555]:
+                  - link [ref=e556] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkhushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3&trk=public_post_social-actions-reactions
+                    - generic [ref=e557]: "54"
+                  - link [ref=e558] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkhushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3&trk=public_post_social-actions-comments
+                    - text: · 34 Comments
+                - generic [ref=e559]:
+                  - link [ref=e560] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkhushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3&trk=public_post_like-cta
+                    - generic [ref=e562]: Like
+                  - link [ref=e563] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkhushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3&trk=public_post_comment-cta
+                    - generic [ref=e565]: Comment
+                  - button [ref=e567] [cursor=pointer]:
+                    - generic [ref=e568]: Share
+                - paragraph [ref=e569]:
+                  - text: To view or add a comment,
+                  - link [ref=e570] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkhushboo-gairola_im-seeing-a-dangerous-trend-in-saas-link-activity-7422687283327287296-m2a3&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e571]:
+            - generic [ref=e572]:
+              - link [ref=e573] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/amangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN
+              - article [ref=e574]:
+                - generic [ref=e575]:
+                  - generic [ref=e577]:
+                    - link [ref=e578] [cursor=pointer]:
+                      - /url: https://uk.linkedin.com/in/amangrowth?trk=public_post_feed-actor-image
+                      - img [ref=e579]
+                    - generic [ref=e580]:
+                      - link [ref=e582] [cursor=pointer]:
+                        - /url: https://uk.linkedin.com/in/amangrowth?trk=public_post_feed-actor-name
+                        - text: Aman Ghataura
+                      - time [ref=e584]: 4mo
+                  - button [ref=e587] [cursor=pointer]
+                - paragraph [ref=e589]: "Series B SaaS lead asked me today: \"What do you do if post impressions were low\" Here's what I don't do: - Think the post sucks - Think I'm shadow banned - Think low impressions are a bad thing Post impressions are a function of 5 things In order of importance - Idea - Written hook - Image - Content - Formatting I will work all the way back up the pyramid And ask myself: Did the idea deserve those impressions? And here's where it gets subjective... A post about a client case studies deserves low impressions. You're not entertaining or educating without self interest... So why should LinkedIn push it? So yeah if you got 'low' impressions then it was fully deserved. Nothing is wrong or broken. But hey if your goal is to get high impressions Then just write a high impression idea post - Hiring - Rage bait - Personal journey - How much money you make - Something to trigger people I promise you it's that easy But then you're going to realize, very quickly - that impressions alone are NOT your goal. They never were and never are. If you've learnt this and don't know where to go next. And want to increase your QUALIFIED IMPRESSIONS (yes that's a thing) Then go through my profile and read some more posts Don't DM me yet... It's not the right time"
+                - generic [ref=e590]:
+                  - link [ref=e591] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Famangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN&trk=public_post_social-actions-reactions
+                    - generic [ref=e592]: "11"
+                  - link [ref=e593] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Famangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN&trk=public_post_social-actions-comments
+                    - text: · 4 Comments
+                - generic [ref=e594]:
+                  - link [ref=e595] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Famangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN&trk=public_post_like-cta
+                    - generic [ref=e597]: Like
+                  - link [ref=e598] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Famangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN&trk=public_post_comment-cta
+                    - generic [ref=e600]: Comment
+                  - button [ref=e602] [cursor=pointer]:
+                    - generic [ref=e603]: Share
+                - paragraph [ref=e604]:
+                  - text: To view or add a comment,
+                  - link [ref=e605] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Famangrowth_series-b-saas-lead-asked-me-today-what-activity-7430735224554029056-t3PN&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e606]:
+            - generic [ref=e607]:
+              - link [ref=e608] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/shaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj
+              - article [ref=e609]:
+                - generic [ref=e610]:
+                  - generic [ref=e612]:
+                    - link [ref=e613] [cursor=pointer]:
+                      - /url: https://uk.linkedin.com/in/shaurya-singh-b53613258?trk=public_post_feed-actor-image
+                      - img [ref=e614]
+                    - generic [ref=e615]:
+                      - link [ref=e617] [cursor=pointer]:
+                        - /url: https://uk.linkedin.com/in/shaurya-singh-b53613258?trk=public_post_feed-actor-name
+                        - text: Shaurya Singh
+                      - time [ref=e619]: 4mo
+                  - button [ref=e622] [cursor=pointer]
+                - paragraph [ref=e624]: "Every SaaS link building campaign I run follows the same 3-tier framework. It’s not complicated.But almost nobody does it properly. Here it is - TIER 1 — Authority Links (5–10% of your profile) These are the hardest to get. And the most powerful. Think: Forbes TechCrunch G2 editorial mentions Major industry publications with real traffic and editorial standards You don’t cold pitch these. You earn them through: → Original research & proprietary data studies → Digital PR campaigns → Expert commentary on trending industry topics → Strong brand positioning Goal: Make Google trust your domain at a fundamental level. TIER 2 — Relevance Links (60–70% of your profile) This is the engine. Niche SaaS blogs. Integration partner pages. Tool comparison sites. Community-driven publications in your space. These sites understand your audience. Their readers are your audience. You earn these through: → Personalized outreach with genuine value exchange → Guest posts on highly relevant blogs → Resource page placements → Broken link building on competitor content Goal: Signal to Google exactly what your SaaS is about. This is where rankings actually move. TIER 3 — Volume Links (20–30% of your profile) Directories. Podcast guest appearances. Startup listings. Community profiles. These alone won’t rank you. But they support Tiers 1 and 2 by creating a diversified, natural-looking backlink profile. Goal: Avoid looking engineered. Most SaaS companies either: 1. Chase only Tier 1 and give up when it doesn’t happen fast 2. Buy only Tier 3 and wonder why nothing moves The magic is in Tier 2. That’s where your rankings are hiding. Save this framework. Use it on your next campaign."
+                - generic [ref=e625]:
+                  - link [ref=e626] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj&trk=public_post_social-actions-reactions
+                    - generic [ref=e627]: "6"
+                  - link [ref=e628] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj&trk=public_post_social-actions-comments
+                    - text: · 1 Comment
+                - generic [ref=e629]:
+                  - link [ref=e630] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj&trk=public_post_like-cta
+                    - generic [ref=e632]: Like
+                  - link [ref=e633] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj&trk=public_post_comment-cta
+                    - generic [ref=e635]: Comment
+                  - button [ref=e637] [cursor=pointer]:
+                    - generic [ref=e638]: Share
+                - paragraph [ref=e639]:
+                  - text: To view or add a comment,
+                  - link [ref=e640] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fshaurya-singh-b53613258_every-saas-link-building-campaign-i-run-follows-activity-7430845640835833856-1asj&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+          - listitem [ref=e641]:
+            - generic [ref=e642]:
+              - link [ref=e643] [cursor=pointer]:
+                - /url: https://www.linkedin.com/posts/kurban-ali-youtube-seo-expert_saas-saasmarketing-b2bmarketing-activity-7427257922235162624-9OnM
+              - article [ref=e644]:
+                - generic [ref=e645]:
+                  - generic [ref=e647]:
+                    - link [ref=e648] [cursor=pointer]:
+                      - /url: https://bd.linkedin.com/in/kurban-ali-youtube-seo-expert?trk=public_post_feed-actor-image
+                      - img [ref=e649]
+                    - generic [ref=e650]:
+                      - link [ref=e652] [cursor=pointer]:
+                        - /url: https://bd.linkedin.com/in/kurban-ali-youtube-seo-expert?trk=public_post_feed-actor-name
+                        - text: Kurban Ali
+                      - time [ref=e654]: 4mo
+                  - button [ref=e657] [cursor=pointer]
+                - paragraph [ref=e659]:
+                  - text: "Most SaaS founders don’t have a traffic problem. They have a trust problem. Because in SaaS, people don’t buy after one post. They buy after they’ve seen you enough times to think: “Okay… these guys know what they’re doing.” That’s why YouTube works so well for SaaS. Not for “going viral”… but for building authority + inbound leads every single week. But here’s what I see most SaaS teams do wrong: They upload product demos… feature updates… random tutorials… And then wonder why: views are low the channel doesn’t grow leads don’t come in the content feels like it’s “not working” The missing piece is YouTube SEO + content positioning. If your videos aren’t built around: what your ICP is already searching for high-intent keywords strong hooks in the first 10 seconds retention-friendly structure …YouTube won’t push them. And your best content stays invisible. This is exactly what I help SaaS founders fix. I work with SaaS teams to turn YouTube into a channel that brings: ✔️ inbound leads ✔️ booked demos ✔️ authority ✔️ long-term organic growth If you’re building a SaaS and want YouTube to start working like a real acquisition channel… DM me “SAAS” and I’ll share a simple roadmap I use to grow SaaS channels."
+                  - link [ref=e660] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fsaas&trk=public_post-text
+                    - text: "#SaaS"
+                  - link [ref=e661] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fsaasmarketing&trk=public_post-text
+                    - text: "#SaaSMarketing"
+                  - link [ref=e662] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fb2bmarketing&trk=public_post-text
+                    - text: "#B2BMarketing"
+                  - link [ref=e663] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fyoutubeseo&trk=public_post-text
+                    - text: "#YouTubeSEO"
+                  - link [ref=e664] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fyoutubemarketing&trk=public_post-text
+                    - text: "#YouTubeMarketing"
+                  - link [ref=e665] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fleadgeneration&trk=public_post-text
+                    - text: "#LeadGeneration"
+                  - link [ref=e666] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ffeed%2Fhashtag%2Fcaliforniabusiness&trk=public_post-text
+                    - text: "#CaliforniaBusiness"
+                - list [ref=e667]:
+                  - listitem [ref=e668]:
+                    - img [ref=e669]
+                - link [ref=e671] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkurban-ali-youtube-seo-expert_saas-saasmarketing-b2bmarketing-activity-7427257922235162624-9OnM&trk=public_post_social-actions-reactions
+                  - generic [ref=e672]: "1"
+                - generic [ref=e673]:
+                  - link [ref=e674] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkurban-ali-youtube-seo-expert_saas-saasmarketing-b2bmarketing-activity-7427257922235162624-9OnM&trk=public_post_like-cta
+                    - generic [ref=e676]: Like
+                  - link [ref=e677] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkurban-ali-youtube-seo-expert_saas-saasmarketing-b2bmarketing-activity-7427257922235162624-9OnM&trk=public_post_comment-cta
+                    - generic [ref=e679]: Comment
+                  - button [ref=e681] [cursor=pointer]:
+                    - generic [ref=e682]: Share
+                - paragraph [ref=e683]:
+                  - text: To view or add a comment,
+                  - link [ref=e684] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fkurban-ali-youtube-seo-expert_saas-saasmarketing-b2bmarketing-activity-7427257922235162624-9OnM&trk=public_post_feed-cta-banner-cta
+                    - text: sign in
+    - generic [ref=e685]:
+      - generic [ref=e687]:
+        - figure [ref=e688]
+        - img [ref=e691]
+        - paragraph [ref=e692]: 7,338 followers
+        - list [ref=e694]:
+          - listitem [ref=e695]:
+            - link [ref=e696] [cursor=pointer]:
+              - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fin%2Froelof-otten%2Frecent-activity%2F&trk=public_post_follow-posts
+              - text: 719 Posts
+          - listitem [ref=e697]:
+            - text: ·
+            - link [ref=e698] [cursor=pointer]:
+              - /url: https://www.linkedin.com/today/author/roelof-otten?trk=public_post_follow-articles
+              - text: 4 Articles
+        - generic [ref=e699]:
+          - link [ref=e700] [cursor=pointer]:
+            - /url: https://nl.linkedin.com/in/roelof-otten?trk=public_post_follow-view-profile
+            - text: View Profile
+          - link [ref=e701] [cursor=pointer]:
+            - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Ffeed%2Fupdate%2Furn%3Ali%3Aactivity%3A7422193713642127360&trk=public_post_follow
+            - text: Connect
+      - generic [ref=e703]:
+        - heading [level=2] [ref=e704]: More from this author
+        - list [ref=e706]:
+          - listitem [ref=e707]:
+            - link [ref=e708] [cursor=pointer]:
+              - /url: https://www.linkedin.com/pulse/im-launching-my-first-ever-linkedin-inbound-cohort-roelof-otten--jmqke?trk=public_post
+              - generic [ref=e710]:
+                - heading [level=3] [ref=e711]: I’m launching my first-ever LinkedIn Inbound cohort.
+                - generic [ref=e712]: Roelof Otten · 5mo
+          - listitem [ref=e713]:
+            - link [ref=e714] [cursor=pointer]:
+              - /url: https://www.linkedin.com/pulse/when-product-led-right-move-roelof-otten--kpdfe?trk=public_post
+              - generic [ref=e716]:
+                - heading [level=3] [ref=e717]: When is Product-Led the right move?
+                - generic [ref=e718]: Roelof Otten · 9mo
+          - listitem [ref=e719]:
+            - link [ref=e720] [cursor=pointer]:
+              - /url: https://www.linkedin.com/pulse/so-im-babysitter-now-roelof-otten--nr34e?trk=public_post
+              - generic [ref=e722]:
+                - heading [level=3] [ref=e723]: So I'm a babysitter now?
+                - generic [ref=e724]: Roelof Otten · 11mo
+      - generic [ref=e725]:
+        - heading [level=2] [ref=e726]: Explore content categories
+        - generic [ref=e728]:
+          - list [ref=e729]:
+            - listitem [ref=e730]:
+              - link [ref=e731] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/career/
+                - text: Career
+            - listitem [ref=e732]:
+              - link [ref=e733] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/productivity/
+                - text: Productivity
+            - listitem [ref=e734]:
+              - link [ref=e735] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/finance/
+                - text: Finance
+            - listitem [ref=e736]:
+              - link [ref=e737] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/soft-skills-emotional-intelligence/
+                - text: Soft Skills & Emotional Intelligence
+            - listitem [ref=e738]:
+              - link [ref=e739] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/project-management/
+                - text: Project Management
+            - listitem [ref=e740]:
+              - link [ref=e741] [cursor=pointer]:
+                - /url: https://www.linkedin.com/top-content/education/
+                - text: Education
+          - button [ref=e742] [cursor=pointer]: Show more
+  - contentinfo [ref=e744]:
+    - list [ref=e745]:
+      - generic [ref=e746]: LinkedIn
+      - generic [ref=e748]: © 2026
+      - listitem [ref=e749]:
+        - link [ref=e750] [cursor=pointer]:
+          - /url: https://about.linkedin.com?trk=d_public_post_footer-about
+          - text: About
+      - listitem [ref=e751]:
+        - link [ref=e752] [cursor=pointer]:
+          - /url: https://www.linkedin.com/accessibility?trk=d_public_post_footer-accessibility
+          - text: Accessibility
+      - listitem [ref=e753]:
+        - link [ref=e754] [cursor=pointer]:
+          - /url: https://www.linkedin.com/legal/user-agreement?trk=d_public_post_footer-user-agreement
+          - text: User Agreement
+      - listitem [ref=e755]:
+        - link [ref=e756] [cursor=pointer]:
+          - /url: https://www.linkedin.com/legal/privacy-policy?trk=d_public_post_footer-privacy-policy
+          - text: Privacy Policy
+      - listitem [ref=e757]:
+        - link [ref=e758] [cursor=pointer]:
+          - /url: https://www.linkedin.com/legal/cookie-policy?trk=d_public_post_footer-cookie-policy
+          - text: Cookie Policy
+      - listitem [ref=e759]:
+        - link [ref=e760] [cursor=pointer]:
+          - /url: https://www.linkedin.com/legal/copyright-policy?trk=d_public_post_footer-copyright-policy
+          - text: Copyright Policy
+      - listitem [ref=e761]:
+        - link [ref=e762] [cursor=pointer]:
+          - /url: https://brand.linkedin.com/policies?trk=d_public_post_footer-brand-policy
+          - text: Brand Policy
+      - listitem [ref=e763]:
+        - link [ref=e764] [cursor=pointer]:
+          - /url: https://www.linkedin.com/psettings/guest-controls?trk=d_public_post_footer-guest-controls
+          - text: Guest Controls
+      - listitem [ref=e765]:
+        - link [ref=e766] [cursor=pointer]:
+          - /url: https://www.linkedin.com/legal/professional-community-policies?trk=d_public_post_footer-community-guide
+          - text: Community Guidelines
+      - listitem [ref=e767]:
+        - button [ref=e769]: Language
+  - dialog "Sign in to view more content" [active] [ref=e772]:
+    - button "Dismiss" [ref=e773] [cursor=pointer]
+    - generic [ref=e775]:
+      - generic [ref=e776]:
+        - heading "Sign in to view more content" [level=2] [ref=e777]
+        - paragraph [ref=e779]: Create your free account or sign in to continue your search
+      - generic [ref=e780]:
+        - generic:
+          - generic:
+            - button "Continue with google"
+        - button "Sign in with Email" [ref=e781] [cursor=pointer]:
+          - generic [ref=e783]: Sign in with Email
+        - paragraph [ref=e785]: or
+        - generic:
+          - generic:
+            - button "Continue with google"
+        - paragraph [ref=e786]:
+          - text: New to LinkedIn?
+          - link "Join now" [ref=e787] [cursor=pointer]:
+            - /url: https://www.linkedin.com/signup/cold-join?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fposts%2Froelof-otten_impressions-are-down-activity-7422193713642127360-yqsg&trk=public_post_contextual-sign-in-modal_join-link
+        - paragraph [ref=e788]:
+          - text: By clicking Continue to join or sign in, you agree to LinkedIn’s
+          - link "User Agreement" [ref=e789] [cursor=pointer]:
+            - /url: /legal/user-agreement?trk=linkedin-tc_auth-button_user-agreement
+          - text: ","
+          - link "Privacy Policy" [ref=e790] [cursor=pointer]:
+            - /url: /legal/privacy-policy?trk=linkedin-tc_auth-button_privacy-policy
+          - text: ", and"
+          - link "Cookie Policy" [ref=e791] [cursor=pointer]:
+            - /url: /legal/cookie-policy?trk=linkedin-tc_auth-button_cookie-policy
+          - text: .

@@ -1,0 +1,900 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - region "Toast message":
+      - heading "0 notifications total" [level=2] [ref=e3]
+      - alert
+  - generic [ref=e4]:
+    - generic [ref=e6]:
+      - button "Skip to search" [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: Skip to search
+      - button "Skip to main content" [ref=e9] [cursor=pointer]:
+        - generic [ref=e10]: Skip to main content
+      - button "Keyboard shortcuts" [ref=e11] [cursor=pointer]:
+        - generic [ref=e12]: Keyboard shortcuts
+      - button "Close jump menu" [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+        - generic [ref=e16]: Close jump menu
+    - banner "Global Navigation" [ref=e17]:
+      - generic [ref=e18]:
+        - link "LinkedIn" [ref=e19] [cursor=pointer]:
+          - /url: https://www.linkedin.com/feed/?nis=true
+          - img "LinkedIn" [ref=e22]:
+            - img [ref=e23]
+        - button "Click to start a search" [ref=e27] [cursor=pointer]:
+          - img [ref=e29]
+          - generic [ref=e31]: Search
+        - navigation "Primary Navigation" [ref=e32]:
+          - list [ref=e33]:
+            - listitem [ref=e34]:
+              - link "new feed updates notifications Home" [ref=e35] [cursor=pointer]:
+                - /url: https://www.linkedin.com/feed/?nis=true&
+                - generic [ref=e36]:
+                  - generic [ref=e39]: new feed updates notifications
+                  - img [ref=e43]
+                - generic "Home" [ref=e45]
+            - listitem [ref=e46]:
+              - link "My Network" [ref=e47] [cursor=pointer]:
+                - /url: https://www.linkedin.com/mynetwork/?
+                - img [ref=e51]
+                - generic "My Network" [ref=e53]
+            - listitem [ref=e54]:
+              - link "Jobs" [ref=e55] [cursor=pointer]:
+                - /url: https://www.linkedin.com/jobs/?
+                - img [ref=e59]
+                - generic "Jobs" [ref=e61]
+            - listitem [ref=e62]:
+              - link "Messaging" [ref=e63] [cursor=pointer]:
+                - /url: https://www.linkedin.com/messaging/?
+                - img [ref=e67]
+                - generic "Messaging" [ref=e69]
+            - listitem [ref=e70]:
+              - link "1 new notification Notifications" [ref=e71] [cursor=pointer]:
+                - /url: https://www.linkedin.com/notifications/?
+                - generic [ref=e72]:
+                  - generic [ref=e73]:
+                    - generic [ref=e74]: "1"
+                    - generic [ref=e75]: 1 new notification
+                  - img [ref=e79]
+                - generic "Notifications" [ref=e81]
+            - listitem [ref=e82]:
+              - button "Brian Huntington Me" [ref=e84] [cursor=pointer]:
+                - img "Brian Huntington" [ref=e85]
+                - generic [ref=e86]:
+                  - text: Me
+                  - img [ref=e87]
+            - listitem [ref=e89]:
+              - button "For Business" [ref=e91] [cursor=pointer]:
+                - img [ref=e95]
+                - generic "For Business" [ref=e97]:
+                  - text: For Business
+                  - img [ref=e98]
+            - listitem [ref=e100]:
+              - link "Try Premium for €0" [ref=e102] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=e103]:
+                  - img [ref=e104]
+                  - generic [ref=e106]: Try Premium for €0
+    - generic [ref=e113]:
+      - complementary "User profile" [ref=e114]
+      - main "Feed detail update" [ref=e135]:
+        - heading "Feed detail update" [level=1] [ref=e136]
+        - generic "Update container" [ref=e137]:
+          - article [ref=e141]:
+            - generic [ref=e143]:
+              - heading "Feed post" [level=2] [ref=e144]
+              - generic [ref=e145]:
+                - generic [ref=e146]:
+                  - generic [ref=e147]:
+                    - generic [ref=e148]:
+                      - link "View Roelof Otten’s graphic link" [ref=e149] [cursor=pointer]:
+                        - /url: https://www.linkedin.com/in/roelof-otten?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAAuDbbYBCAYuKXD8iLBZwLfmZISHRREYeM8
+                        - img "View Roelof Otten’s graphic link" [ref=e153]
+                      - generic [ref=e154]:
+                        - 'link "View: Roelof Otten Premium • 3rd+ Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e155] [cursor=pointer]':
+                          - /url: https://www.linkedin.com/in/roelof-otten?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAAuDbbYBCAYuKXD8iLBZwLfmZISHRREYeM8
+                          - generic [ref=e156]:
+                            - generic [ref=e159]: Roelof Otten
+                            - generic [ref=e161]:
+                              - img [ref=e162]:
+                                - img [ref=e163]
+                              - text: • 3rd+
+                          - generic [ref=e166]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                        - generic [ref=e168]:
+                          - text: 5mo •
+                          - img [ref=e171]
+                    - button "Follow Roelof Otten" [ref=e173] [cursor=pointer]:
+                      - img [ref=e174]
+                      - generic [ref=e176]: Follow
+                  - button "Open control menu for post by Roelof Otten" [ref=e179] [cursor=pointer]:
+                    - img [ref=e180]
+                - generic [ref=e186]:
+                  - text: "\"My ICP isn't seeing my content anymore\""
+                  - text: Here's a quick fix for that ↓
+                  - text: Last year, I was still fully focused on PLG
+                  - text: My feed reflected that.
+                  - text: "I mainly saw posts from:"
+                  - text: SaaS founder
+                  - text: PLG peers.
+                  - text: But LinkedIn has introduced its own LLM called 360Brew.
+                  - text: With that, it makes the feed behave more like a “For You” page.
+                  - text: Quite similar to TikTok/Instagram/etc.
+                  - text: So, because I've made the switch to helping B2B SaaS founders and consultants with LI.
+                  - text: LI has placed me in a different bucket.
+                  - text: The coaching bucket.
+                  - text: And because of that, I don't see posts anymore from leading SaaS, and PLG creators.
+                  - text: "Instead, it shows me posts from:"
+                  - text: "- Jasmin Alic"
+                  - text: "- Lara Acosta"
+                  - text: "- Nick Broekma"
+                  - text: "- Daniel Korenblum"
+                  - text: Super valuable, but I still like to catch up on SaaS and PLG.
+                  - text: Not only that.
+                  - text: Many SaaS consultants (my ICP) are in that bucket, so I still want to interact with them.
+                  - text: "Here's how I fixed that:"
+                  - text: 1. Go to the person's profile
+                  - text: 2. Click on the 2 bells in the top right corner
+                  - text: "3. You see a pop-up: Manage notifications about [name]"
+                  - text: 4. Select 'Everything'
+                  - text: 5. Save
+                  - text: You can do this with your ICP and peers from people who aren't in your 'bucket'
+                  - text: Interact with that post, and leave a valuable comment.
+                  - text: The algorithm may not show your post to the right people.
+                  - text: But your comments still can.
+                  - text: When you comment, you can share value directly with your ICP.
+                  - text: Try it out, and see your feed adapt.
+                - generic [ref=e188]:
+                  - alert [ref=e191]: Your document is loading
+                  - iframe [ref=e204]:
+                    
+                - generic [ref=e205]:
+                  - list [ref=e209]:
+                    - listitem [ref=e210]:
+                      - button "84 reactions" [ref=e211] [cursor=pointer]:
+                        - img "like" [ref=e212]
+                        - img "love" [ref=e213]
+                        - img "insightful" [ref=e214]
+                        - generic [ref=e215]: "84"
+                    - listitem [ref=e216]:
+                      - list [ref=e217]:
+                        - listitem [ref=e218]:
+                          - button "59 comments on Roelof Otten’s post" [ref=e219] [cursor=pointer]:
+                            - generic [ref=e220]: 59 comments
+                          - text: ·
+                        - listitem [ref=e221]:
+                          - button "1 repost of Roelof Otten’s post" [ref=e222] [cursor=pointer]:
+                            - generic [ref=e223]: 1 repost
+                  - generic [ref=e224]:
+                    - generic [ref=e225]:
+                      - button "React Like" [ref=e226] [cursor=pointer]:
+                        - img [ref=e229]
+                      - button "Open reactions menu":
+                        - img [ref=e232] [cursor=pointer]
+                    - button "Comment" [ref=e236] [cursor=pointer]:
+                      - img [ref=e237]
+                    - button [ref=e241] [cursor=pointer]:
+                      - img [ref=e242]
+                    - button "Send in a private message" [ref=e246] [cursor=pointer]:
+                      - img [ref=e247]
+              - generic [ref=e250]:
+                - generic [ref=e252]:
+                  - img "Brian Huntington" [ref=e254]
+                  - generic [ref=e257]:
+                    - generic [ref=e261]:
+                      - textbox "Text editor for creating content" [ref=e263]:
+                        - paragraph [ref=e264]
+                        - text: Add a comment…
+                      - generic [ref=e265]: Add a comment…
+                    - generic [ref=e267]:
+                      - button "Open Emoji Keyboard" [ref=e270] [cursor=pointer]:
+                        - img
+                        - generic [ref=e271]: Open Emoji Keyboard
+                      - button "Add a photo" [ref=e273] [cursor=pointer]:
+                        - img [ref=e274]
+                - button "Current selected sort order is Most relevant" [ref=e279] [cursor=pointer]:
+                  - generic [ref=e280]: Current selected sort order is Most relevant
+                  - generic [ref=e281]:
+                    - text: Most relevant
+                    - img [ref=e282]
+                - generic [ref=e284]:
+                  - generic [ref=e287]:
+                    - article [ref=e289]:
+                      - generic [ref=e290]:
+                        - generic [ref=e291]:
+                          - link "View Roelof Otten’s graphic link" [ref=e292] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/roelof-otten
+                            - img "View Roelof Otten’s graphic link" [ref=e295]
+                          - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e296] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/roelof-otten
+                            - heading "Roelof Otten Author" [level=3] [ref=e297]:
+                              - generic [ref=e298]: Roelof Otten
+                              - img [ref=e300]:
+                                - img [ref=e301]
+                              - generic [ref=e303]: Author
+                            - generic [ref=e304]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                        - generic [ref=e305]:
+                          - time [ref=e306]: 5mo
+                          - button "Open options for Roelof Otten’s comment" [ref=e309] [cursor=pointer]:
+                            - img "Open options for Roelof Otten’s comment" [ref=e310]
+                      - generic [ref=e312]:
+                        - button [ref=e313] [cursor=pointer]
+                        - generic [ref=e316]:
+                          - generic [ref=e317]:
+                            - generic [ref=e320]:
+                              - text: Another simple option.
+                              - text: Bookmark your ICP and peers in a separate list.
+                              - text: Go through that list every day.
+                              - text: The reason I prefer notifications?
+                              - text: It’s easier.
+                              - text: I get a notification as soon as my ICP or a peer posts.
+                            - button "see more, visually reveals content which is already detected by screen readers" [ref=e321] [cursor=pointer]:
+                              - generic [ref=e322]: …more
+                          - generic [ref=e323]:
+                            - link "Comment image, no alternative text available":
+                              - /url: "#"
+                              - generic:
+                                - generic:
+                                  - img "Comment image, no alternative text available"
+                      - generic [ref=e324]:
+                        - generic [ref=e325]:
+                          - button [ref=e326] [cursor=pointer]
+                          - generic [ref=e328]:
+                            - generic [ref=e329]:
+                              - generic [ref=e330]:
+                                - button "React Like to Roelof Otten’s comment" [ref=e331] [cursor=pointer]:
+                                  - generic [ref=e334]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e336] [cursor=pointer]
+                              - generic [ref=e338]: ·
+                              - button "3 Reactions on Roelof Otten’s comment" [ref=e339] [cursor=pointer]:
+                                - img "love" [ref=e340]
+                                - img "support" [ref=e341]
+                                - generic [ref=e342]: "3"
+                            - generic [ref=e344]:
+                              - button "Reply to Roelof Otten’s comment" [ref=e345] [cursor=pointer]:
+                                - generic [ref=e347]: Reply
+                              - generic [ref=e348]: ·
+                              - generic [ref=e349]: 4 replies
+                              - generic [ref=e350]: 4 Replies on Roelof Otten’s comment
+                        - generic [ref=e351]:
+                          - generic [ref=e352]:
+                            - button [ref=e353] [cursor=pointer]
+                            - button "Load previous replies on Roelof Otten’s comment" [ref=e356] [cursor=pointer]:
+                              - generic [ref=e357]: See previous replies
+                          - generic [ref=e358]:
+                            - button [ref=e359] [cursor=pointer]
+                            - article [ref=e361]:
+                              - generic [ref=e362]:
+                                - generic [ref=e363]:
+                                  - link "View Roelof Otten’s graphic link" [ref=e364] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/roelof-otten
+                                    - img "View Roelof Otten’s graphic link" [ref=e367]
+                                  - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e368] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/roelof-otten
+                                    - heading "Roelof Otten Author" [level=3] [ref=e369]:
+                                      - generic [ref=e370]: Roelof Otten
+                                      - img [ref=e372]:
+                                        - img [ref=e373]
+                                      - generic [ref=e375]: Author
+                                    - generic [ref=e376]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                                - generic [ref=e377]:
+                                  - time [ref=e378]: 5mo
+                                  - button "Open options for Roelof Otten’s comment" [ref=e381] [cursor=pointer]:
+                                    - img "Open options for Roelof Otten’s comment" [ref=e382]
+                              - generic [ref=e392]:
+                                - link "Masud Rana" [ref=e394] [cursor=pointer]:
+                                  - /url: /in/masudthewebwise/
+                                - text: I've been using this for a very long time, but since this algo change I've found it even more usefull
+                              - generic [ref=e399]:
+                                - generic [ref=e401]:
+                                  - button "React Like to Roelof Otten’s comment" [ref=e402] [cursor=pointer]:
+                                    - generic [ref=e405]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=e407] [cursor=pointer]
+                                - button "Reply to Roelof Otten’s comment" [ref=e411] [cursor=pointer]:
+                                  - generic [ref=e413]: Reply
+                    - article [ref=e415]:
+                      - generic [ref=e416]:
+                        - generic [ref=e417]:
+                          - link "View Hristo Butchvarov’s graphic link" [ref=e418] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/hristo-butchvarov
+                            - img "View Hristo Butchvarov’s graphic link" [ref=e421]
+                          - 'link "View: Hristo Butchvarov • 3rd+ Stop looking DIY on LinkedIn. I redesign profiles into premium brands." [ref=e422] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/hristo-butchvarov
+                            - heading "Hristo Butchvarov • 3rd+" [level=3] [ref=e423]:
+                              - generic [ref=e424]: Hristo Butchvarov
+                              - generic [ref=e425]:
+                                - img [ref=e426]:
+                                  - img [ref=e427]
+                                - text: • 3rd+
+                            - generic [ref=e429]: Stop looking DIY on LinkedIn. I redesign profiles into premium brands.
+                        - generic [ref=e430]:
+                          - time [ref=e431]: 5mo
+                          - button "Open options for Hristo Butchvarov’s comment" [ref=e434] [cursor=pointer]:
+                            - img "Open options for Hristo Butchvarov’s comment" [ref=e435]
+                      - generic [ref=e437]:
+                        - button [ref=e438] [cursor=pointer]
+                        - generic [ref=e442]:
+                          - generic [ref=e445]:
+                            - text: I'm using a different strategy because in the notification I can miss something.
+                            - text: I make a custom feed bookmark.
+                            - text: 1. Go to the LinkedIn Search Bar → Hit Enter (without typing anything).
+                            - text: 2. Click Posts → Click All Filters.
+                            - text: 3. Scroll to "From member" → Add 20-30 people (show results after each name)
+                            - text: 4. Scroll to "Date posted" → Select Past 24 hours.
+                            - text: 5. Click Show Results.
+                            - text: 6. Bookmark this URL in your browser bar.
+                            - text: Now you have a personalized feed showing only posts from people who you added.
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=e446] [cursor=pointer]:
+                            - generic [ref=e447]: …more
+                      - generic [ref=e448]:
+                        - generic [ref=e449]:
+                          - button [ref=e450] [cursor=pointer]
+                          - generic [ref=e452]:
+                            - generic [ref=e453]:
+                              - generic [ref=e454]:
+                                - button "React Like to Hristo Butchvarov’s comment" [ref=e455] [cursor=pointer]:
+                                  - generic [ref=e458]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e460] [cursor=pointer]
+                              - generic [ref=e462]: ·
+                              - button "2 Reactions on Hristo Butchvarov’s comment" [ref=e463] [cursor=pointer]:
+                                - img "like" [ref=e464]
+                                - img "celebrate" [ref=e465]
+                                - generic [ref=e466]: "2"
+                            - generic [ref=e468]:
+                              - button "Reply to Hristo Butchvarov’s comment" [ref=e469] [cursor=pointer]:
+                                - generic [ref=e471]: Reply
+                              - generic [ref=e472]: ·
+                              - generic [ref=e473]: 2 replies
+                              - generic [ref=e474]: 2 Replies on Hristo Butchvarov’s comment
+                        - generic [ref=e475]:
+                          - generic [ref=e476]:
+                            - button [ref=e477] [cursor=pointer]
+                            - button "Load previous replies on Hristo Butchvarov’s comment" [ref=e480] [cursor=pointer]:
+                              - generic [ref=e481]: See previous replies
+                          - generic [ref=e482]:
+                            - button [ref=e483] [cursor=pointer]
+                            - article [ref=e485]:
+                              - generic [ref=e486]:
+                                - generic [ref=e487]:
+                                  - link "View Hristo Butchvarov’s graphic link" [ref=e488] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/hristo-butchvarov
+                                    - img "View Hristo Butchvarov’s graphic link" [ref=e491]
+                                  - 'link "View: Hristo Butchvarov • 3rd+ Stop looking DIY on LinkedIn. I redesign profiles into premium brands." [ref=e492] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/hristo-butchvarov
+                                    - heading "Hristo Butchvarov • 3rd+" [level=3] [ref=e493]:
+                                      - generic [ref=e494]: Hristo Butchvarov
+                                      - generic [ref=e495]:
+                                        - img [ref=e496]:
+                                          - img [ref=e497]
+                                        - text: • 3rd+
+                                    - generic [ref=e499]: Stop looking DIY on LinkedIn. I redesign profiles into premium brands.
+                                - generic [ref=e500]:
+                                  - time [ref=e501]: 5mo
+                                  - button "Open options for Hristo Butchvarov’s comment" [ref=e504] [cursor=pointer]:
+                                    - img "Open options for Hristo Butchvarov’s comment" [ref=e505]
+                              - generic [ref=e515]:
+                                - link "Roelof Otten" [ref=e517] [cursor=pointer]:
+                                  - /url: /in/roelof-otten/
+                                - text: Hahaha. You too, man. And I'm using both. My custom and my regular feed. I definitely need both.
+                              - generic [ref=e522]:
+                                - generic [ref=e524]:
+                                  - button "React Like to Hristo Butchvarov’s comment" [ref=e525] [cursor=pointer]:
+                                    - generic [ref=e528]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=e530] [cursor=pointer]
+                                - button "Reply to Hristo Butchvarov’s comment" [ref=e534] [cursor=pointer]:
+                                  - generic [ref=e536]: Reply
+                    - article [ref=e538]:
+                      - generic [ref=e539]:
+                        - generic [ref=e540]:
+                          - link "View Shane Elahi’s graphic link" [ref=e541] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/shane-elahi-22a46835
+                            - img "View Shane Elahi’s graphic link" [ref=e544]
+                          - 'link "View: Shane Elahi • 3rd+ Co-Founder &amp; COO @ Software Finder | Sales Pipeline Enhancement" [ref=e545] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/shane-elahi-22a46835
+                            - heading "Shane Elahi • 3rd+" [level=3] [ref=e546]:
+                              - generic [ref=e547]: Shane Elahi
+                              - generic [ref=e548]:
+                                - img [ref=e549]
+                                - text: • 3rd+
+                            - generic [ref=e551]: Co-Founder & COO @ Software Finder | Sales Pipeline Enhancement
+                        - generic [ref=e552]:
+                          - time [ref=e553]: 5mo
+                          - button "Open options for Shane Elahi’s comment" [ref=e556] [cursor=pointer]:
+                            - img "Open options for Shane Elahi’s comment" [ref=e557]
+                      - generic [ref=e559]:
+                        - button [ref=e560] [cursor=pointer]
+                        - generic [ref=e567]: Feed relevance is no longer passive; creators must actively curate visibility through intentional engagement.
+                      - generic [ref=e568]:
+                        - generic [ref=e569]:
+                          - button [ref=e570] [cursor=pointer]
+                          - generic [ref=e572]:
+                            - generic [ref=e573]:
+                              - generic [ref=e574]:
+                                - button "React Like to Shane Elahi’s comment" [ref=e575] [cursor=pointer]:
+                                  - generic [ref=e578]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e580] [cursor=pointer]
+                              - generic [ref=e582]: ·
+                              - button "1 Reaction on Shane Elahi’s comment" [ref=e583] [cursor=pointer]:
+                                - img "like" [ref=e584]
+                                - generic [ref=e585]: "1"
+                            - generic [ref=e587]:
+                              - button "Reply to Shane Elahi’s comment" [ref=e588] [cursor=pointer]:
+                                - generic [ref=e590]: Reply
+                              - generic [ref=e591]: ·
+                              - generic [ref=e592]: 1 reply
+                              - generic [ref=e593]: 1 Comment on Shane Elahi’s comment
+                        - generic [ref=e595]:
+                          - button [ref=e596] [cursor=pointer]
+                          - article [ref=e598]:
+                            - generic [ref=e599]:
+                              - generic [ref=e600]:
+                                - link "View Roelof Otten’s graphic link" [ref=e601] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - img "View Roelof Otten’s graphic link" [ref=e604]
+                                - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e605] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - heading "Roelof Otten Author" [level=3] [ref=e606]:
+                                    - generic [ref=e607]: Roelof Otten
+                                    - img [ref=e609]:
+                                      - img [ref=e610]
+                                    - generic [ref=e612]: Author
+                                  - generic [ref=e613]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                              - generic [ref=e614]:
+                                - time [ref=e615]: 5mo
+                                - button "Open options for Roelof Otten’s comment" [ref=e618] [cursor=pointer]:
+                                  - img "Open options for Roelof Otten’s comment" [ref=e619]
+                            - generic [ref=e629]:
+                              - link "Shane Elahi" [ref=e631] [cursor=pointer]:
+                                - /url: /in/shane-elahi-22a46835/
+                              - text: ", that's exactly how it works today."
+                            - generic [ref=e636]:
+                              - generic [ref=e638]:
+                                - button "React Like to Roelof Otten’s comment" [ref=e639] [cursor=pointer]:
+                                  - generic [ref=e642]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e644] [cursor=pointer]
+                              - button "Reply to Roelof Otten’s comment" [ref=e648] [cursor=pointer]:
+                                - generic [ref=e650]: Reply
+                    - article [ref=e652]:
+                      - generic [ref=e653]:
+                        - generic [ref=e654]:
+                          - link "View Muniba Nawaz’s graphic link" [ref=e655] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/muniba-nawaz
+                            - img "View Muniba Nawaz’s graphic link" [ref=e658]
+                          - 'link "View: Muniba Nawaz • 3rd+ I build websites + GHL funnels that turn clicks into booked calls | Web Developer &amp; GoHighLevel Specialist | Serving coaches, agencies &amp; service businesses." [ref=e659] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/muniba-nawaz
+                            - heading "Muniba Nawaz • 3rd+" [level=3] [ref=e660]:
+                              - generic [ref=e661]: Muniba Nawaz
+                              - generic [ref=e662]:
+                                - img [ref=e663]
+                                - text: • 3rd+
+                            - generic [ref=e665]: I build websites + GHL funnels that turn clicks into booked calls | Web Developer & GoHighLevel Specialist | Serving coaches, agencies & service businesses.
+                        - generic [ref=e666]:
+                          - time [ref=e667]: 5mo
+                          - button "Open options for Muniba Nawaz’s comment" [ref=e670] [cursor=pointer]:
+                            - img "Open options for Muniba Nawaz’s comment" [ref=e671]
+                      - generic [ref=e673]:
+                        - button [ref=e674] [cursor=pointer]
+                        - generic [ref=e678]:
+                          - generic [ref=e681]:
+                            - text: This is such an underrated point 👏 People obsess over reach, but comments still cut through the algorithm.
+                            - text: Smart reminder that you can train your feed (and visibility) instead of fighting it. Definitely trying the bell + comment combo 🔔💬
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=e682] [cursor=pointer]:
+                            - generic [ref=e683]: …more
+                      - generic [ref=e684]:
+                        - generic [ref=e685]:
+                          - button [ref=e686] [cursor=pointer]
+                          - generic [ref=e688]:
+                            - generic [ref=e689]:
+                              - generic [ref=e690]:
+                                - button "React Like to Muniba Nawaz’s comment" [ref=e691] [cursor=pointer]:
+                                  - generic [ref=e694]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e696] [cursor=pointer]
+                              - generic [ref=e698]: ·
+                              - button "1 Reaction on Muniba Nawaz’s comment" [ref=e699] [cursor=pointer]:
+                                - img "love" [ref=e700]
+                                - generic [ref=e701]: "1"
+                            - generic [ref=e703]:
+                              - button "Reply to Muniba Nawaz’s comment" [ref=e704] [cursor=pointer]:
+                                - generic [ref=e706]: Reply
+                              - generic [ref=e707]: ·
+                              - generic [ref=e708]: 1 reply
+                              - generic [ref=e709]: 1 Comment on Muniba Nawaz’s comment
+                        - generic [ref=e711]:
+                          - button [ref=e712] [cursor=pointer]
+                          - article [ref=e714]:
+                            - generic [ref=e715]:
+                              - generic [ref=e716]:
+                                - link "View Roelof Otten’s graphic link" [ref=e717] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - img "View Roelof Otten’s graphic link" [ref=e720]
+                                - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e721] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - heading "Roelof Otten Author" [level=3] [ref=e722]:
+                                    - generic [ref=e723]: Roelof Otten
+                                    - img [ref=e725]:
+                                      - img [ref=e726]
+                                    - generic [ref=e728]: Author
+                                  - generic [ref=e729]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                              - generic [ref=e730]:
+                                - time [ref=e731]: 5mo
+                                - button "Open options for Roelof Otten’s comment" [ref=e734] [cursor=pointer]:
+                                  - img "Open options for Roelof Otten’s comment" [ref=e735]
+                            - generic [ref=e745]:
+                              - link "Muniba Nawaz" [ref=e747] [cursor=pointer]:
+                                - /url: /in/muniba-nawaz/
+                              - text: like the way you put it. Training your feed on the content that you want to see. lmk how it works out for you
+                            - generic [ref=e752]:
+                              - generic [ref=e754]:
+                                - button "React Like to Roelof Otten’s comment" [ref=e755] [cursor=pointer]:
+                                  - generic [ref=e758]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e760] [cursor=pointer]
+                              - button "Reply to Roelof Otten’s comment" [ref=e764] [cursor=pointer]:
+                                - generic [ref=e766]: Reply
+                    - article [ref=e768]:
+                      - generic [ref=e769]:
+                        - generic [ref=e770]:
+                          - link "View Emanuel Bagerakis’ graphic link" [ref=e771] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/emanuel-bagerakis
+                            - img "View Emanuel Bagerakis’ graphic link" [ref=e774]
+                          - 'link "View: Emanuel Bagerakis • 3rd+ Helping entrepreneurs visualize and communicate their expertise so it spreads and grows their business" [ref=e775] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/emanuel-bagerakis
+                            - heading "Emanuel Bagerakis • 3rd+" [level=3] [ref=e776]:
+                              - generic [ref=e777]: Emanuel Bagerakis
+                              - generic [ref=e778]:
+                                - img [ref=e779]:
+                                  - img [ref=e780]
+                                - text: • 3rd+
+                            - generic [ref=e782]: Helping entrepreneurs visualize and communicate their expertise so it spreads and grows their business
+                        - generic [ref=e783]:
+                          - time [ref=e784]: 5mo
+                          - button "Open options for Emanuel Bagerakis’ comment" [ref=e787] [cursor=pointer]:
+                            - img "Open options for Emanuel Bagerakis’ comment" [ref=e788]
+                      - generic [ref=e790]:
+                        - button [ref=e791] [cursor=pointer]
+                        - generic [ref=e795]:
+                          - generic [ref=e798]:
+                            - text: I was talking about this with a prospect the other day.
+                            - text: To add to your tip, what I told him was to start using a bit of warm outreach as well not to rely only on the content to reach his ICP.
+                            - text: And use a new visual content system in the content to build authority assets for when the ICP notices his content
+                          - button "see more, visually reveals content which is already detected by screen readers" [ref=e799] [cursor=pointer]:
+                            - generic [ref=e800]: …more
+                      - generic [ref=e801]:
+                        - generic [ref=e802]:
+                          - button [ref=e803] [cursor=pointer]
+                          - generic [ref=e805]:
+                            - generic [ref=e806]:
+                              - generic [ref=e807]:
+                                - button "React Like to Emanuel Bagerakis’ comment" [ref=e808] [cursor=pointer]:
+                                  - generic [ref=e811]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e813] [cursor=pointer]
+                              - generic [ref=e815]: ·
+                              - button "1 Reaction on Emanuel Bagerakis’ comment" [ref=e816] [cursor=pointer]:
+                                - img "celebrate" [ref=e817]
+                                - generic [ref=e818]: "1"
+                            - generic [ref=e820]:
+                              - button "Reply to Emanuel Bagerakis’ comment" [ref=e821] [cursor=pointer]:
+                                - generic [ref=e823]: Reply
+                              - generic [ref=e824]: ·
+                              - generic [ref=e825]: 2 replies
+                              - generic [ref=e826]: 2 Replies on Emanuel Bagerakis’ comment
+                        - generic [ref=e827]:
+                          - generic [ref=e828]:
+                            - button [ref=e829] [cursor=pointer]
+                            - button "Load previous replies on Emanuel Bagerakis’ comment" [ref=e832] [cursor=pointer]:
+                              - generic [ref=e833]: See previous replies
+                          - generic [ref=e834]:
+                            - button [ref=e835] [cursor=pointer]
+                            - article [ref=e837]:
+                              - generic [ref=e838]:
+                                - generic [ref=e839]:
+                                  - link "View Emanuel Bagerakis’ graphic link" [ref=e840] [cursor=pointer]:
+                                    - /url: https://www.linkedin.com/in/emanuel-bagerakis
+                                    - img "View Emanuel Bagerakis’ graphic link" [ref=e843]
+                                  - 'link "View: Emanuel Bagerakis • 3rd+ Helping entrepreneurs visualize and communicate their expertise so it spreads and grows their business" [ref=e844] [cursor=pointer]':
+                                    - /url: https://www.linkedin.com/in/emanuel-bagerakis
+                                    - heading "Emanuel Bagerakis • 3rd+" [level=3] [ref=e845]:
+                                      - generic [ref=e846]: Emanuel Bagerakis
+                                      - generic [ref=e847]:
+                                        - img [ref=e848]:
+                                          - img [ref=e849]
+                                        - text: • 3rd+
+                                    - generic [ref=e851]: Helping entrepreneurs visualize and communicate their expertise so it spreads and grows their business
+                                - generic [ref=e852]:
+                                  - time [ref=e853]: 5mo
+                                  - button "Open options for Emanuel Bagerakis’ comment" [ref=e856] [cursor=pointer]:
+                                    - img "Open options for Emanuel Bagerakis’ comment" [ref=e857]
+                              - generic [ref=e867]:
+                                - link "Roelof Otten" [ref=e869] [cursor=pointer]:
+                                  - /url: /in/roelof-otten/
+                                - text: proactivity, that's the word for having success here haha
+                              - generic [ref=e874]:
+                                - generic [ref=e876]:
+                                  - button "React Like to Emanuel Bagerakis’ comment" [ref=e877] [cursor=pointer]:
+                                    - generic [ref=e880]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=e882] [cursor=pointer]
+                                - button "Reply to Emanuel Bagerakis’ comment" [ref=e886] [cursor=pointer]:
+                                  - generic [ref=e888]: Reply
+                    - article [ref=e890]:
+                      - generic [ref=e891]:
+                        - generic [ref=e892]:
+                          - link "View Shristi Gautam’s graphic link" [ref=e893] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/shristi-growthmarketer
+                            - img "View Shristi Gautam’s graphic link" [ref=e896]
+                          - 'link "View: Shristi Gautam • 3rd+ Digital Marketer | SEO, Google Ads, Meta Ads | Growth Strategy for Founders" [ref=e897] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/shristi-growthmarketer
+                            - heading "Shristi Gautam • 3rd+" [level=3] [ref=e898]:
+                              - generic [ref=e899]: Shristi Gautam
+                              - generic [ref=e900]:
+                                - img [ref=e901]
+                                - text: • 3rd+
+                            - generic [ref=e903]: Digital Marketer | SEO, Google Ads, Meta Ads | Growth Strategy for Founders
+                        - generic [ref=e904]:
+                          - time [ref=e905]: 5mo
+                          - button "Open options for Shristi Gautam’s comment" [ref=e908] [cursor=pointer]:
+                            - img "Open options for Shristi Gautam’s comment" [ref=e909]
+                      - generic [ref=e911]:
+                        - button [ref=e912] [cursor=pointer]
+                        - generic [ref=e919]:
+                          - text: This is the same principle we apply at
+                          - link "Connecttly" [ref=e920] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/company/connecttly-growth/
+                            - generic [ref=e922]: Connecttly
+                          - text: ", don’t wait to be shown to the right people, intentionally show up where they already are."
+                      - generic [ref=e923]:
+                        - generic [ref=e924]:
+                          - button [ref=e925] [cursor=pointer]
+                          - generic [ref=e927]:
+                            - generic [ref=e928]:
+                              - generic [ref=e929]:
+                                - button "React Like to Shristi Gautam’s comment" [ref=e930] [cursor=pointer]:
+                                  - generic [ref=e933]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e935] [cursor=pointer]
+                              - generic [ref=e937]: ·
+                              - button "1 Reaction on Shristi Gautam’s comment" [ref=e938] [cursor=pointer]:
+                                - img "celebrate" [ref=e939]
+                                - generic [ref=e940]: "1"
+                            - generic [ref=e942]:
+                              - button "Reply to Shristi Gautam’s comment" [ref=e943] [cursor=pointer]:
+                                - generic [ref=e945]: Reply
+                              - generic [ref=e946]: ·
+                              - generic [ref=e947]: 1 reply
+                              - generic [ref=e948]: 1 Comment on Shristi Gautam’s comment
+                        - generic [ref=e950]:
+                          - button [ref=e951] [cursor=pointer]
+                          - article [ref=e953]:
+                            - generic [ref=e954]:
+                              - generic [ref=e955]:
+                                - link "View Roelof Otten’s graphic link" [ref=e956] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - img "View Roelof Otten’s graphic link" [ref=e959]
+                                - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e960] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - heading "Roelof Otten Author" [level=3] [ref=e961]:
+                                    - generic [ref=e962]: Roelof Otten
+                                    - img [ref=e964]:
+                                      - img [ref=e965]
+                                    - generic [ref=e967]: Author
+                                  - generic [ref=e968]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                              - generic [ref=e969]:
+                                - time [ref=e970]: 5mo
+                                - button "Open options for Roelof Otten’s comment" [ref=e973] [cursor=pointer]:
+                                  - img "Open options for Roelof Otten’s comment" [ref=e974]
+                            - generic [ref=e984]:
+                              - link "Shristi Gautam" [ref=e986] [cursor=pointer]:
+                                - /url: /in/shristi-growthmarketer/
+                              - text: that the right mindset 💪
+                            - generic [ref=e991]:
+                              - generic [ref=e993]:
+                                - button "React Like to Roelof Otten’s comment" [ref=e994] [cursor=pointer]:
+                                  - generic [ref=e997]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e999] [cursor=pointer]
+                              - button "Reply to Roelof Otten’s comment" [ref=e1003] [cursor=pointer]:
+                                - generic [ref=e1005]: Reply
+                    - article [ref=e1007]:
+                      - generic [ref=e1008]:
+                        - generic [ref=e1009]:
+                          - link "View Mahnaz Mansouri’s open to work graphic link" [ref=e1010] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/mahnaz-mansouri
+                            - img "View Mahnaz Mansouri’s open to work graphic link" [ref=e1013]
+                          - 'link "View: Mahnaz Mansouri • 3rd+ Business Operations &amp; ERP Support | Eerstegraads Docent Engels (DUO NL) | Onderwijscoördinatie | Back Office | B2B Operations" [ref=e1014] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/mahnaz-mansouri
+                            - heading "Mahnaz Mansouri • 3rd+" [level=3] [ref=e1015]:
+                              - generic [ref=e1016]: Mahnaz Mansouri
+                              - generic [ref=e1017]:
+                                - img [ref=e1018]
+                                - text: • 3rd+
+                            - generic [ref=e1020]: Business Operations & ERP Support | Eerstegraads Docent Engels (DUO NL) | Onderwijscoördinatie | Back Office | B2B Operations
+                        - generic [ref=e1021]:
+                          - time [ref=e1022]: 4mo
+                          - button "Open options for Mahnaz Mansouri’s comment" [ref=e1025] [cursor=pointer]:
+                            - img "Open options for Mahnaz Mansouri’s comment" [ref=e1026]
+                      - generic [ref=e1033]:
+                        - generic [ref=e1036]:
+                          - text: This is a very practical breakdown of what’s actually happening behind the feed changes. The “bucket” shift explains a lot of the visibility frustration people are feeling.
+                          - text: Great reminder that while posts may get filtered, comments are still a powerful distribution channel to reach your ICP directly. Simple, actionable, and easy to test—thanks for sharing this workaround.
+                        - button "see more, visually reveals content which is already detected by screen readers" [ref=e1037] [cursor=pointer]:
+                          - generic [ref=e1038]: …more
+                      - generic [ref=e1043]:
+                        - generic [ref=e1045]:
+                          - button "React Like to Mahnaz Mansouri’s comment" [ref=e1046] [cursor=pointer]:
+                            - generic [ref=e1049]: Like
+                          - button "Open reactions menu":
+                            - img [ref=e1051] [cursor=pointer]
+                        - button "Reply to Mahnaz Mansouri’s comment" [ref=e1055] [cursor=pointer]:
+                          - generic [ref=e1057]: Reply
+                    - article [ref=e1059]:
+                      - generic [ref=e1060]:
+                        - generic [ref=e1061]:
+                          - link "View Simon Schmitz’s graphic link" [ref=e1062] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/simon-schmitz-tx
+                            - img "View Simon Schmitz’s graphic link" [ref=e1065]
+                          - 'link "View: Simon Schmitz • 3rd+ Positioning strategy for AI-native B2Bs | Making ‘AI-powered’ actually mean something" [ref=e1066] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/simon-schmitz-tx
+                            - heading "Simon Schmitz • 3rd+" [level=3] [ref=e1067]:
+                              - generic [ref=e1068]: Simon Schmitz
+                              - generic [ref=e1069]:
+                                - img [ref=e1070]
+                                - text: • 3rd+
+                            - generic [ref=e1072]: Positioning strategy for AI-native B2Bs | Making ‘AI-powered’ actually mean something
+                        - generic [ref=e1073]:
+                          - time [ref=e1074]: 5mo
+                          - button "Open options for Simon Schmitz’s comment" [ref=e1077] [cursor=pointer]:
+                            - img "Open options for Simon Schmitz’s comment" [ref=e1078]
+                      - generic [ref=e1085]:
+                        - generic [ref=e1088]: I have the same exact problem! My following is mostly comprised of people looking for help with LinkedIn tactics, when my actual content is mostly about positioning and messaging clarity as it relates to content. I've been weeding out my feed, and it has helped to some extent, but it's still not where I want it to be.
+                        - button "see more, visually reveals content which is already detected by screen readers" [ref=e1089] [cursor=pointer]:
+                          - generic [ref=e1090]: …more
+                      - generic [ref=e1095]:
+                        - generic [ref=e1097]:
+                          - button "React Like to Simon Schmitz’s comment" [ref=e1098] [cursor=pointer]:
+                            - generic [ref=e1101]: Like
+                          - button "Open reactions menu":
+                            - img [ref=e1103] [cursor=pointer]
+                        - button "Reply to Simon Schmitz’s comment" [ref=e1107] [cursor=pointer]:
+                          - generic [ref=e1109]: Reply
+                    - article [ref=e1111]:
+                      - generic [ref=e1112]:
+                        - generic [ref=e1113]:
+                          - link "View Md Ismail H.’s graphic link" [ref=e1114] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/ismailuiux36
+                            - img "View Md Ismail H.’s graphic link" [ref=e1117]
+                          - 'link "View: Md Ismail H. • 3rd+ UI/UX &amp; Product Designer | Websites, Mobile Apps &amp; Dashboards | Helping Startups &amp; Founders Improve User Experience" [ref=e1118] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/ismailuiux36
+                            - heading "Md Ismail H. • 3rd+" [level=3] [ref=e1119]:
+                              - generic [ref=e1120]: Md Ismail H.
+                              - generic [ref=e1121]:
+                                - img [ref=e1122]
+                                - text: • 3rd+
+                            - generic [ref=e1124]: UI/UX & Product Designer | Websites, Mobile Apps & Dashboards | Helping Startups & Founders Improve User Experience
+                        - generic [ref=e1125]:
+                          - generic [ref=e1126]: (edited)
+                          - time [ref=e1127]: 5mo
+                          - button "Open options for Md Ismail H.’s comment" [ref=e1130] [cursor=pointer]:
+                            - img "Open options for Md Ismail H.’s comment" [ref=e1131]
+                      - generic [ref=e1141]:
+                        - text: The “different bucket” point is the missing explanation behind 90% of “impressions are down” panic. Bells + intentional comments is such a practical workaround (and honestly more reliable than praying for reach).
+                        - link "Roelof Otten" [ref=e1143] [cursor=pointer]:
+                          - /url: /in/roelof-otten/
+                      - generic [ref=e1148]:
+                        - generic [ref=e1150]:
+                          - button "React Like to Md Ismail H.’s comment" [ref=e1151] [cursor=pointer]:
+                            - generic [ref=e1154]: Like
+                          - button "Open reactions menu":
+                            - img [ref=e1156] [cursor=pointer]
+                        - button "Reply to Md Ismail H.’s comment" [ref=e1160] [cursor=pointer]:
+                          - generic [ref=e1162]: Reply
+                    - article [ref=e1164]:
+                      - generic [ref=e1165]:
+                        - generic [ref=e1166]:
+                          - link "View DUA FATIMA’s graphic link" [ref=e1167] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/duafatimapk
+                            - img "View DUA FATIMA’s graphic link" [ref=e1170]
+                          - 'link "View: DUA FATIMA • 3rd+ Helping Businesses Build &amp; Position Strong Brands | SMM, Brand Setup, Consultation &amp; Strategy | 3+ Years • 60M+ Combined Reach" [ref=e1171] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/duafatimapk
+                            - heading "DUA FATIMA • 3rd+" [level=3] [ref=e1172]:
+                              - generic [ref=e1173]: DUA FATIMA
+                              - generic [ref=e1174]: • 3rd+
+                            - generic [ref=e1175]: Helping Businesses Build & Position Strong Brands | SMM, Brand Setup, Consultation & Strategy | 3+ Years • 60M+ Combined Reach
+                        - generic [ref=e1176]:
+                          - time [ref=e1177]: 5mo
+                          - button "Open options for DUA FATIMA’s comment" [ref=e1180] [cursor=pointer]:
+                            - img "Open options for DUA FATIMA’s comment" [ref=e1181]
+                      - generic [ref=e1183]:
+                        - button [ref=e1184] [cursor=pointer]
+                        - generic [ref=e1191]: Buckets shift, but attention can be rerouted. Using comments to bypass feed limitations is a smart move.
+                      - generic [ref=e1192]:
+                        - generic [ref=e1193]:
+                          - button [ref=e1194] [cursor=pointer]
+                          - generic [ref=e1196]:
+                            - generic [ref=e1197]:
+                              - generic [ref=e1198]:
+                                - button "React Like to DUA FATIMA’s comment" [ref=e1199] [cursor=pointer]:
+                                  - generic [ref=e1202]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e1204] [cursor=pointer]
+                              - generic [ref=e1206]: ·
+                              - button "1 Reaction on DUA FATIMA’s comment" [ref=e1207] [cursor=pointer]:
+                                - img "celebrate" [ref=e1208]
+                                - generic [ref=e1209]: "1"
+                            - generic [ref=e1211]:
+                              - button "Reply to DUA FATIMA’s comment" [ref=e1212] [cursor=pointer]:
+                                - generic [ref=e1214]: Reply
+                              - generic [ref=e1215]: ·
+                              - generic [ref=e1216]: 1 reply
+                              - generic [ref=e1217]: 1 Comment on DUA FATIMA’s comment
+                        - generic [ref=e1219]:
+                          - button [ref=e1220] [cursor=pointer]
+                          - article [ref=e1222]:
+                            - generic [ref=e1223]:
+                              - generic [ref=e1224]:
+                                - link "View Roelof Otten’s graphic link" [ref=e1225] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - img "View Roelof Otten’s graphic link" [ref=e1228]
+                                - 'link "View: Roelof Otten Author, Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com" [ref=e1229] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/roelof-otten
+                                  - heading "Roelof Otten Author" [level=3] [ref=e1230]:
+                                    - generic [ref=e1231]: Roelof Otten
+                                    - img [ref=e1233]:
+                                      - img [ref=e1234]
+                                    - generic [ref=e1236]: Author
+                                  - generic [ref=e1237]: Selling the system that made me € 300K+ through LinkedIn for €99 → saasmeister.com
+                              - generic [ref=e1238]:
+                                - time [ref=e1239]: 5mo
+                                - button "Open options for Roelof Otten’s comment" [ref=e1242] [cursor=pointer]:
+                                  - img "Open options for Roelof Otten’s comment" [ref=e1243]
+                            - generic [ref=e1253]:
+                              - link "DUA FATIMA" [ref=e1255] [cursor=pointer]:
+                                - /url: /in/duafatimapk/
+                              - text: you got it
+                            - generic [ref=e1260]:
+                              - generic [ref=e1262]:
+                                - button "React Like to Roelof Otten’s comment" [ref=e1263] [cursor=pointer]:
+                                  - generic [ref=e1266]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e1268] [cursor=pointer]
+                              - button "Reply to Roelof Otten’s comment" [ref=e1272] [cursor=pointer]:
+                                - generic [ref=e1274]: Reply
+                  - generic [ref=e1275]:
+                    - button "Load more comments" [ref=e1276] [cursor=pointer]:
+                      - img [ref=e1277]
+                    - button "Load more comments" [ref=e1280] [cursor=pointer]:
+                      - generic [ref=e1281]: Load more comments
+      - complementary "Advertisement and similar pages" [ref=e1282]:
+        - generic "LinkedIn Footer Content" [ref=e1285]:
+          - generic [ref=e1286]:
+            - list
+            - generic [ref=e1287]:
+              - img "LinkedIn" [ref=e1288]:
+                - img [ref=e1289]
+              - text: LinkedIn Corporation © 2026
+    - generic:
+      - generic:
+        - complementary:
+          - generic [ref=e1292]:
+            - generic [ref=e1294] [cursor=pointer]:
+              - img "Brian Huntington" [ref=e1296]
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=e1297]:
+                - generic [ref=e1298]:
+                  - generic [ref=e1299]: Messaging
+                  - generic [ref=e1300]: You are on the messaging overlay. Press enter to open the list of conversations.
+            - generic [ref=e1301]:
+              - button "Open messenger dropdown menu" [ref=e1303] [cursor=pointer]:
+                - img "Open messenger dropdown menu" [ref=e1304]
+              - button "Compose message" [ref=e1307] [cursor=pointer]:
+                - img [ref=e1308]
+                - generic [ref=e1310]: Compose message
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=e1311] [cursor=pointer]:
+                - img [ref=e1312]
+                - generic [ref=e1314]: You are on the messaging overlay. Press enter to open the list of conversations.
+        - complementary "AI-powered assistant to get help with your career, jobs etc"
+  - region [ref=e1315]

@@ -1,0 +1,908 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - region "Toast message":
+      - heading "0 notifications total" [level=2] [ref=e3]
+      - alert
+  - region [ref=e4]
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - heading "Update to our terms and data use" [level=1] [ref=e9]
+      - paragraph [ref=e11]:
+        - text: As of November 3, 2025, we are using some of your LinkedIn data to improve the content-generating AI that enhances your experience, unless you opt out in your
+        - link "settings" [ref=e12] [cursor=pointer]:
+          - /url: https://www.linkedin.com/mypreferences/d/settings/data-for-ai-improvement
+        - text: . We also updated our terms. See what’s new and how to manage your data.
+        - link "Learn more" [ref=e13] [cursor=pointer]:
+          - /url: https://www.linkedin.com/help/linkedin/answer/a8059228
+    - button "Dismiss" [ref=e14] [cursor=pointer]:
+      - img [ref=e15]
+      - generic [ref=e17]: Dismiss
+  - generic [ref=e18]:
+    - generic [ref=e20]:
+      - button "Skip to search" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: Skip to search
+      - button "Skip to main content" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: Skip to main content
+      - button "Keyboard shortcuts" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: Keyboard shortcuts
+      - button "Close jump menu" [ref=e27] [cursor=pointer]:
+        - img [ref=e28]
+        - generic [ref=e30]: Close jump menu
+    - banner "Global Navigation" [ref=e31]:
+      - generic [ref=e32]:
+        - link "LinkedIn" [ref=e33] [cursor=pointer]:
+          - /url: https://www.linkedin.com/feed/?nis=true
+          - img "LinkedIn" [ref=e36]:
+            - img [ref=e37]
+        - button "Click to start a search" [ref=e41] [cursor=pointer]:
+          - img [ref=e43]
+          - generic [ref=e45]: Search
+        - navigation "Primary Navigation" [ref=e46]:
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - link "new feed updates notifications Home" [ref=e49] [cursor=pointer]:
+                - /url: https://www.linkedin.com/feed/?nis=true&
+                - generic [ref=e50]:
+                  - generic [ref=e53]: new feed updates notifications
+                  - img [ref=e57]
+                - generic "Home" [ref=e59]
+            - listitem [ref=e60]:
+              - link "My Network" [ref=e61] [cursor=pointer]:
+                - /url: https://www.linkedin.com/mynetwork/?
+                - img [ref=e65]
+                - generic "My Network" [ref=e67]
+            - listitem [ref=e68]:
+              - link "Jobs" [ref=e69] [cursor=pointer]:
+                - /url: https://www.linkedin.com/jobs/?
+                - img [ref=e73]
+                - generic "Jobs" [ref=e75]
+            - listitem [ref=e76]:
+              - link "Messaging" [ref=e77] [cursor=pointer]:
+                - /url: https://www.linkedin.com/messaging/?
+                - img [ref=e81]
+                - generic "Messaging" [ref=e83]
+            - listitem [ref=e84]:
+              - link "1 new notification Notifications" [ref=e85] [cursor=pointer]:
+                - /url: https://www.linkedin.com/notifications/?
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - generic [ref=e88]: "1"
+                    - generic [ref=e89]: 1 new notification
+                  - img [ref=e93]
+                - generic "Notifications" [ref=e95]
+            - listitem [ref=e96]:
+              - button "Brian Huntington Me" [ref=e98] [cursor=pointer]:
+                - img "Brian Huntington" [ref=e99]
+                - generic [ref=e100]:
+                  - text: Me
+                  - img [ref=e101]
+            - listitem [ref=e103]:
+              - button "For Business" [ref=e105] [cursor=pointer]:
+                - img [ref=e109]
+                - generic "For Business" [ref=e111]:
+                  - text: For Business
+                  - img [ref=e112]
+            - listitem [ref=e114]:
+              - link "Try Premium for €0" [ref=e116] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=e117]:
+                  - img [ref=e118]
+                  - generic [ref=e120]: Try Premium for €0
+    - generic [ref=e126]:
+      - complementary "User profile" [ref=e127]:
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - link "Default background" [ref=e1200] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+            - link "Photo of Brian Huntington" [ref=e1202] [cursor=pointer]:
+              - /url: /in/brian-huntington-11820b2a4/
+              - img "Photo of Brian Huntington" [ref=e1203]
+            - generic [ref=e1204]:
+              - link "Brian Huntington Student at Dublin City University Dundalk, County Louth" [ref=e1205] [cursor=pointer]:
+                - /url: /in/brian-huntington-11820b2a4/
+                - heading "Brian Huntington" [level=3] [ref=e1207]
+                - paragraph [ref=e1208]: Student at Dublin City University
+                - paragraph [ref=e1209]: Dundalk, County Louth
+              - button "Add Experience" [ref=e1210] [cursor=pointer]:
+                - generic [ref=e1211]:
+                  - img [ref=e1212]
+                  - generic [ref=e1214]: Experience
+          - link "Access exclusive tools & insights Try Premium for €0" [ref=e1216] [cursor=pointer]:
+            - /url: http://www.linkedin.com/premium/products/?upsellOrderOrigin=Tracking%3Av1%3Apremium_homepage_identity_upsell%3ANav%3AIn-Product&referenceId=%2F%2FtemukLRP2X%2B%2Fyk99c8%2Fg%3D%3D&isSS=true&upsellSlotId=IDENTITY_MODULE&destRedirectURL=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fobeidullahlinkedindesigner_most-linkedin-content-doesnt-fail-because-activity-7469682896946036736-WWeB%2F%3Futm_source%3Dsocial_share_send%26utm_medium%3Dmember_desktop_web%26rcm%3DACoAADHA-9cBJKNcAH4ACwbwtw5U2LtOJxMO-rw
+            - heading "Access exclusive tools & insights" [level=3] [ref=e1217]
+            - generic [ref=e1218]:
+              - img [ref=e1219]
+              - generic [ref=e1221]: Try Premium for €0
+          - list [ref=e141]:
+            - listitem [ref=e142]:
+              - link "Connections Grow your network Grow your network by adding connections." [ref=e143] [cursor=pointer]:
+                - /url: /mynetwork/
+                - generic [ref=e144]:
+                  - generic [ref=e145]:
+                    - generic [ref=e146]: Connections
+                    - generic [ref=e147]: Grow your network
+                  - img "Grow your network by adding connections." [ref=e149]
+      - main "Feed detail update" [ref=e150]:
+        - heading "Feed detail update" [level=1] [ref=e151]
+        - generic "Update container" [ref=e152]:
+          - article [ref=e156]:
+            - generic [ref=e158]:
+              - heading "Feed post" [level=2] [ref=e159]
+              - generic [ref=e160]:
+                - generic [ref=e161]:
+                  - generic [ref=e162]:
+                    - generic [ref=e163]:
+                      - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e164] [cursor=pointer]:
+                        - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAEA1SeUBRMJuZg3Ctj0317HFJaaK1aYQlXA
+                        - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e168]
+                      - generic [ref=e169]:
+                        - 'link "View: Muhammad Obeidullah Siddiqui Premium • 3rd+ I make your LinkedIn speak in visuals." [ref=e170] [cursor=pointer]':
+                          - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAEA1SeUBRMJuZg3Ctj0317HFJaaK1aYQlXA
+                          - generic [ref=e171]:
+                            - generic [ref=e174]: Muhammad Obeidullah Siddiqui
+                            - generic [ref=e176]:
+                              - img [ref=e177]:
+                                - img [ref=e178]
+                              - text: • 3rd+
+                          - generic [ref=e181]: I make your LinkedIn speak in visuals.
+                        - link "Visit my website" [ref=e182] [cursor=pointer]:
+                          - /url: https://obiicreatives.com/
+                          - generic [ref=e183]: Visit my website
+                        - generic [ref=e185]:
+                          - text: 3w •
+                          - img [ref=e188]
+                    - button "Follow Muhammad Obeidullah Siddiqui" [ref=e190] [cursor=pointer]:
+                      - img [ref=e191]
+                      - generic [ref=e193]: Follow
+                  - button "Open control menu for post by Muhammad Obeidullah Siddiqui" [ref=e196] [cursor=pointer]:
+                    - img [ref=e197]
+                - generic [ref=e203]:
+                  - text: Most LinkedIn content doesn’t fail because it’s bad
+                  - text: It fails because it never reaches the people it was written for
+                  - text: "Here's what most creators get wrong:"
+                  - text: They chase likes before quality
+                  - text: They chase reach before relevance
+                  - text: They chase DMs before trust
+                  - text: "But a predictable lead pipeline follows a different path:"
+                  - text: Content Quality → Engagement Depth → Audience Reach → Profile Visits → Conversations → Clients
+                  - text: Every stage feeds the next
+                  - text: A post that gets 50 likes and 20 saves is often more valuable than a post with 500 likes and no buying intent
+                  - text: Because leads don't come from vanity metrics
+                  - text: They come from moving the right people through the right stages
+                  - text: "Inside this infographic, I break down:"
+                  - text: • How LinkedIn evaluates your content
+                  - text: • Why saves matter more than likes
+                  - text: • How to push beyond your existing network
+                  - text: • The profile optimization mistake killing conversions
+                  - text: • How content turns into inbound DMs
+                  - text: If you're posting consistently but not seeing business results, your pipeline is probably leaking at one of these stages
+                  - text: Dm me "Content" and ill help you generate a consistent lead pipeline with visual content
+                - generic [ref=e205]:
+                  - button "Activate to view larger image, No alternative text description for this image" [ref=e207] [cursor=pointer]:
+                    - generic [ref=e208]: Activate to view larger image,
+                    - img "No alternative text description for this image" [ref=e211]
+                  - generic [ref=e212]: Activate to view larger image,
+                - generic [ref=e213]:
+                  - list [ref=e217]:
+                    - listitem [ref=e218]:
+                      - button "114 reactions" [ref=e219] [cursor=pointer]:
+                        - img "like" [ref=e220]
+                        - img "love" [ref=e221]
+                        - img "support" [ref=e222]
+                        - generic [ref=e223]: "114"
+                    - listitem [ref=e224]:
+                      - list [ref=e225]:
+                        - listitem [ref=e226]:
+                          - button "40 comments on Muhammad Obeidullah Siddiqui’s post" [ref=e227] [cursor=pointer]:
+                            - generic [ref=e228]: 40 comments
+                          - text: ·
+                        - listitem [ref=e229]:
+                          - button "3 reposts of Muhammad Obeidullah Siddiqui’s post" [ref=e230] [cursor=pointer]:
+                            - generic [ref=e231]: 3 reposts
+                  - generic [ref=e1223]:
+                    - heading "Reactions" [level=3] [ref=e1224]
+                    - list "Reactions" [ref=e1225]:
+                      - listitem [ref=e1226]:
+                        - link "View Monsur Adelakun’s graphic link, reacted with LIKE, graphic" [ref=e1227] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAADfgBcoBxo-DxF1p-opBq5Xo28v8OfYQwbY
+                          - generic [ref=e1229]:
+                            - img "View Monsur Adelakun’s graphic link" [ref=e1232]
+                            - img "like" [ref=e1233]
+                      - listitem [ref=e1234]:
+                        - link "View Muneeba Iqbal’s graphic link, reacted with LIKE, graphic" [ref=e1235] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAADIykXEBnf1UiMpYvD0SUwGiQ9EWVZk1vGw
+                          - generic [ref=e1237]:
+                            - img "View Muneeba Iqbal’s graphic link" [ref=e1240]
+                            - img "like" [ref=e1241]
+                      - listitem [ref=e1242]:
+                        - link "View Muhammad Irteza💚’s graphic link, reacted with LIKE, graphic" [ref=e1243] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAD232uABcnQ_1IPSSLARz51BAI_a0zshzdU
+                          - generic [ref=e1245]:
+                            - img "View Muhammad Irteza💚’s graphic link" [ref=e1248]
+                            - img "like" [ref=e1249]
+                      - listitem [ref=e1250]:
+                        - link "View Stephanie N. Mbelu, MBA’s graphic link, reacted with LIKE, graphic" [ref=e1251] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAAanpc4B6qyegd-r4TqrDr7Z9ZFQm_YM6Xo
+                          - generic [ref=e1253]:
+                            - img "View Stephanie N. Mbelu, MBA’s graphic link" [ref=e1256]
+                            - img "like" [ref=e1257]
+                      - listitem [ref=e1258]:
+                        - link "View Ayesha Raza 🥷’s graphic link, reacted with LIKE, graphic" [ref=e1259] [cursor=pointer]:
+                          - /url: https://www.linkedin.com/in/ACoAAGC9ulQBdmrwYDSDoMnKmpQX0UO8PCskTbo
+                          - generic [ref=e1261]:
+                            - img "View Ayesha Raza 🥷’s graphic link" [ref=e1264]
+                            - img "like" [ref=e1265]
+                      - listitem [ref=e1266]:
+                        - button "See 109 more reactions" [ref=e1267] [cursor=pointer]: …
+                  - generic [ref=e232]:
+                    - generic [ref=e233]:
+                      - button "React Like" [ref=e234] [cursor=pointer]:
+                        - img [ref=e237]
+                      - button "Open reactions menu":
+                        - img [ref=e240] [cursor=pointer]
+                    - button "Comment" [ref=e244] [cursor=pointer]:
+                      - img [ref=e245]
+                    - button [ref=e249] [cursor=pointer]:
+                      - img [ref=e250]
+                    - button "Send in a private message" [ref=e254] [cursor=pointer]:
+                      - img [ref=e255]
+              - generic [ref=e258]:
+                - generic [ref=e260]:
+                  - img "Brian Huntington" [ref=e262]
+                  - generic [ref=e265]:
+                    - generic [ref=e269]:
+                      - textbox "Text editor for creating content" [ref=e271]:
+                        - paragraph [ref=e272]
+                        - text: Add a comment…
+                      - generic [ref=e273]: Add a comment…
+                    - generic [ref=e275]:
+                      - button "Open Emoji Keyboard" [ref=e278] [cursor=pointer]:
+                        - img
+                        - generic [ref=e279]: Open Emoji Keyboard
+                      - button "Add a photo" [ref=e281] [cursor=pointer]:
+                        - img [ref=e282]
+                - button "Current selected sort order is Most relevant" [ref=e287] [cursor=pointer]:
+                  - generic [ref=e288]: Current selected sort order is Most relevant
+                  - generic [ref=e289]:
+                    - text: Most relevant
+                    - img [ref=e290]
+                - generic [ref=e292]:
+                  - generic [ref=e295]:
+                    - article [ref=e297]:
+                      - generic [ref=e298]:
+                        - generic [ref=e299]:
+                          - link "View Mohan Katira’s graphic link" [ref=e300] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/mohan-katira
+                            - img "View Mohan Katira’s graphic link" [ref=e303]
+                          - 'link "View: Mohan Katira • 3rd+ LinkedIn Distribution Systems for Coaches &amp; Consultants | Turning Expertise Into Inbound Client Acquisition" [ref=e304] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/mohan-katira
+                            - heading "Mohan Katira • 3rd+" [level=3] [ref=e305]:
+                              - generic [ref=e306]: Mohan Katira
+                              - generic [ref=e307]: • 3rd+
+                            - generic [ref=e308]: LinkedIn Distribution Systems for Coaches & Consultants | Turning Expertise Into Inbound Client Acquisition
+                        - generic [ref=e309]:
+                          - time [ref=e310]: 3w
+                          - button "Open options for Mohan Katira’s comment" [ref=e313] [cursor=pointer]:
+                            - img "Open options for Mohan Katira’s comment" [ref=e314]
+                      - generic [ref=e324]:
+                        - text: The save metric is becoming the real indicator know days
+                        - text: And also people are judging the value of the post by it's substance coming from lived experience and competence
+                        - link "Muhammad Obeidullah Siddiqui" [ref=e326] [cursor=pointer]:
+                          - /url: /in/obeidullahlinkedindesigner/
+                      - generic [ref=e331]:
+                        - generic [ref=e332]:
+                          - generic [ref=e333]:
+                            - button "React Like to Mohan Katira’s comment" [ref=e334] [cursor=pointer]:
+                              - generic [ref=e337]: Like
+                            - button "Open reactions menu":
+                              - img [ref=e339] [cursor=pointer]
+                          - generic [ref=e341]: ·
+                          - button "1 Reaction on Mohan Katira’s comment" [ref=e342] [cursor=pointer]:
+                            - img "like" [ref=e343]
+                            - generic [ref=e344]: "1"
+                        - button "Reply to Mohan Katira’s comment" [ref=e347] [cursor=pointer]:
+                          - generic [ref=e349]: Reply
+                    - article [ref=e351]:
+                      - generic [ref=e352]:
+                        - generic [ref=e353]:
+                          - link "View Kainat Abbas’ graphic link" [ref=e354] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/kaainat
+                            - img "View Kainat Abbas’ graphic link" [ref=e357]
+                          - 'link "View: Kainat Abbas • 3rd+ Co-Founder @ NebularAds | done-for-you content that turns social into your #1 sales channel for established businesses | 8.6x ROAS · 11:1 ROI · 1M+ impressions" [ref=e358] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/kaainat
+                            - heading "Kainat Abbas • 3rd+" [level=3] [ref=e359]:
+                              - generic [ref=e360]: Kainat Abbas
+                              - generic [ref=e361]:
+                                - img [ref=e362]:
+                                  - img [ref=e363]
+                                - text: • 3rd+
+                            - generic [ref=e365]: "Co-Founder @ NebularAds | done-for-you content that turns social into your #1 sales channel for established businesses | 8.6x ROAS · 11:1 ROI · 1M+ impressions"
+                        - generic [ref=e366]:
+                          - time [ref=e367]: 3w
+                          - button "Open options for Kainat Abbas’ comment" [ref=e370] [cursor=pointer]:
+                            - img "Open options for Kainat Abbas’ comment" [ref=e371]
+                      - generic [ref=e378]:
+                        - generic [ref=e381]:
+                          - link "Muhammad" [ref=e383] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                          - text: "One metric I think is underrated: profile-view-to-conversation rate."
+                          - text: If people are engaging with content but not visiting your profile, your content isn't creating enough curiosity.
+                          - text: If they're visiting but not reaching out, your positioning or offer may be unclear.
+                          - text: Every stage of the pipeline tells a different story.
+                        - button "see more, visually reveals content which is already detected by screen readers" [ref=e384] [cursor=pointer]:
+                          - generic [ref=e385]: …more
+                      - generic [ref=e390]:
+                        - generic [ref=e392]:
+                          - button "React Like to Kainat Abbas’ comment" [ref=e393] [cursor=pointer]:
+                            - generic [ref=e396]: Like
+                          - button "Open reactions menu":
+                            - img [ref=e398] [cursor=pointer]
+                        - button "Reply to Kainat Abbas’ comment" [ref=e402] [cursor=pointer]:
+                          - generic [ref=e404]: Reply
+                    - article [ref=e406]:
+                      - generic [ref=e407]:
+                        - generic [ref=e408]:
+                          - link "View Anamta Arshad’s graphic link" [ref=e409] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/anamta-arshad-68bb6826a
+                            - img "View Anamta Arshad’s graphic link" [ref=e412]
+                          - 'link "View: Anamta Arshad • 3rd+ Visual Designer &amp; Personal Branding Strategist | LinkedIn Content Creator | Building Authority Through Design &amp; Writing🌻" [ref=e413] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/anamta-arshad-68bb6826a
+                            - heading "Anamta Arshad • 3rd+" [level=3] [ref=e414]:
+                              - generic [ref=e415]: Anamta Arshad
+                              - generic [ref=e416]:
+                                - img [ref=e417]:
+                                  - img [ref=e418]
+                                - text: • 3rd+
+                            - generic [ref=e420]: Visual Designer & Personal Branding Strategist | LinkedIn Content Creator | Building Authority Through Design & Writing🌻
+                        - generic [ref=e421]:
+                          - time [ref=e422]: 3w
+                          - button "Open options for Anamta Arshad’s comment" [ref=e425] [cursor=pointer]:
+                            - img "Open options for Anamta Arshad’s comment" [ref=e426]
+                      - generic [ref=e428]:
+                        - button [ref=e429] [cursor=pointer]
+                        - generic [ref=e436]:
+                          - text: I think a lot of creators would make different decisions if they tracked saves as closely as they track likes.
+                          - link "Muhammad Obeidullah Siddiqui" [ref=e438] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                      - generic [ref=e439]:
+                        - generic [ref=e440]:
+                          - button [ref=e441] [cursor=pointer]
+                          - generic [ref=e443]:
+                            - generic [ref=e444]:
+                              - generic [ref=e445]:
+                                - button "React Like to Anamta Arshad’s comment" [ref=e446] [cursor=pointer]:
+                                  - generic [ref=e449]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e451] [cursor=pointer]
+                              - generic [ref=e453]: ·
+                              - button "2 Reactions on Anamta Arshad’s comment" [ref=e454] [cursor=pointer]:
+                                - img "insightful" [ref=e455]
+                                - img "like" [ref=e456]
+                                - generic [ref=e457]: "2"
+                            - generic [ref=e459]:
+                              - button "Reply to Anamta Arshad’s comment" [ref=e460] [cursor=pointer]:
+                                - generic [ref=e462]: Reply
+                              - generic [ref=e463]: ·
+                              - generic [ref=e464]: 1 reply
+                              - generic [ref=e465]: 1 Comment on Anamta Arshad’s comment
+                        - generic [ref=e467]:
+                          - button [ref=e468] [cursor=pointer]
+                          - article [ref=e470]:
+                            - generic [ref=e471]:
+                              - generic [ref=e472]:
+                                - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e473] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e476]
+                                - 'link "View: Muhammad Obeidullah Siddiqui Author, I make your LinkedIn speak in visuals." [ref=e477] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - heading "Muhammad Obeidullah Siddiqui Author" [level=3] [ref=e478]:
+                                    - generic [ref=e479]: Muhammad Obeidullah Siddiqui
+                                    - img [ref=e481]:
+                                      - img [ref=e482]
+                                    - generic [ref=e484]: Author
+                                  - generic [ref=e485]: I make your LinkedIn speak in visuals.
+                              - generic [ref=e486]:
+                                - time [ref=e487]: 3w
+                                - button "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e490] [cursor=pointer]:
+                                  - img "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e491]
+                            - generic [ref=e501]:
+                              - link "Anamta Arshad" [ref=e503] [cursor=pointer]:
+                                - /url: /in/anamta-arshad-68bb6826a/
+                              - text: Agree with you!
+                            - generic [ref=e508]:
+                              - generic [ref=e510]:
+                                - button "React Like to Muhammad Obeidullah Siddiqui’s comment" [ref=e511] [cursor=pointer]:
+                                  - generic [ref=e514]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e516] [cursor=pointer]
+                              - button "Reply to Muhammad Obeidullah Siddiqui’s comment" [ref=e520] [cursor=pointer]:
+                                - generic [ref=e522]: Reply
+                    - article [ref=e524]:
+                      - generic [ref=e525]:
+                        - generic [ref=e526]:
+                          - link "View Ansif I’s graphic link" [ref=e527] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/ansifdeveloper
+                            - img "View Ansif I’s graphic link" [ref=e530]
+                          - 'link "View: Ansif I • 3rd+ One embedded web team for scaling SaaS | UI/UX, Developer, SEO &amp; CRO experts at $1,999/mo | Webflow premium partner" [ref=e531] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/ansifdeveloper
+                            - heading "Ansif I • 3rd+" [level=3] [ref=e532]:
+                              - generic [ref=e533]: Ansif I
+                              - generic [ref=e534]:
+                                - img [ref=e535]:
+                                  - img [ref=e536]
+                                - text: • 3rd+
+                            - generic [ref=e538]: One embedded web team for scaling SaaS | UI/UX, Developer, SEO & CRO experts at $1,999/mo | Webflow premium partner
+                        - generic [ref=e539]:
+                          - time [ref=e540]: 3w
+                          - button "Open options for Ansif I’s comment" [ref=e543] [cursor=pointer]:
+                            - img "Open options for Ansif I’s comment" [ref=e544]
+                      - generic [ref=e554]: This is something a lot of people miss. A smaller audience that actually cares is worth way more than a big audience that scrolls past.
+                      - generic [ref=e559]:
+                        - generic [ref=e560]:
+                          - generic [ref=e561]:
+                            - button "React Like to Ansif I’s comment" [ref=e562] [cursor=pointer]:
+                              - generic [ref=e565]: Like
+                            - button "Open reactions menu":
+                              - img [ref=e567] [cursor=pointer]
+                          - generic [ref=e569]: ·
+                          - button "1 Reaction on Ansif I’s comment" [ref=e570] [cursor=pointer]:
+                            - img "like" [ref=e571]
+                            - generic [ref=e572]: "1"
+                        - button "Reply to Ansif I’s comment" [ref=e575] [cursor=pointer]:
+                          - generic [ref=e577]: Reply
+                    - article [ref=e579]:
+                      - generic [ref=e580]:
+                        - generic [ref=e581]:
+                          - link "View Anisha Saleem’s graphic link" [ref=e582] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/anishasaleem
+                            - img "View Anisha Saleem’s graphic link" [ref=e585]
+                          - 'link "View: Anisha Saleem • 3rd+ I build websites and personalised lead magnets to help businesses get more leads and grow faster." [ref=e586] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/anishasaleem
+                            - heading "Anisha Saleem • 3rd+" [level=3] [ref=e587]:
+                              - generic [ref=e588]: Anisha Saleem
+                              - generic [ref=e589]:
+                                - img [ref=e590]:
+                                  - img [ref=e591]
+                                - text: • 3rd+
+                            - generic [ref=e593]: I build websites and personalised lead magnets to help businesses get more leads and grow faster.
+                        - generic [ref=e594]:
+                          - time [ref=e595]: 3w
+                          - button "Open options for Anisha Saleem’s comment" [ref=e598] [cursor=pointer]:
+                            - img "Open options for Anisha Saleem’s comment" [ref=e599]
+                      - generic [ref=e606]:
+                        - generic [ref=e609]:
+                          - text: One thing I really admire is how your designs are so clean yet still deliver great value. Even without using gradients or flashy elements, they still feel premium and effective
+                          - link "Muhammad Obeidullah Siddiqui" [ref=e611] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                        - button "see more, visually reveals content which is already detected by screen readers" [ref=e612] [cursor=pointer]:
+                          - generic [ref=e613]: …more
+                      - generic [ref=e618]:
+                        - generic [ref=e619]:
+                          - generic [ref=e620]:
+                            - button "React Like to Anisha Saleem’s comment" [ref=e621] [cursor=pointer]:
+                              - generic [ref=e624]: Like
+                            - button "Open reactions menu":
+                              - img [ref=e626] [cursor=pointer]
+                          - generic [ref=e628]: ·
+                          - button "1 Reaction on Anisha Saleem’s comment" [ref=e629] [cursor=pointer]:
+                            - img "like" [ref=e630]
+                            - generic [ref=e631]: "1"
+                        - button "Reply to Anisha Saleem’s comment" [ref=e634] [cursor=pointer]:
+                          - generic [ref=e636]: Reply
+                    - article [ref=e638]:
+                      - generic [ref=e639]:
+                        - generic [ref=e640]:
+                          - link "View Abdul Khaliq’s graphic link" [ref=e641] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/abdulkhaliqofficial
+                            - img "View Abdul Khaliq’s graphic link" [ref=e644]
+                          - 'link "View: Abdul Khaliq • 3rd+ Pakistan’s No. 1 YouTuber (18M Subscribers) @Ak Ultra | Trading Analytics Expert | YouTube Content Creation Specialist" [ref=e645] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/abdulkhaliqofficial
+                            - heading "Abdul Khaliq • 3rd+" [level=3] [ref=e646]:
+                              - generic [ref=e647]: Abdul Khaliq
+                              - generic [ref=e648]:
+                                - img [ref=e649]:
+                                  - img [ref=e650]
+                                - text: • 3rd+
+                            - generic [ref=e652]: Pakistan’s No. 1 YouTuber (18M Subscribers) @Ak Ultra | Trading Analytics Expert | YouTube Content Creation Specialist
+                        - generic [ref=e653]:
+                          - time [ref=e654]: 3w
+                          - button "Open options for Abdul Khaliq’s comment" [ref=e657] [cursor=pointer]:
+                            - img "Open options for Abdul Khaliq’s comment" [ref=e658]
+                      - generic [ref=e660]:
+                        - button [ref=e661] [cursor=pointer]
+                        - generic [ref=e668]: most posts fail here, not because of effort, but because they never reach the right audience in the first place
+                      - generic [ref=e669]:
+                        - generic [ref=e670]:
+                          - button [ref=e671] [cursor=pointer]
+                          - generic [ref=e673]:
+                            - generic [ref=e674]:
+                              - generic [ref=e675]:
+                                - button "React Like to Abdul Khaliq’s comment" [ref=e676] [cursor=pointer]:
+                                  - generic [ref=e679]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e681] [cursor=pointer]
+                              - generic [ref=e683]: ·
+                              - button "3 Reactions on Abdul Khaliq’s comment" [ref=e684] [cursor=pointer]:
+                                - img "like" [ref=e685]
+                                - img "support" [ref=e686]
+                                - generic [ref=e687]: "3"
+                            - generic [ref=e689]:
+                              - button "Reply to Abdul Khaliq’s comment" [ref=e690] [cursor=pointer]:
+                                - generic [ref=e692]: Reply
+                              - generic [ref=e693]: ·
+                              - generic [ref=e694]: 1 reply
+                              - generic [ref=e695]: 1 Comment on Abdul Khaliq’s comment
+                        - generic [ref=e697]:
+                          - button [ref=e698] [cursor=pointer]
+                          - article [ref=e700]:
+                            - generic [ref=e701]:
+                              - generic [ref=e702]:
+                                - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e703] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e706]
+                                - 'link "View: Muhammad Obeidullah Siddiqui Author, I make your LinkedIn speak in visuals." [ref=e707] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - heading "Muhammad Obeidullah Siddiqui Author" [level=3] [ref=e708]:
+                                    - generic [ref=e709]: Muhammad Obeidullah Siddiqui
+                                    - img [ref=e711]:
+                                      - img [ref=e712]
+                                    - generic [ref=e714]: Author
+                                  - generic [ref=e715]: I make your LinkedIn speak in visuals.
+                              - generic [ref=e716]:
+                                - time [ref=e717]: 3w
+                                - button "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e720] [cursor=pointer]:
+                                  - img "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e721]
+                            - generic [ref=e731]:
+                              - link "Abdul Khaliq" [ref=e733] [cursor=pointer]:
+                                - /url: /in/abdulkhaliqofficial/
+                              - text: They are never designed our written to appeal that specific audience
+                            - generic [ref=e738]:
+                              - generic [ref=e740]:
+                                - button "React Like to Muhammad Obeidullah Siddiqui’s comment" [ref=e741] [cursor=pointer]:
+                                  - generic [ref=e744]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e746] [cursor=pointer]
+                              - button "Reply to Muhammad Obeidullah Siddiqui’s comment" [ref=e750] [cursor=pointer]:
+                                - generic [ref=e752]: Reply
+                    - article [ref=e754]:
+                      - generic [ref=e755]:
+                        - generic [ref=e756]:
+                          - link "View Inam Ullah’s graphic link" [ref=e757] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/inam-ullah-7394372b1
+                            - img "View Inam Ullah’s graphic link" [ref=e760]
+                          - 'link "View: Inam Ullah • 3rd+ I Craft LinkedIn Brands That Deliver $$ Results! | DM Me for Profile &amp; Content Upgrade" [ref=e761] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/inam-ullah-7394372b1
+                            - heading "Inam Ullah • 3rd+" [level=3] [ref=e762]:
+                              - generic [ref=e763]: Inam Ullah
+                              - generic [ref=e764]:
+                                - img [ref=e765]:
+                                  - img [ref=e766]
+                                - text: • 3rd+
+                            - generic [ref=e768]: I Craft LinkedIn Brands That Deliver $$ Results! | DM Me for Profile & Content Upgrade
+                        - generic [ref=e769]:
+                          - time [ref=e770]: 3w
+                          - button "Open options for Inam Ullah’s comment" [ref=e773] [cursor=pointer]:
+                            - img "Open options for Inam Ullah’s comment" [ref=e774]
+                      - generic [ref=e776]:
+                        - button [ref=e777] [cursor=pointer]
+                        - generic [ref=e784]:
+                          - text: Saves vs likes saves show intent, likes show visibility
+                          - link "Muhammad Obeidullah Siddiqui" [ref=e786] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                      - generic [ref=e787]:
+                        - generic [ref=e788]:
+                          - button [ref=e789] [cursor=pointer]
+                          - generic [ref=e791]:
+                            - generic [ref=e792]:
+                              - generic [ref=e793]:
+                                - button "React Like to Inam Ullah’s comment" [ref=e794] [cursor=pointer]:
+                                  - generic [ref=e797]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e799] [cursor=pointer]
+                              - generic [ref=e801]: ·
+                              - button "2 Reactions on Inam Ullah’s comment" [ref=e802] [cursor=pointer]:
+                                - img "like" [ref=e803]
+                                - img "celebrate" [ref=e804]
+                                - generic [ref=e805]: "2"
+                            - generic [ref=e807]:
+                              - button "Reply to Inam Ullah’s comment" [ref=e808] [cursor=pointer]:
+                                - generic [ref=e810]: Reply
+                              - generic [ref=e811]: ·
+                              - generic [ref=e812]: 1 reply
+                              - generic [ref=e813]: 1 Comment on Inam Ullah’s comment
+                        - generic [ref=e815]:
+                          - button [ref=e816] [cursor=pointer]
+                          - article [ref=e818]:
+                            - generic [ref=e819]:
+                              - generic [ref=e820]:
+                                - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e821] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e824]
+                                - 'link "View: Muhammad Obeidullah Siddiqui Author, I make your LinkedIn speak in visuals." [ref=e825] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - heading "Muhammad Obeidullah Siddiqui Author" [level=3] [ref=e826]:
+                                    - generic [ref=e827]: Muhammad Obeidullah Siddiqui
+                                    - img [ref=e829]:
+                                      - img [ref=e830]
+                                    - generic [ref=e832]: Author
+                                  - generic [ref=e833]: I make your LinkedIn speak in visuals.
+                              - generic [ref=e834]:
+                                - time [ref=e835]: 3w
+                                - button "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e838] [cursor=pointer]:
+                                  - img "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e839]
+                            - generic [ref=e849]:
+                              - link "Inam Ullah" [ref=e851] [cursor=pointer]:
+                                - /url: /in/inam-ullah-7394372b1/
+                              - text: Agreed!
+                            - generic [ref=e856]:
+                              - generic [ref=e858]:
+                                - button "React Like to Muhammad Obeidullah Siddiqui’s comment" [ref=e859] [cursor=pointer]:
+                                  - generic [ref=e862]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e864] [cursor=pointer]
+                              - button "Reply to Muhammad Obeidullah Siddiqui’s comment" [ref=e868] [cursor=pointer]:
+                                - generic [ref=e870]: Reply
+                    - article [ref=e872]:
+                      - generic [ref=e873]:
+                        - generic [ref=e874]:
+                          - link "View Hiba Aamir’s graphic link" [ref=e875] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/hiba-aamir-pk
+                            - img "View Hiba Aamir’s graphic link" [ref=e878]
+                          - 'link "View: Hiba Aamir • 3rd+ Content Designer &amp; Writer for Founders | Profile Optimization | Helping Leaders Build Authority on LinkedIn | 2+years." [ref=e879] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/hiba-aamir-pk
+                            - heading "Hiba Aamir • 3rd+" [level=3] [ref=e880]:
+                              - generic [ref=e881]: Hiba Aamir
+                              - generic [ref=e882]: • 3rd+
+                            - generic [ref=e883]: Content Designer & Writer for Founders | Profile Optimization | Helping Leaders Build Authority on LinkedIn | 2+years.
+                        - generic [ref=e884]:
+                          - time [ref=e885]: 3w
+                          - button "Open options for Hiba Aamir’s comment" [ref=e888] [cursor=pointer]:
+                            - img "Open options for Hiba Aamir’s comment" [ref=e889]
+                      - generic [ref=e891]:
+                        - button [ref=e892] [cursor=pointer]
+                        - generic [ref=e899]: 10 saves beats 100s of likes, this is the best infographic that explains everything simply.. easy peasyyyy
+                      - generic [ref=e900]:
+                        - generic [ref=e901]:
+                          - button [ref=e902] [cursor=pointer]
+                          - generic [ref=e904]:
+                            - generic [ref=e905]:
+                              - generic [ref=e906]:
+                                - button "React Like to Hiba Aamir’s comment" [ref=e907] [cursor=pointer]:
+                                  - generic [ref=e910]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e912] [cursor=pointer]
+                              - generic [ref=e914]: ·
+                              - button "2 Reactions on Hiba Aamir’s comment" [ref=e915] [cursor=pointer]:
+                                - img "like" [ref=e916]
+                                - img "support" [ref=e917]
+                                - generic [ref=e918]: "2"
+                            - generic [ref=e920]:
+                              - button "Reply to Hiba Aamir’s comment" [ref=e921] [cursor=pointer]:
+                                - generic [ref=e923]: Reply
+                              - generic [ref=e924]: ·
+                              - generic [ref=e925]: 1 reply
+                              - generic [ref=e926]: 1 Comment on Hiba Aamir’s comment
+                        - generic [ref=e928]:
+                          - button [ref=e929] [cursor=pointer]
+                          - article [ref=e931]:
+                            - generic [ref=e932]:
+                              - generic [ref=e933]:
+                                - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e934] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e937]
+                                - 'link "View: Muhammad Obeidullah Siddiqui Author, I make your LinkedIn speak in visuals." [ref=e938] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - heading "Muhammad Obeidullah Siddiqui Author" [level=3] [ref=e939]:
+                                    - generic [ref=e940]: Muhammad Obeidullah Siddiqui
+                                    - img [ref=e942]:
+                                      - img [ref=e943]
+                                    - generic [ref=e945]: Author
+                                  - generic [ref=e946]: I make your LinkedIn speak in visuals.
+                              - generic [ref=e947]:
+                                - time [ref=e948]: 3w
+                                - button "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e951] [cursor=pointer]:
+                                  - img "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e952]
+                            - generic [ref=e962]:
+                              - link "Hiba Aamir" [ref=e964] [cursor=pointer]:
+                                - /url: /in/hiba-aamir-pk/
+                              - text: Thanks! hope this helps you
+                            - generic [ref=e969]:
+                              - generic [ref=e970]:
+                                - generic [ref=e971]:
+                                  - button "React Like to Muhammad Obeidullah Siddiqui’s comment" [ref=e972] [cursor=pointer]:
+                                    - generic [ref=e975]: Like
+                                  - button "Open reactions menu":
+                                    - img [ref=e977] [cursor=pointer]
+                                - generic [ref=e979]: ·
+                                - button "1 Reaction on Muhammad Obeidullah Siddiqui’s comment" [ref=e980] [cursor=pointer]:
+                                  - img "like" [ref=e981]
+                                  - generic [ref=e982]: "1"
+                              - button "Reply to Muhammad Obeidullah Siddiqui’s comment" [ref=e985] [cursor=pointer]:
+                                - generic [ref=e987]: Reply
+                    - article [ref=e989]:
+                      - generic [ref=e990]:
+                        - generic [ref=e991]:
+                          - link "View Muneeba Mehmood’s graphic link" [ref=e992] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/muneeba-graphic-designer-expert
+                            - img "View Muneeba Mehmood’s graphic link" [ref=e995]
+                          - 'link "View: Muneeba Mehmood • 3rd+ Ready to take your content from drab to fab? Just drop me a &quot;DM,&quot; and let&#39;s make your online presence look sizzling with impactful designs. Personal branding expert" [ref=e996] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/muneeba-graphic-designer-expert
+                            - heading "Muneeba Mehmood • 3rd+" [level=3] [ref=e997]:
+                              - generic [ref=e998]: Muneeba Mehmood
+                              - generic [ref=e999]: • 3rd+
+                            - generic [ref=e1000]: Ready to take your content from drab to fab? Just drop me a "DM," and let's make your online presence look sizzling with impactful designs. Personal branding expert
+                        - generic [ref=e1001]:
+                          - time [ref=e1002]: 3w
+                          - button "Open options for Muneeba Mehmood’s comment" [ref=e1005] [cursor=pointer]:
+                            - img "Open options for Muneeba Mehmood’s comment" [ref=e1006]
+                      - generic [ref=e1008]:
+                        - button [ref=e1009] [cursor=pointer]
+                        - generic [ref=e1016]:
+                          - text: I love how this cheat sheet is still breathing despite delivering so much value. You're a great designer, love it.
+                          - link "Muhammad Obeidullah Siddiqui" [ref=e1018] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                      - generic [ref=e1019]:
+                        - generic [ref=e1020]:
+                          - button [ref=e1021] [cursor=pointer]
+                          - generic [ref=e1023]:
+                            - generic [ref=e1024]:
+                              - generic [ref=e1025]:
+                                - button "React Like to Muneeba Mehmood’s comment" [ref=e1026] [cursor=pointer]:
+                                  - generic [ref=e1029]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e1031] [cursor=pointer]
+                              - generic [ref=e1033]: ·
+                              - button "2 Reactions on Muneeba Mehmood’s comment" [ref=e1034] [cursor=pointer]:
+                                - img "like" [ref=e1035]
+                                - img "celebrate" [ref=e1036]
+                                - generic [ref=e1037]: "2"
+                            - generic [ref=e1039]:
+                              - button "Reply to Muneeba Mehmood’s comment" [ref=e1040] [cursor=pointer]:
+                                - generic [ref=e1042]: Reply
+                              - generic [ref=e1043]: ·
+                              - generic [ref=e1044]: 1 reply
+                              - generic [ref=e1045]: 1 Comment on Muneeba Mehmood’s comment
+                        - generic [ref=e1047]:
+                          - button [ref=e1048] [cursor=pointer]
+                          - article [ref=e1050]:
+                            - generic [ref=e1051]:
+                              - generic [ref=e1052]:
+                                - link "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e1053] [cursor=pointer]:
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - img "View Muhammad Obeidullah Siddiqui’s graphic link" [ref=e1056]
+                                - 'link "View: Muhammad Obeidullah Siddiqui Author, I make your LinkedIn speak in visuals." [ref=e1057] [cursor=pointer]':
+                                  - /url: https://www.linkedin.com/in/obeidullahlinkedindesigner
+                                  - heading "Muhammad Obeidullah Siddiqui Author" [level=3] [ref=e1058]:
+                                    - generic [ref=e1059]: Muhammad Obeidullah Siddiqui
+                                    - img [ref=e1061]:
+                                      - img [ref=e1062]
+                                    - generic [ref=e1064]: Author
+                                  - generic [ref=e1065]: I make your LinkedIn speak in visuals.
+                              - generic [ref=e1066]:
+                                - time [ref=e1067]: 3w
+                                - button "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e1070] [cursor=pointer]:
+                                  - img "Open options for Muhammad Obeidullah Siddiqui’s comment" [ref=e1071]
+                            - generic [ref=e1081]:
+                              - link "Muneeba Mehmood" [ref=e1083] [cursor=pointer]:
+                                - /url: /in/muneeba-graphic-designer-expert/
+                              - text: Thanku so much! put in a lot of efforts into this!
+                            - generic [ref=e1088]:
+                              - generic [ref=e1090]:
+                                - button "React Like to Muhammad Obeidullah Siddiqui’s comment" [ref=e1091] [cursor=pointer]:
+                                  - generic [ref=e1094]: Like
+                                - button "Open reactions menu":
+                                  - img [ref=e1096] [cursor=pointer]
+                              - button "Reply to Muhammad Obeidullah Siddiqui’s comment" [ref=e1100] [cursor=pointer]:
+                                - generic [ref=e1102]: Reply
+                    - article [ref=e1104]:
+                      - generic [ref=e1105]:
+                        - generic [ref=e1106]:
+                          - link "View Muhammad Zohaib.’s graphic link" [ref=e1107] [cursor=pointer]:
+                            - /url: https://www.linkedin.com/in/muhammadzohaibdev
+                            - img "View Muhammad Zohaib.’s graphic link" [ref=e1110]
+                          - 'link "View: Muhammad Zohaib. • 3rd+ LinkedIn Brand Designer → Coaches &amp; Creators | Helping Professionals Build Magnetic LinkedIn Presence that brings clients | DM “Brand” to get started." [ref=e1111] [cursor=pointer]':
+                            - /url: https://www.linkedin.com/in/muhammadzohaibdev
+                            - heading "Muhammad Zohaib. • 3rd+" [level=3] [ref=e1112]:
+                              - generic [ref=e1113]: Muhammad Zohaib.
+                              - generic [ref=e1114]: • 3rd+
+                            - generic [ref=e1115]: LinkedIn Brand Designer → Coaches & Creators | Helping Professionals Build Magnetic LinkedIn Presence that brings clients | DM “Brand” to get started.
+                        - generic [ref=e1116]:
+                          - time [ref=e1117]: 3w
+                          - button "Open options for Muhammad Zohaib.’s comment" [ref=e1120] [cursor=pointer]:
+                            - img "Open options for Muhammad Zohaib.’s comment" [ref=e1121]
+                      - generic [ref=e1128]:
+                        - generic [ref=e1131]:
+                          - text: Such a minimalist point of consideration on this infographical content!
+                          - text: Content always creates massive impact if it's redirecting towards right people
+                          - link "Muhammad Obeidullah Siddiqui" [ref=e1133] [cursor=pointer]:
+                            - /url: /in/obeidullahlinkedindesigner/
+                        - button "see more, visually reveals content which is already detected by screen readers" [ref=e1134] [cursor=pointer]:
+                          - generic [ref=e1135]: …more
+                      - generic [ref=e1140]:
+                        - generic [ref=e1141]:
+                          - generic [ref=e1142]:
+                            - button "React Like to Muhammad Zohaib.’s comment" [ref=e1143] [cursor=pointer]:
+                              - generic [ref=e1146]: Like
+                            - button "Open reactions menu":
+                              - img [ref=e1148] [cursor=pointer]
+                          - generic [ref=e1150]: ·
+                          - button "3 Reactions on Muhammad Zohaib.’s comment" [ref=e1151] [cursor=pointer]:
+                            - img "like" [ref=e1152]
+                            - img "celebrate" [ref=e1153]
+                            - generic [ref=e1154]: "3"
+                        - button "Reply to Muhammad Zohaib.’s comment" [ref=e1157] [cursor=pointer]:
+                          - generic [ref=e1159]: Reply
+                  - generic [ref=e1160]:
+                    - button "Load more comments" [ref=e1161] [cursor=pointer]:
+                      - img [ref=e1162]
+                    - button "Load more comments" [ref=e1165] [cursor=pointer]:
+                      - generic [ref=e1166]: Load more comments
+      - complementary "Advertisement and similar pages" [ref=e1167]:
+        - generic [ref=e1169]:
+          - iframe [ref=e1269]:
+            - link "Advertise on LinkedIn" [ref=f1e4] [cursor=pointer]:
+              - /url: https://www.linkedin.com/jobs/?trk=li_FA_global_careers_jobsgtm_jsFA_v1&mcid=6899045044465016833
+              - img "Advertise on LinkedIn" [ref=f1e5]
+          - generic "LinkedIn Footer Content" [ref=e1170]:
+            - generic [ref=e1171]:
+              - list [ref=e1270]:
+                - listitem [ref=e1271]:
+                  - link "About" [ref=e1272] [cursor=pointer]:
+                    - /url: https://about.linkedin.com/
+                    - generic [ref=e1273]: About
+                - listitem [ref=e1274]:
+                  - link "Accessibility" [ref=e1275] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/accessibility
+                    - generic [ref=e1276]: Accessibility
+                - listitem [ref=e1277]:
+                  - link "Help Center" [ref=e1278] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin?trk=footer_d_flagship3_detail_base
+                    - generic [ref=e1279]: Help Center
+                - listitem [ref=e1280]:
+                  - button "Privacy & Terms" [ref=e1282] [cursor=pointer]:
+                    - generic [ref=e1284]:
+                      - text: Privacy & Terms
+                      - img [ref=e1285]
+                - listitem [ref=e1287]:
+                  - link "Ad Choices" [ref=e1288] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/help/linkedin/answer/62931
+                    - generic [ref=e1289]: Ad Choices
+                - listitem [ref=e1290]:
+                  - link "Advertising" [ref=e1291] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/ad/start?trk=n_nav_ads_rr
+                    - generic [ref=e1292]: Advertising
+                - listitem [ref=e1293]:
+                  - button "Business Services" [ref=e1295] [cursor=pointer]:
+                    - generic [ref=e1297]:
+                      - text: Business Services
+                      - img [ref=e1298]
+                - listitem [ref=e1300]:
+                  - button "Get the LinkedIn app" [ref=e1303] [cursor=pointer]
+                - listitem [ref=e1304]:
+                  - button "More options" [ref=e1305] [cursor=pointer]: More
+              - generic [ref=e1172]:
+                - img "LinkedIn" [ref=e1173]:
+                  - img [ref=e1174]
+                - text: LinkedIn Corporation © 2026
+    - generic:
+      - generic:
+        - complementary:
+          - generic [ref=e1177]:
+            - generic [ref=e1179] [cursor=pointer]:
+              - generic [ref=e1180]:
+                - img "Brian Huntington" [ref=e1181]
+                - generic [ref=e1307]: Status is online
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=e1182]:
+                - generic [ref=e1183]:
+                  - generic [ref=e1184]: Messaging
+                  - generic [ref=e1185]: You are on the messaging overlay. Press enter to open the list of conversations.
+            - generic [ref=e1186]:
+              - button "Open messenger dropdown menu" [ref=e1188] [cursor=pointer]:
+                - img "Open messenger dropdown menu" [ref=e1189]
+              - button "Compose message" [ref=e1192] [cursor=pointer]:
+                - img [ref=e1193]
+                - generic [ref=e1195]: Compose message
+              - button "You are on the messaging overlay. Press enter to open the list of conversations." [ref=e1196] [cursor=pointer]:
+                - img [ref=e1197]
+                - generic [ref=e1199]: You are on the messaging overlay. Press enter to open the list of conversations.
+        - complementary "AI-powered assistant to get help with your career, jobs etc"

@@ -270,7 +270,64 @@ Lightbox overlay (`#imageOverlay`) supports both single and multi-image navigati
 
 ---
 
-### Layout Modes (Posts only)
+## Multi-Select & Batch Delete
+
+Users can select multiple cards in any mode and delete them in one confirmation instead of deleting one-by-one.
+
+### State
+
+- `selectMode` (boolean, default `false`) — whether selection mode is active
+- `selectedIds` (Set) — set of selected card IDs
+
+### How It Works
+
+```
+User clicks "Select" button in filter bar
+  → toggleSelectMode()
+  → selectMode = true
+  → renderFilterBar() + applyFilters() → renderCards() with checkboxes
+
+Cards render with:
+  - data-id attribute on each .card element
+  - .card-check div (checkbox overlay, top-left corner, scale+fade animation)
+  - onclick changed from openEditModal to toggleCardSelection (on card body)
+  - .selected class applied if ID is in selectedIds Set
+
+User clicks a card in select mode:
+  → toggleCardSelection(id)
+  → Toggles ID in selectedIds Set
+  → DOM query finds card by data-id, toggles .selected class (O(1), no full re-render)
+  → updateBatchBar() — shows/hides floating bar with count
+
+Batch bar (fixed bottom, slides up via CSS transition):
+  - Shows count "N selected"
+  - "Deselect" button — clears all selections
+  - "Delete selected" button (red) — disabled when count is 0
+  - "Cancel" button — exits selection mode
+
+batchDeleteSelected():
+  1. Auth guard (currentUser check)
+  2. confirm("Delete N items? This cannot be undone.")
+  3. For each selected ID: filter from correct mode array + fire Supabase DELETE
+  4. persist(), clear selectedIds, exit selectMode
+  5. renderFilterBar(), applyFilters(), showToast()
+
+### Edge Cases
+
+- **Mode switch:** setMode() exits select mode + clears selections
+- **Guests:** #selectToggle hidden via CSS body[data-auth="guest"] rule
+- **Single delete in select mode:** deleteSwipe() removes deleted ID from selectedIds
+- **Perf:** Individual card toggles use DOM classList.toggle — no full re-render
+- **Z-index:** Batch bar at z-index 100 (below modals at 500, above card content)
+- **Disable after search/filter:** Cards outside current filter are NOT selectable since they're not rendered. selectedIds may contain non-visible IDs — they're just skipped on batch delete.
+
+### Visual Design
+
+- Checkbox: absolute positioned top-left on card, `pointer-events: none` (pass-through to card body)
+- Selected card: 2px accent-colored ring via box-shadow
+- Batch bar: `position: fixed; bottom: 0`, slides up with 280ms ease transition
+- Dark mode: batch bar gets stronger shadow via `[data-theme="dark"] .batch-bar`
+- Select toggle button: `.btn-ghost.active` gives purple accent highlight### Layout Modes (Posts only)
 
 `layoutMode`: `'grid'` | `'masonry'` (localStorage key `swipeardy_layout_v1`).
 A toggle button in the filter bar switches layouts (Posts mode only).
