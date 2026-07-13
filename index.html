@@ -206,7 +206,7 @@
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
     .lightbox-close:hover { background: rgba(0,0,0,0.65); }
     .card-hero-wrap { position: relative; }
-    .card-hero-track { display: flex; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    .card-hero-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
     .card-hero-track::-webkit-scrollbar { display: none; }
     .card-hero-track > .slide { flex: 0 0 100%; scroll-snap-align: start; position: relative; overflow: hidden; min-height: 80px; background: var(--bg-secondary); }
     .card-hero-track > .slide > img { width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; position: relative; z-index: 1; }
