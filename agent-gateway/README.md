@@ -63,6 +63,20 @@ shared, not the credentials.
 
 ## Local secret files
 
-Copy `.env.example` to `.env.local` only on your machine. `.env.local` is ignored
-and must never be uploaded, committed, or pasted into a chat.
+Copy `.env.example` to `.env.local` only on your machine, and ensure that local
+secret files remain excluded from version control. They must never be uploaded,
+committed, or pasted into a chat.
+
+## Read-only smoke test
+
+Run the smoke test after a new client setup, gateway deployment, or restart. It
+initializes MCP, verifies the expected tool surface, calls `status`, and performs
+one `search_posts` read. It never creates, updates, curates, or deletes data.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\agent-gateway\smoke-test.ps1
+```
+
+The script reads `SWIPEARDY_CODEX_TOKEN` from a local `.env.local` file or the
+user environment and never prints its value.
 

@@ -67,6 +67,69 @@ Reads use `SB_KEY` (anon). Writes use `sbFetchAuth()` which sends the user's `ac
 
 ---
 
+## AI Agent Gateway — Preferred Interface
+
+Codex, Hermes, and other MCP-capable agents should use the scoped Swipe Ardy Agent
+Gateway for automation. Do not give an agent the editor password, the publishable
+browser key, or a Supabase service-role key.
+
+```text
+MCP     https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/mcp
+REST    https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/api/v1
+OpenAPI https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/openapi.json
+Health  https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/health
+```
+
+Authentication uses `Authorization: Bearer swa_...`. Each agent has its own
+revocable token; Supabase stores only its SHA-256 hash in
+`swipeardy_agent_api_keys`. Codex and Hermes tokens are separate and independently
+audited. The endpoint and operating contract are shared, but credentials are not.
+
+The MCP tool surface is intentionally aligned with SwipeShare:
+
+| Tool | Purpose |
+|---|---|
+| `status` | Verify connection, scopes, region, and record count |
+| `search_posts` | Paginated search; pass `mode` explicitly for non-Posts reads |
+| `get_post` | Read one structured record; optionally include image blocks |
+| `get_post_image` | Fetch one actual image block for vision/OCR |
+| `create_post` / `update_post` | Idempotent Posts-mode writes with revision checks |
+| `delete_posts` | Two-step deletion into recoverable 30-day Trash |
+| `list_trash` / `restore_post` | Review or restore deleted records |
+| `export_posts` | Private JSON/CSV/NDJSON/Markdown export with expiring URL |
+| `curate_posts` | Preview or atomically apply up to 100 revision-checked patches |
+| `list_filters` / `update_filter_config` | Read or safely replace filter configuration |
+| `list_views` | Read saved views |
+
+All agent writes require a fresh `idempotency_key` and are audited. Judgment-heavy
+operations support `dry_run`; updates and curation require the latest `revision`;
+revision conflicts require rereading rather than forcing an overwrite. Deletes are
+previewed first, then moved to Trash only with a short-lived confirmation token.
+Image tools accept only HTTPS image resources, block obvious private hosts, cap each
+image at 5 MB, and return standard MCP image blocks for direct visual analysis.
+
+Swipe Ardy currently supports read access to `posts`, `creators`, `websites`, and
+`snippets`; the first write surface is Posts. This is a capability boundary, not a
+credential boundary, and must remain explicit when an agent chooses a mode.
+
+### Agent onboarding and smoke test
+
+Read this file, `agent-gateway/README.md`, and
+`agent-gateway/AGENT-COLLABORATION.md` before acting. Then run the read-only smoke
+test, which initializes MCP, checks the advertised tools, calls `status`, and reads
+one post without writing data:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\agent-gateway\smoke-test.ps1
+```
+
+The checked-in `.codex/config.toml` and `agent-gateway/hermes.example.yaml` are
+secret-free client templates. Local tokens must remain in ignored environment or
+client configuration files. The same gateway contract is available to SwipeShare,
+but each project keeps its own endpoint, token, database, and audit trail.
+
+---
+
 ## Data Flow: All Operations
 
 ### Save (create an item)
@@ -725,3 +788,4 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 10. **Extension `background.js` criticality.** `background.js` runs as a Chrome service worker and handles ALL message routing and Supabase saves. If deleted, the entire extension breaks (no saves, no scan forwarding, no bookmark sync). Before commit `928c94c` it was untracked — a `git reset --hard` would permanently delete it. It is now tracked in git. Always commit it.
 
 11. **`GRANT` before RLS.** RLS policies with `TO authenticated` require the `authenticated` role to have table-level access via `GRANT ALL ON public.swipes TO authenticated`. Without it, writes silently return 403 `permission denied for table` (caught by `.catch(()=>{})`). The app updates localStorage but reverts on refresh because Supabase writes never went through. Always include `GRANT` statements before `CREATE POLICY` in the setup SQL.
+
