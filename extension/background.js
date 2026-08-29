@@ -2,6 +2,105 @@
 var SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
 var SB_HEADERS = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
+var SB_STORAGE_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/storage/v1';
+var STORAGE_BUCKET = 'swipe-assets';
+var STORAGE_URL_CACHE = {};
+
+function isStoredMediaUrl(url) {
+  return url.indexOf('/storage/v1/object/public/' + STORAGE_BUCKET + '/') !== -1
+    || url.indexOf('/storage/v1/object/' + STORAGE_BUCKET + '/') !== -1;
+}
+
+function isEmbedLink(url) {
+  return /youtube\.com|youtu\.be|vimeo\.com/i.test(url);
+}
+
+function mediaExt(url, type) {
+  if (type) {
+    if (type === 'image/jpeg') return 'jpg';
+    if (type === 'image/png') return 'png';
+    if (type === 'image/gif') return 'gif';
+    if (type === 'image/webp') return 'webp';
+    if (type === 'video/mp4') return 'mp4';
+    if (type === 'video/webm') return 'webm';
+  }
+  var m = /\.(jpg|jpeg|png|gif|webp|mp4|webm|mov)(?:\?|$)/i.exec(url);
+  if (m) { var e = m[1].toLowerCase(); return e === 'jpeg' ? 'jpg' : e; }
+  return '';
+}
+
+function fetchMedia(url) {
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 20000);
+  return fetch(url, { cache: 'no-store', signal: ctrl.signal }).then(function (res) {
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('download ' + res.status);
+    return res.arrayBuffer().then(function (buf) {
+      return { buf: buf, type: (res.headers.get('content-type') || '').split(';')[0].toLowerCase().trim() };
+    });
+  }).catch(function (e) { clearTimeout(timer); throw e; });
+}
+
+function uploadMedia(path, buf, contentType) {
+  return fetch(SB_STORAGE_URL + '/object/' + STORAGE_BUCKET + '/' + path, {
+    method: 'POST',
+    headers: {
+      apikey: SB_KEY,
+      Authorization: 'Bearer ' + SB_KEY,
+      'Content-Type': contentType || 'application/octet-stream'
+    },
+    body: buf
+  }).then(function (res) {
+    // The path contains a content hash, so a 409 means another capture
+    // already uploaded the exact same bytes. Treat that as success while
+    // keeping anonymous Storage access insert-only (no public overwrite).
+    if (!res.ok && res.status !== 409) throw new Error('upload ' + res.status);
+    return res.text();
+  });
+}
+
+function mediaHash(buf) {
+  return crypto.subtle.digest('SHA-256', buf).then(function (digest) {
+    return Array.prototype.map.call(new Uint8Array(digest), function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  });
+}
+
+function storeOneMedia(url, swipeId, idx) {
+  url = (url || '').trim();
+  if (!url || isStoredMediaUrl(url) || isEmbedLink(url)) return Promise.resolve(url);
+  if (STORAGE_URL_CACHE[url]) return Promise.resolve(STORAGE_URL_CACHE[url]);
+  return fetchMedia(url).then(function (r) {
+    var ext = mediaExt(url, r.type);
+    if (!ext) throw new Error('unsupported type: ' + r.type);
+    return mediaHash(r.buf).then(function (hash) {
+      var path = 's' + swipeId + (idx > 0 ? '_' + idx : '') + '_' + hash.slice(0, 20) + '.' + ext;
+      return uploadMedia(path, r.buf, r.type).then(function () {
+        var pub = SB_STORAGE_URL + '/object/public/' + STORAGE_BUCKET + '/' + path;
+        STORAGE_URL_CACHE[url] = pub;
+        return pub;
+      });
+    });
+  }).catch(function (e) {
+    console.warn('[swipeardy] media store failed (' + url.slice(0, 100) + '):', e.message);
+    return url;
+  });
+}
+
+function storeItemMedia(item) {
+  var image = (item.image || '').trim();
+  if (!image) return Promise.resolve(item);
+  var urls = image.split(',').map(function (u) { return u.trim(); }).filter(function (u) { return u; });
+  if (urls.length === 0) return Promise.resolve(item);
+  var tasks = [];
+  for (var i = 0; i < urls.length; i++) tasks.push(storeOneMedia(urls[i], item.id, i));
+  return Promise.all(tasks).then(function (stored) {
+    item.image = stored.join(',');
+    return item;
+  });
+}
+
 var STORAGE_SEEN_KEY = 'swipeardyBookmarksSeen';
 var STORAGE_BASELINE_KEY = 'swipeardyBaselineEstablished';
 var STORAGE_VERSION_KEY = 'swipeardyCaptureVersion';
@@ -30,14 +129,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       reposts: message.data.reposts || 0,
       filters: message.data.filters || {}
     };
-    fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
-      .then(function (res) {
-        res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
-          sendResponse({ ok: true, status: res.status, body: body });
-        });
-      })
-      .catch(function (err) { sendResponse({ ok: false, error: err.message }); });
+    storeItemMedia(item).then(function (storedItem) {
+      return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(storedItem) });
+    }).then(function (res) {
+      return res.text().then(function (body) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
+        sendResponse({ ok: true, status: res.status, body: body });
+      });
+    }).catch(function (err) { sendResponse({ ok: false, error: err.message }); });
     return true;
   }
 
@@ -105,17 +204,18 @@ function trySaveBookmark(item, tweetId, opts) {
       if (tweetId) return markSeen([tweetId]).then(function () { return { ok: true, duplicate: true }; });
       return { ok: true, duplicate: true };
     }
-    return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
-      .then(function (res) {
-        return res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
-          return Promise.resolve().then(function () {
-            if (tweetId) return markSeen([tweetId]);
-          }).then(function () {
-            return { ok: true, duplicate: false };
-          });
+    return storeItemMedia(item).then(function (storedItem) {
+      return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(storedItem) });
+    }).then(function (res) {
+      return res.text().then(function (body) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
+        return Promise.resolve().then(function () {
+          if (tweetId) return markSeen([tweetId]);
+        }).then(function () {
+          return { ok: true, duplicate: false };
         });
       });
+    });
   });
 }
 
@@ -182,13 +282,14 @@ function syncBookmarkToSupabase(b, forceOpt) {
 
   return doDedupCheck(item.postUrl).then(function (isDup) {
     if (isDup) return { ok: true, duplicate: true };
-    return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
-      .then(function (res) {
-        return res.text().then(function (body) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
-          return { ok: true, duplicate: false };
-        });
+    return storeItemMedia(item).then(function (storedItem) {
+      return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(storedItem) });
+    }).then(function (res) {
+      return res.text().then(function (body) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ΓÇö ' + body);
+        return { ok: true, duplicate: false };
       });
+    });
   }).catch(function (err) { throw err; });
 }
 
@@ -534,11 +635,11 @@ function handleBulkImport(posts) {
           filters: p.filters || {}
         };
         batch.push(
-          fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(item) })
-            .then(function (res) {
-              if (res.ok) saved++;
-            })
-            .catch(function () {})
+          storeItemMedia(item).then(function (storedItem) {
+            return fetch(SB_URL + '/swipes', { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(storedItem) });
+          }).then(function (res) {
+            if (res.ok) saved++;
+          }).catch(function () {})
         );
       }
       return Promise.all(batch).then(function () {

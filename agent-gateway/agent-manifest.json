@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "name": "swipeardy",
+  "description": "Agent-agnostic MCP and REST gateway for Swipe Ardy.",
+  "region": "ap-northeast-1",
+  "endpoints": {
+    "mcp": "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/mcp",
+    "rest": "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/api/v1",
+    "openapi": "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/openapi.json",
+    "health": "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/health"
+  },
+  "authentication": { "scheme": "bearer", "prefix": "swa_", "identity": "one-revocable-token-per-agent", "secret_reference": "client-local-environment" },
+  "transport": { "mcp": "streamable-http", "parallel_tool_calls": false },
+  "capabilities": ["status", "search_posts", "get_post", "get_post_image", "create_post", "update_post", "delete_posts", "list_trash", "restore_post", "export_posts", "curate_posts", "list_filters", "update_filter_config", "list_views"],
+  "mode_support": { "read": ["posts", "creators", "websites", "snippets"], "write_first_phase": ["posts"] },
+  "safety": { "writes_require_idempotency": true, "updates_require_expected_revision": true, "deletes_are_two_step_and_recoverable": true, "delete_retention_days": 30, "image_max_bytes": 5242880 },
+  "client_configs": { "codex": ".codex/config.toml", "hermes": "agent-gateway/hermes.example.yaml", "claude_code": "agent-gateway/claude.example.json" }
+}

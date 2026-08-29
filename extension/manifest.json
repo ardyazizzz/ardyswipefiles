@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Swipe.ardy",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Extract LinkedIn, Twitter/X, and Pinterest post data and save to your Swipe.ardy collection.",
   "permissions": ["activeTab", "storage", "alarms", "cookies", "scripting"],
   "host_permissions": [
@@ -10,7 +10,10 @@
     "https://twitter.com/*",
     "https://*.pinterest.com/*",
     "https://dmhiitzunsdqyxopqsby.supabase.co/*",
-    "https://media.licdn.com/*"
+    "https://media.licdn.com/*",
+    "https://pbs.twimg.com/*",
+    "https://video.twimg.com/*",
+    "https://i.pinimg.com/*"
   ],
   "background": {
     "service_worker": "background.js"
