@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "swipeardy": {
+      "type": "http",
+      "url": "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/mcp",
+      "headers": { "Authorization": "Bearer ${SWIPEARDY_CLAUDE_TOKEN}" },
+      "timeout": 120000
+    }
+  }
+}

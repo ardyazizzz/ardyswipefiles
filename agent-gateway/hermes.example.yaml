@@ -1,0 +1,8 @@
+mcp_servers:
+  swipeardy:
+    url: "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/mcp"
+    headers:
+      Authorization: "Bearer ${SWIPEARDY_HERMES_TOKEN}"
+    timeout: 120
+    connect_timeout: 30
+    supports_parallel_tool_calls: false

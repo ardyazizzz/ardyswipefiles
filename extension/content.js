@@ -244,16 +244,82 @@
     return '';
   }
 
+  function findLinkedInEngagementBoundary(text) {
+    if (!text) return -1;
+
+    // LinkedIn often serializes the whole footer into one text node. Only
+    // treat a complete engagement shape as a caption boundary; words such as
+    // "like" or "comment" alone may be legitimate copy.
+    var actionMatch = /\bLike\s+Comment\s+Repost\s+Send\b/i.exec(text);
+    var actionIndex = actionMatch ? actionMatch.index : -1;
+    var reactionIndex = -1;
+    var reactionPattern;
+    var reactionMatch;
+
+    // Flattened footer form, for example:
+    // "Name and N others reacted Name and N others 1,079 comments".
+    reactionPattern = /\b((?:[A-Z][A-Za-z'’.-]*(?:[ \t]+[A-Z][A-Za-z'’.-]*){0,8})[ \t]+and[ \t]+\d[\d,.]*[ \t]+others?)[ \t]+reacted[ \t]+\1[ \t]+\d[\d,.]*[ \t]+comments?\b/i;
+    reactionMatch = reactionPattern.exec(text);
+    if (reactionMatch && (actionIndex === -1 || reactionMatch.index < actionIndex)) {
+      reactionIndex = reactionMatch.index;
+    }
+
+    // Normal DOM form: keep this fallback line-anchored so ordinary caption
+    // sentences are not mistaken for the footer.
+    reactionPattern = /\n[ \t]*((?:[A-Z][A-Za-z'’.-]*(?:[ \t]+[A-Z][A-Za-z'’.-]*){0,8})[ \t]+and[ \t]+\d[\d,.]*[ \t]+others?[ \t]+reacted)\b/i;
+    reactionMatch = reactionPattern.exec(text);
+    if (reactionMatch) {
+      var lineReactionIndex = reactionMatch.index + reactionMatch[0].indexOf(reactionMatch[1]);
+      if ((actionIndex === -1 || lineReactionIndex < actionIndex) && (reactionIndex === -1 || lineReactionIndex < reactionIndex)) {
+        reactionIndex = lineReactionIndex;
+      }
+    }
+
+    var commentIndex = -1;
+    var commentPattern = /\b\d[\d,.]*\s+comments?\b/gi;
+    var commentMatch;
+    while ((commentMatch = commentPattern.exec(text))) {
+      if (actionIndex === -1 || commentMatch.index < actionIndex) commentIndex = commentMatch.index;
+    }
+
+    if (actionIndex !== -1) {
+      if (reactionIndex !== -1) return reactionIndex;
+      if (commentIndex !== -1) return commentIndex;
+      // A bare action row is safe only when it starts its own line.
+      var lineAction = /(?:^|\n)[ \t]*Like\s+Comment\s+Repost\s+Send[ \t]*(?:\n|$)/i.exec(text);
+      return lineAction ? lineAction.index + (lineAction[0].charAt(0) === '\n' ? 1 : 0) : -1;
+    }
+
+    // Without the action row, require a reaction summary followed shortly by
+    // a comment count to avoid truncating legitimate caption text.
+    if (reactionIndex !== -1 && commentIndex !== -1 && commentIndex - reactionIndex <= 180) return reactionIndex;
+
+    var lineComment = /(?:^|\n)\s*\d[\d,.]*\s+comments?\b/i.exec(text);
+    return lineComment ? lineComment.index + (lineComment[0].charAt(0) === '\n' ? 1 : 0) : -1;
+  }
+
   function cleanSnippet(text) {
     if (!text) return '';
+    text = String(text).replace(/\u00a0/g, ' ');
     var boundaries = ['Activate to view larger image', 'Add a comment', 'Open Emoji Keyboard', 'Like Reply', 'Like\nReply', 'Load more comments', 'Reaction button', 'Most relevant', 'most relevant', 'About\nAccessibility', 'Help Center', 'LinkedIn Corporation', 'Get the LinkedIn app', 'Privacy & Terms'];
+    var boundaryIndex = -1;
+    var boundaryLabel = '';
     for (var bi = 0; bi < boundaries.length; bi++) {
       var idx = text.indexOf(boundaries[bi]);
       if (idx !== -1) {
-        text = text.slice(0, idx);
-        LOG&&console.log('[Swipe.ardy cs] cleanSnippet: truncated at "' + boundaries[bi] + '"');
+        boundaryIndex = idx;
+        boundaryLabel = boundaries[bi];
         break;
       }
+    }
+    var engagementIndex = findLinkedInEngagementBoundary(text);
+    if (engagementIndex !== -1 && (boundaryIndex === -1 || engagementIndex < boundaryIndex)) {
+      boundaryIndex = engagementIndex;
+      boundaryLabel = 'engagement footer';
+    }
+    if (boundaryIndex !== -1) {
+      text = text.slice(0, boundaryIndex);
+      LOG&&console.log('[Swipe.ardy cs] cleanSnippet: truncated at "' + boundaryLabel + '"');
     }
     var lines = text.split('\n');
     while (lines.length > 0 && /^\d{1,6}$/.test(lines[lines.length - 1].trim())) {
@@ -289,7 +355,43 @@
     return cleaned.join('\n').replace(/\n{3,}/g, '\n\n').trim();
   }
 
+  function extractLinkedInCaptionFromSelectors(card) {
+    var selectors = [
+      '.update-components-text .break-words',
+      '.feed-shared-update-v2__description-wrapper .break-words',
+      '.update-components-text',
+      '.feed-shared-update-v2__description-wrapper',
+      '.feed-shared-inline-show-more-text',
+      '.feed-shared-text',
+      '.update-components-update-v2__commentary'
+    ];
+    var blacklist = ['following', 'premium', 'promoted', 'reposted this', 'visit my website', 'subscribe'];
+    for (var i = 0; i < selectors.length; i++) {
+      var nodes = card.querySelectorAll(selectors[i]);
+      for (var j = 0; j < nodes.length; j++) {
+        var node = nodes[j];
+        var txt = visibleText(node);
+        if (!txt || txt.length < 20) continue;
+        // Do not accidentally select text from an expanded comment subtree.
+        if (node.closest && node.closest('.comments-comment-item, .comments-comments-list, [class*="comments-comment"]')) continue;
+        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
+        var lower = txt.toLowerCase();
+        if (blacklist.filter(function (w) { return lower.indexOf(w) !== -1; }).length >= 3) continue;
+        var cleaned = cleanSnippet(txt);
+        if (!cleaned) continue;
+        LOG&&console.log('[Swipe.ardy cs] Caption selector hit:', selectors[i], '->', cleaned.slice(0, 150));
+        return cleaned;
+      }
+    }
+    return '';
+  }
+
   function extractLinkedInSnippet(card) {
+    // Prefer LinkedIn's caption container. Broad card text also contains
+    // reaction summaries, action buttons, and (when expanded) comments.
+    var selectorCaption = extractLinkedInCaptionFromSelectors(card);
+    if (selectorCaption) return selectorCaption;
+
     var fullText = visibleText(card);
     var postText = getPostAreaText(fullText);
 
@@ -1116,6 +1218,11 @@
   }
 
   function scanLinkedInSnippet(card) {
+    // Keep page-scan extraction on the same precise caption path as
+    // single-post extraction so engagement footer text cannot leak into saves.
+    var selectorCaption = extractLinkedInCaptionFromSelectors(card);
+    if (selectorCaption) return selectorCaption;
+
     var selectors = [
       '.update-components-text .break-words',
       '.update-components-text',
@@ -1131,7 +1238,7 @@
         var el = nodes[i];
         var txt = visibleText(el);
         if (!txt || txt.length < 20) continue;
-        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\s+/g, ' ').trim();
+        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
         var lower = txt.toLowerCase();
         var polluted = true;
         var hitCount = 0;
@@ -1140,7 +1247,9 @@
         }
         polluted = hitCount >= 3;
         if (polluted) continue;
-        return txt;
+        var cleaned = cleanSnippet(txt);
+        if (!cleaned) continue;
+        return cleaned;
       }
     }
     return '';
