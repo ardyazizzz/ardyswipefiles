@@ -600,10 +600,15 @@ export async function getPostImage(ctx: RequestContext, idValue: unknown, modeVa
 }
 
 async function countForMode(mode: string): Promise<number | null> {
-  const response = await adminRequest("/rest/v1/rpc/swipeardy_search_swipes", { method: "POST", headers: { Prefer: "count=exact" }, json: { p_mode: mode, p_limit: 1, p_offset: 0 } });
-  const range = response.response.headers.get("content-range") || "";
-  const match = /\/(\d+)$/.exec(range);
-  return match ? Number(match[1]) : null;
+  const response = await adminRequest("/rest/v1/rpc/swipeardy_count_swipes", { method: "POST", json: { p_mode: mode } });
+  if (typeof response.data === "number") return response.data;
+  if (Array.isArray(response.data) && response.data[0] && typeof response.data[0] === "object") {
+    const value = Object.values(response.data[0] as Record<string, unknown>)[0];
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  const parsed = Number(response.data);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export async function status(ctx: RequestContext): Promise<JsonObject> {
@@ -638,3 +643,4 @@ export async function executeTool(name: string, args: unknown, ctx: RequestConte
     default: throw new GatewayError(404, "tool_not_found", `Unknown tool '${name}'`);
   }
 }
+
