@@ -10,9 +10,8 @@ browser editor password and from the public Supabase publishable key.
 - OpenAPI: `https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/openapi.json`
 - Health: `https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent/health`
 
-The endpoint is intentionally not usable until the database migrations are
-reviewed/applied, a private Edge Function secret is configured, and a separate
-hashed token is created for each agent.
+The production database migrations and private Edge Function are active. Every
+protected request still requires a separate hashed token for the calling agent.
 
 ## Capabilities
 
@@ -55,11 +54,15 @@ never commit it.
 
 ## Hermes and other clients
 
-`hermes.example.yaml` and `claude.example.json` are templates only. Each client
-must keep its own token and can be revoked independently. The endpoint and tool
-contract are shared, not the credentials.
+`hermes.example.yaml` and `claude.example.json` are secret-free templates. On the
+configured development machine, Hermes now has a `swipeardy` server entry alongside
+the existing SwipeShare entry, using its own revocable token. Restart Hermes after
+configuration changes so the server appears in its MCP list. Each client keeps its
+own token and can be revoked independently; the endpoint and tool contract are
+shared, not the credentials.
 
 ## Local secret files
 
 Copy `.env.example` to `.env.local` only on your machine. `.env.local` is ignored
 and must never be uploaded, committed, or pasted into a chat.
+
