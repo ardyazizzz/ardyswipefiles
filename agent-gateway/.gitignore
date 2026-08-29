@@ -1,3 +1,6 @@
 .env.local
 .env.*.local
 *.token
+*.secret.*
+*.local.*
+
