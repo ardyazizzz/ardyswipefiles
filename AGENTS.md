@@ -93,6 +93,8 @@ The MCP tool surface is intentionally aligned with SwipeShare:
 | `search_posts` | Paginated search; pass `mode` explicitly for non-Posts reads |
 | `get_post` | Read one structured record; optionally include image blocks |
 | `get_post_image` | Fetch one actual image block for vision/OCR |
+| `scan_image_health` | Read-only bounded health scan for explicit Posts-mode image URLs |
+| `repair_post_images` | Preview then revision-check a public-browser-discovered image repair |
 | `create_post` / `update_post` | Idempotent Posts-mode writes with revision checks |
 | `delete_posts` | Two-step deletion into recoverable 30-day Trash |
 | `list_trash` / `restore_post` | Review or restore deleted records |
@@ -108,6 +110,25 @@ previewed first, then moved to Trash only with a short-lived confirmation token.
 Image tools accept only HTTPS image resources, block obvious private hosts, cap each
 image at 5 MB, and return standard MCP image blocks for direct visual analysis.
 
+### Public-browser image repair
+
+`scan_image_health` is read-only and never scans the whole library implicitly: an
+agent supplies up to 25 explicit Posts-mode IDs, and the gateway reports each
+image as `healthy`, definitively `broken` (404/410), or `uncheckable`. An
+`uncheckable` result can mean a CDN rejects lightweight probes; it is not proof
+that the media is missing.
+
+For `repair_post_images`, the calling agent—not this gateway—opens the post's
+`postUrl` in its own normal/in-app browser, preferably without login, and extracts
+actual public HTTPS image URL(s). The gateway does not automate a browser, read
+cookies, store passwords, or bypass sign-in walls. The agent first creates a
+preview with the current `revision` and candidate URLs. After human approval it
+uses the returned 15-minute confirmation token plus a fresh idempotency key to
+apply. The gateway refetches and hash-verifies the reviewed bytes, stores approved
+copies at new immutable Swipe Ardy Storage paths, then updates only the post's
+comma-separated `image` field if that same revision still exists. A changed source
+or revision stops the repair without overwriting the post.
+
 Swipe Ardy currently supports read access to `posts`, `creators`, `websites`, and
 `snippets`; the first write surface is Posts. This is a capability boundary, not a
 credential boundary, and must remain explicit when an agent chooses a mode.
@@ -116,8 +137,9 @@ credential boundary, and must remain explicit when an agent chooses a mode.
 
 Read this file, `agent-gateway/README.md`, and
 `agent-gateway/AGENT-COLLABORATION.md` before acting. Then run the read-only smoke
-test, which initializes MCP, checks the advertised tools, calls `status`, and reads
-one post without writing data:
+test, which initializes MCP, checks the advertised tools, calls `status`, reads
+one post, and runs one lightweight read-only image-health probe without writing
+data:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\agent-gateway\smoke-test.ps1

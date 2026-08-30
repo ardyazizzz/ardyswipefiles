@@ -2,7 +2,7 @@ export const openApiDocument = {
   openapi: "3.1.0",
   info: {
     title: "Swipe Ardy Agent Gateway",
-    version: "1.0.0",
+    version: "1.1.0",
     description: "Scoped AI-agent access to Swipe Ardy. MCP is preferred for multimodal image analysis; REST/OpenAPI is the portable fallback.",
   },
   servers: [{ url: "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent" }],
@@ -32,6 +32,8 @@ export const openApiDocument = {
     "/api/v1/trash/{trash_id}/restore": { post: { summary: "Restore a Trash item", parameters: [{ name: "trash_id", in: "path", required: true, schema: { type: "string", format: "uuid" } }, { name: "Idempotency-Key", in: "header", schema: { type: "string" }}], responses: { "200": { description: "Restored record" } } } },
     "/api/v1/export": { post: { summary: "Create a private structured export", responses: { "200": { description: "Expiring download URL" } } } },
     "/api/v1/curate": { post: { summary: "Preview or atomically apply up to 100 curation patches", responses: { "200": { description: "Preview or updated records" }, "409": { description: "Revision conflict" } } } },
+    "/api/v1/images/health": { post: { summary: "Read-only bounded health probe for explicit Posts-mode image URLs", responses: { "200": { description: "Per-image healthy, broken, or uncheckable status" } } } },
+    "/api/v1/images/repair": { post: { summary: "Preview or apply a public-browser-discovered Posts-mode image repair", parameters: [{ name: "Idempotency-Key", in: "header", schema: { type: "string" }}], responses: { "200": { description: "Preview metadata or revision-checked repaired record" }, "409": { description: "Revision conflict or source changed" }, "410": { description: "Preview expired" } } } },
     "/api/v1/filters": { get: { summary: "Read mode filter config", responses: { "200": { description: "Filter definitions and colors" } } }, put: { summary: "Replace mode filter config", responses: { "200": { description: "Updated config or preview" } } } },
     "/api/v1/views": { get: { summary: "Read saved views", responses: { "200": { description: "Saved views" } } } },
   },

@@ -34,7 +34,7 @@ $searchResult = Invoke-McpRequest 5 'tools/call' @{ name = 'search_posts'; argum
 
 $expectedTools = @(
   'status', 'search_posts', 'get_post', 'get_post_image', 'create_post',
-  'update_post', 'delete_posts', 'list_trash', 'restore_post', 'export_posts',
+  'scan_image_health', 'repair_post_images', 'update_post', 'delete_posts', 'list_trash', 'restore_post', 'export_posts',
   'curate_posts', 'list_filters', 'update_filter_config', 'list_views'
 )
 $advertisedTools = @($toolsResult.result.tools | ForEach-Object { $_.name })
@@ -52,6 +52,12 @@ function Get-StructuredContent($result) {
 
 $status = Get-StructuredContent $statusResult
 $search = Get-StructuredContent $searchResult
+$firstPost = @($search.records | Select-Object -First 1)[0]
+if ($null -eq $firstPost -or $null -eq $firstPost.id) {
+  throw 'Gateway search returned no post to use for the read-only image-health smoke check.'
+}
+$imageHealthResult = Invoke-McpRequest 6 'tools/call' @{ name = 'scan_image_health'; arguments = @{ post_ids = @([int64]$firstPost.id); max_images_per_post = 1 } }
+$imageHealth = Get-StructuredContent $imageHealthResult
 $searchCount = if ($null -ne $search.count) {
   $search.count
 } elseif ($null -ne $search.page.returned) {
@@ -72,6 +78,8 @@ $searchCount = if ($null -ne $search.count) {
   post_count = $status.counts.posts
   search_mode = $search.mode
   search_count = $searchCount
+  image_health_post_id = $firstPost.id
+  image_health_status = @($imageHealth.records | Select-Object -First 1).status
   region = $status.region
   writes_performed = $false
 } | Format-List

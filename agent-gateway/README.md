@@ -21,6 +21,8 @@ protected request still requires a separate hashed token for the calling agent.
 | `search_posts` | Search any mode (`posts`, `creators`, `websites`, `snippets`) | Paginated, read-only |
 | `get_post` | Read one structured record | Optional real image blocks |
 | `get_post_image` | Fetch one image for vision/OCR | HTTPS-only, private-host block, 5 MB limit |
+| `scan_image_health` | Probe explicit Posts-mode image URLs | Read-only, max 25 posts and 8 images/post; reports healthy, broken, or uncheckable |
+| `repair_post_images` | Archive browser-discovered replacement images and update one Post | Preview + human confirmation, 15-minute token, byte hash, immutable Storage paths, revision check |
 | `create_post` / `update_post` | Write Posts-mode records | Idempotency, dry-run, revision check |
 | `delete_posts` | Delete Posts-mode records | Two-step confirmation, 30-day Trash |
 | `list_trash` / `restore_post` | Review or recover deletion | Expiry and ID-conflict checks |
@@ -46,6 +48,33 @@ contract.
    to Trash, where they remain recoverable for 30 days.
 8. Use `export_posts` for structured handoff; signed URLs expire after 15 minutes.
 
+## Public-browser image repair workflow
+
+`scan_image_health` is intentionally bounded: pass specific Posts-mode IDs and
+it performs lightweight network checks only. A `broken` result is a definite
+404/410. `uncheckable` is not proof that an image is gone; the source may reject
+lightweight requests or require a normal browser.
+
+For a repair, Codex, Hermes, or another browser-capable agent performs the
+browser step itself. The gateway does **not** control the browser, collect
+cookies, store LinkedIn credentials, or bypass a sign-in wall.
+
+1. Read the post and retain its `revision`; run `scan_image_health` if useful.
+2. Open that post's `postUrl` in the agent's normal/in-app browser. Prefer a
+   public page and extract the actual HTTPS image URL(s) from the post.
+3. Call `repair_post_images` with `phase: "preview"`, the post ID, revision,
+   fresh idempotency key, and up to four `source_image_urls`.
+4. Review the returned source URLs and metadata with the user. The post remains
+   untouched at this point.
+5. Only after approval, call `repair_post_images` with `phase: "apply"`, the
+   returned repair ID/token, same revision, and a **new** idempotency key.
+
+On apply, the gateway refetches the source and verifies its SHA-256 hash still
+matches the reviewed preview. It then copies the bytes to a new immutable path
+in Swipe Ardy Storage and changes only the Post's comma-separated `image` field.
+If the post revision or source bytes changed, it stops without updating the row.
+It cannot recreate media that has been deleted from every public source.
+
 ## Codex setup
 
 The checked-in `.codex/config.toml` is secret-free and reads
@@ -70,8 +99,9 @@ committed, or pasted into a chat.
 ## Read-only smoke test
 
 Run the smoke test after a new client setup, gateway deployment, or restart. It
-initializes MCP, verifies the expected tool surface, calls `status`, and performs
-one `search_posts` read. It never creates, updates, curates, or deletes data.
+initializes MCP, verifies the expected tool surface, calls `status`, performs
+one `search_posts` read, and runs one lightweight `scan_image_health` probe. It
+never creates, updates, curates, repairs, or deletes data.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\agent-gateway\smoke-test.ps1

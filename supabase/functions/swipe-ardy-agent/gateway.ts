@@ -36,6 +36,10 @@ type SwipeRow = JsonObject & {
 const MAX_SEARCH_LIMIT = 200;
 const MAX_IMAGES_PER_CALL = 4;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_HEALTH_POSTS_PER_CALL = 25;
+const MAX_HEALTH_IMAGES_PER_POST = 8;
+const REPAIR_CONFIRMATION_MS = 15 * 60 * 1000;
+const REPAIRED_MEDIA_BUCKET = "swipeardy-repaired-media";
 const ALLOWED_PATCH_FIELDS = new Set([
   "author", "date", "platform", "filters", "text", "image", "postUrl",
   "reactions", "comments", "reposts", "followers",
@@ -92,6 +96,18 @@ export const toolDefinitions = [
     description: "Fetch a record image as an MCP image content block for vision/OCR analysis.",
     inputSchema: { type: "object", required: ["post_id"], properties: { post_id: { type: "integer", minimum: 1 }, mode: modeProperty, image_index: { type: "integer", minimum: 0, default: 0 } }, additionalProperties: false },
     annotations: { title: "Inspect a Swipe Ardy image", readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+  },
+  {
+    name: "scan_image_health",
+    description: "Read-only health check for explicit Posts-mode IDs. It probes only the supplied public image URLs; it never changes data and reports broken, healthy, or uncheckable media.",
+    inputSchema: { type: "object", required: ["post_ids"], properties: { post_ids: { type: "array", items: { type: "integer", minimum: 1 }, minItems: 1, maxItems: MAX_HEALTH_POSTS_PER_CALL }, max_images_per_post: { type: "integer", minimum: 1, maximum: MAX_HEALTH_IMAGES_PER_POST, default: 4 } }, additionalProperties: false },
+    annotations: { title: "Scan Swipe Ardy image health", readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+  },
+  {
+    name: "repair_post_images",
+    description: "Two-step Posts-mode image repair. Preview public browser-discovered source_image_urls first; after human review, apply with the returned confirmation token. Apply copies verified bytes into Swipe Ardy Storage and revision-checks the image update. This never controls a browser or uses LinkedIn credentials.",
+    inputSchema: { type: "object", required: ["phase", "idempotency_key"], properties: { phase: { type: "string", enum: ["preview", "apply"] }, post_id: { type: "integer", minimum: 1 }, expected_revision: { type: "integer", minimum: 1 }, source_image_urls: { type: "array", items: { type: "string", format: "uri" }, minItems: 1, maxItems: MAX_IMAGES_PER_CALL }, repair_id: { type: "string", format: "uuid" }, confirmation_token: { type: "string", minLength: 20, maxLength: 200 }, idempotency_key: { type: "string", minLength: 8, maxLength: 200 } }, additionalProperties: false },
+    annotations: { title: "Preview or apply Swipe Ardy image repair", readOnlyHint: false, destructiveHint: false, idempotentHint: true },
   },
   {
     name: "create_post",
@@ -544,10 +560,52 @@ function hostIsPrivate(hostname: string): boolean {
   return false;
 }
 
-async function fetchImage(urlValue: string): Promise<{ bytes: Uint8Array; mimeType: string; url: string }> {
+function parsePublicHttpsUrl(urlValue: string, label = "Image URL"): URL {
   let parsed: URL;
-  try { parsed = new URL(urlValue); } catch { throw new GatewayError(400, "invalid_image_url", "Image URL is invalid"); }
-  if (parsed.protocol !== "https:" || hostIsPrivate(parsed.hostname)) throw new GatewayError(400, "invalid_image_url", "Only public HTTPS image URLs are allowed");
+  try { parsed = new URL(urlValue); } catch { throw new GatewayError(400, "invalid_image_url", `${label} is invalid`); }
+  if (parsed.protocol !== "https:" || hostIsPrivate(parsed.hostname)) {
+    throw new GatewayError(400, "invalid_image_url", "Only public HTTPS image URLs are allowed");
+  }
+  return parsed;
+}
+
+function ensurePublicRedirect(urlValue: string): void {
+  const parsed = parsePublicHttpsUrl(urlValue, "Image redirect URL");
+  if (hostIsPrivate(parsed.hostname)) throw new GatewayError(400, "invalid_image_url", "Image redirect points to a private host");
+}
+
+async function readImageBytes(response: Response): Promise<Uint8Array> {
+  const length = Number(response.headers.get("content-length") || 0);
+  if (length > MAX_IMAGE_BYTES) throw new GatewayError(413, "image_too_large", "Image exceeds the 5 MB limit");
+  if (!response.body) return new Uint8Array(await response.arrayBuffer());
+  const reader = response.body.getReader();
+  const parts: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      total += next.value.byteLength;
+      if (total > MAX_IMAGE_BYTES) {
+        await reader.cancel();
+        throw new GatewayError(413, "image_too_large", "Image exceeds the 5 MB limit");
+      }
+      parts.push(next.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(part, offset);
+    offset += part.byteLength;
+  }
+  return bytes;
+}
+
+async function fetchImage(urlValue: string): Promise<{ bytes: Uint8Array; mimeType: string; url: string }> {
+  const parsed = parsePublicHttpsUrl(urlValue);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
   let response: Response;
@@ -555,13 +613,10 @@ async function fetchImage(urlValue: string): Promise<{ bytes: Uint8Array; mimeTy
   catch { throw new GatewayError(502, "image_fetch_failed", "Image could not be fetched"); }
   finally { clearTimeout(timeout); }
   if (!response.ok) throw new GatewayError(502, "image_fetch_failed", `Image server returned HTTP ${response.status}`);
-  try { if (hostIsPrivate(new URL(response.url).hostname)) throw new GatewayError(400, "invalid_image_url", "Image redirect points to a private host"); } catch (error) { if (error instanceof GatewayError) throw error; }
+  ensurePublicRedirect(response.url || urlValue);
   const mimeType = (response.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
   if (!mimeType.startsWith("image/")) throw new GatewayError(415, "not_an_image", `Resource type '${mimeType || "unknown"}' is not an image`);
-  const length = Number(response.headers.get("content-length") || 0);
-  if (length > MAX_IMAGE_BYTES) throw new GatewayError(413, "image_too_large", "Image exceeds the 5 MB limit");
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if (bytes.byteLength > MAX_IMAGE_BYTES) throw new GatewayError(413, "image_too_large", "Image exceeds the 5 MB limit");
+  const bytes = await readImageBytes(response);
   return { bytes, mimeType, url: response.url || urlValue };
 }
 
@@ -570,6 +625,257 @@ function bytesToBase64(bytes: Uint8Array): string {
   const chunk = 0x8000;
   for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + chunk, bytes.length)));
   return btoa(binary);
+}
+
+async function hashBytes(bytes: Uint8Array): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+type ImageHealth = {
+  url: string;
+  status: "healthy" | "broken" | "uncheckable";
+  http_status: number | null;
+  mime_type: string | null;
+  resolved_url: string | null;
+  detail?: string;
+};
+
+async function cancelResponseBody(response: Response): Promise<void> {
+  try { await response.body?.cancel(); } catch { /* probe body is deliberately discarded */ }
+}
+
+async function probeImage(urlValue: string): Promise<ImageHealth> {
+  let parsed: URL;
+  try { parsed = parsePublicHttpsUrl(urlValue); }
+  catch (error) {
+    return { url: urlValue, status: "uncheckable", http_status: null, mime_type: null, resolved_url: null, detail: error instanceof Error ? error.message : "invalid URL" };
+  }
+  const probe = async (method: "HEAD" | "GET"): Promise<Response> => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      return await fetch(parsed, { method, signal: controller.signal, redirect: "follow", headers: { "User-Agent": "SwipeArdy-Agent-Gateway/1.1", ...(method === "GET" ? { Range: "bytes=0-16383" } : {}) } });
+    } finally { clearTimeout(timeout); }
+  };
+  let response: Response;
+  try { response = await probe("HEAD"); }
+  catch { return { url: urlValue, status: "uncheckable", http_status: null, mime_type: null, resolved_url: null, detail: "network timeout or fetch failure" }; }
+  if ([405, 501].includes(response.status)) {
+    await cancelResponseBody(response);
+    try { response = await probe("GET"); }
+    catch { return { url: urlValue, status: "uncheckable", http_status: null, mime_type: null, resolved_url: null, detail: "network timeout or fetch failure" }; }
+  }
+  const resolvedUrl = response.url || urlValue;
+  try { ensurePublicRedirect(resolvedUrl); }
+  catch (error) {
+    await cancelResponseBody(response);
+    return { url: urlValue, status: "uncheckable", http_status: response.status, mime_type: null, resolved_url: null, detail: error instanceof Error ? error.message : "unsafe redirect" };
+  }
+  const mimeType = (response.headers.get("content-type") || "").split(";")[0].trim().toLowerCase() || null;
+  const status = response.status;
+  await cancelResponseBody(response);
+  if (status === 404 || status === 410) return { url: urlValue, status: "broken", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source returned a definitive missing status" };
+  if (response.ok && Boolean(mimeType?.startsWith("image/"))) return { url: urlValue, status: "healthy", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl };
+  if (response.ok) return { url: urlValue, status: "uncheckable", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source did not identify itself as an image" };
+  return { url: urlValue, status: "uncheckable", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source denied or could not satisfy a lightweight probe" };
+}
+
+function repairImageUrls(value: unknown): string[] {
+  const values = asArray(value, "source_image_urls");
+  if (!values.length || values.length > MAX_IMAGES_PER_CALL) throw new GatewayError(400, "invalid_input", `source_image_urls must contain between 1 and ${MAX_IMAGES_PER_CALL} URLs`);
+  const urls = [...new Set(values.map((item, index) => cleanText(item, `source_image_urls[${index}]`, 4000, true)!))];
+  for (const url of urls) parsePublicHttpsUrl(url, "source_image_urls entry");
+  return urls;
+}
+
+function repairedMediaExtension(mimeType: string): string {
+  const extensions: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/gif": "gif", "image/webp": "webp", "image/avif": "avif" };
+  const extension = extensions[mimeType];
+  if (!extension) throw new GatewayError(415, "unsupported_image_type", `Image type '${mimeType}' is not supported for repaired media`);
+  return extension;
+}
+
+function storagePathUrl(bucket: string, path: string): string {
+  const base = (Deno.env.get("SUPABASE_PUBLIC_URL") || Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
+  if (!base) throw new GatewayError(500, "server_misconfigured", "SUPABASE_URL is unavailable");
+  return `${base}/storage/v1/object/public/${bucket}/${path.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+async function uploadRepairedMedia(path: string, image: { bytes: Uint8Array; mimeType: string }): Promise<void> {
+  const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+  await adminRequest(`/storage/v1/object/${REPAIRED_MEDIA_BUCKET}/${encodedPath}`, {
+    method: "POST",
+    headers: { "Content-Type": image.mimeType, "x-upsert": "false", "Cache-Control": "public, max-age=31536000, immutable" },
+    body: image.bytes,
+  });
+}
+
+async function removeUploadedRepairedMedia(paths: string[]): Promise<void> {
+  if (!paths.length) return;
+  await adminRequest(`/storage/v1/object/${REPAIRED_MEDIA_BUCKET}`, { method: "DELETE", json: { prefixes: paths } });
+}
+
+async function repairConfirmationToken(ctx: RequestContext, repairId: string): Promise<string> {
+  // The token can be regenerated for an idempotent retry without storing its
+  // plaintext. The server-only secret makes the proof unguessable even if a
+  // repair UUID is somehow observed.
+  const secret = Deno.env.get("SUPABASE_SECRET_KEYS") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!secret) throw new GatewayError(500, "server_misconfigured", "Supabase admin key is unavailable");
+  const proof = (await sha256Hex(`${secret}:${ctx.agent.id}:${repairId}`)).slice(0, 48);
+  return `swir_${repairId}_${proof}`;
+}
+
+function repairMetadata(row: JsonObject): JsonObject {
+  return {
+    repair_id: row.repair_id,
+    post_id: row.post_id,
+    expected_revision: row.expected_revision,
+    source_post_url: row.source_post_url || null,
+    candidate_images: Array.isArray(row.candidate_images) ? row.candidate_images : [],
+    confirmation_expires_at: row.expires_at,
+  };
+}
+
+export async function scanImageHealth(ctx: RequestContext, args: unknown): Promise<JsonObject> {
+  requireScope(ctx.agent, "read");
+  const input = asObject(args, "arguments");
+  const ids = normalizeIds(input.post_ids, MAX_HEALTH_POSTS_PER_CALL);
+  const maxImages = Math.min(Math.max(cleanInteger(input.max_images_per_post, "max_images_per_post", 4), 1), MAX_HEALTH_IMAGES_PER_POST);
+  const records = await recordsByIds(ids, "posts");
+  const byId = new Map(records.map((record) => [record.id, record]));
+  const results: JsonObject[] = [];
+  for (const id of ids) {
+    const record = byId.get(id);
+    if (!record) {
+      results.push({ post_id: id, status: "not_found_or_not_posts_mode" });
+      continue;
+    }
+    const urls = imageList(record.image);
+    const scannedUrls = urls.slice(0, maxImages);
+    const images: ImageHealth[] = [];
+    for (const url of scannedUrls) images.push(await probeImage(url));
+    const counts = { healthy: images.filter((item) => item.status === "healthy").length, broken: images.filter((item) => item.status === "broken").length, uncheckable: images.filter((item) => item.status === "uncheckable").length };
+    results.push({ post_id: id, revision: record.revision, post_url: record.postUrl || null, image_count: urls.length, checked_image_count: images.length, omitted_image_count: Math.max(0, urls.length - images.length), status: !urls.length ? "no_image" : counts.broken ? "needs_repair" : counts.uncheckable ? "needs_review" : "healthy", counts, images });
+  }
+  return { mode: "posts", read_only: true, max_images_per_post: maxImages, count: results.length, records: results };
+}
+
+async function createRepairPreview(ctx: RequestContext, input: JsonObject): Promise<JsonObject> {
+  const postId = cleanInteger(input.post_id, "post_id");
+  const expectedRevision = cleanInteger(input.expected_revision, "expected_revision");
+  if (expectedRevision < 1) throw new GatewayError(400, "invalid_input", "expected_revision must be positive");
+  const sourceUrls = repairImageUrls(input.source_image_urls);
+  const current = await getPost(ctx, postId, "posts");
+  if (Number(current.revision) !== expectedRevision) throw new GatewayError(409, "revision_conflict", `Post ${postId} changed since it was read`, { id: postId, expected_revision: expectedRevision, current_revision: current.revision });
+  const candidateImages: JsonObject[] = [];
+  for (const sourceUrl of sourceUrls) {
+    const image = await fetchImage(sourceUrl);
+    candidateImages.push({ source_url: sourceUrl, resolved_url: image.url, mime_type: image.mimeType, size_bytes: image.bytes.byteLength, sha256: await hashBytes(image.bytes) });
+  }
+  const expiresAt = new Date(Date.now() + REPAIR_CONFIRMATION_MS).toISOString();
+  const insert = await adminRequest("/rest/v1/swipeardy_agent_image_repairs?select=repair_id,post_id,expected_revision,source_post_url,candidate_images,expires_at", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    json: { agent_key_id: ctx.agent.id, post_id: postId, expected_revision: expectedRevision, source_post_url: current.postUrl || null, candidate_images: candidateImages, confirmation_hash: "pending", expires_at: expiresAt },
+  });
+  const row = Array.isArray(insert.data) && insert.data[0] ? asObject(insert.data[0], "repair preview") : null;
+  if (!row?.repair_id) throw new GatewayError(502, "repair_preview_failed", "Supabase did not return a repair preview ID");
+  const confirmationToken = await repairConfirmationToken(ctx, String(row.repair_id));
+  await adminRequest(`/rest/v1/swipeardy_agent_image_repairs?repair_id=eq.${encodeURIComponent(String(row.repair_id))}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { confirmation_hash: await sha256Hex(confirmationToken) } });
+  const result = { dry_run: true, mode: "posts", ...repairMetadata(row), confirmation_token: confirmationToken, instruction: "Inspect these browser-discovered candidates, then call repair_post_images with phase=apply, repair_id, confirmation_token, expected_revision, and a fresh idempotency_key. No post has changed yet." };
+  await writeAudit(ctx, "images.repair.preview", String(postId), current, { ...result, confirmation_token: "[redacted]" }, { candidate_count: candidateImages.length });
+  return result;
+}
+
+async function applyRepairPreview(ctx: RequestContext, input: JsonObject): Promise<JsonObject> {
+  const repairId = cleanText(input.repair_id, "repair_id", 100, true)!;
+  const confirmationToken = cleanText(input.confirmation_token, "confirmation_token", 200, true)!;
+  const expectedRevision = cleanInteger(input.expected_revision, "expected_revision");
+  if (expectedRevision < 1) throw new GatewayError(400, "invalid_input", "expected_revision must be positive");
+  const key = requireIdempotency(input);
+  const replay = await readIdempotentResult(ctx, "images.repair.apply", key, { repair_id: repairId, expected_revision: expectedRevision });
+  if (replay.response) return { ...asObject(replay.response), idempotent_replay: true };
+  const query = new URLSearchParams({ select: "*", repair_id: `eq.${repairId}`, agent_key_id: `eq.${ctx.agent.id}`, limit: "1" });
+  const { data } = await adminRequest(`/rest/v1/swipeardy_agent_image_repairs?${query}`);
+  const rows = Array.isArray(data) ? data as JsonObject[] : [];
+  const repair = rows[0];
+  if (!repair) throw new GatewayError(404, "repair_not_found", "Repair preview was not found for this agent");
+  if (repair.status !== "previewed") throw new GatewayError(409, "repair_not_applicable", "Repair preview was already applied or is no longer available");
+  if (new Date(String(repair.expires_at)).getTime() <= Date.now()) {
+    await adminRequest(`/rest/v1/swipeardy_agent_image_repairs?repair_id=eq.${encodeURIComponent(repairId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { status: "expired" } });
+    throw new GatewayError(410, "repair_preview_expired", "Repair preview expired; create a new preview before applying");
+  }
+  if (Number(repair.expected_revision) !== expectedRevision) throw new GatewayError(409, "revision_conflict", "The supplied revision differs from the reviewed repair preview", { expected_revision: repair.expected_revision });
+  if (await sha256Hex(confirmationToken) !== String(repair.confirmation_hash)) throw new GatewayError(403, "invalid_confirmation_token", "Repair confirmation token is invalid");
+  const postId = cleanInteger(repair.post_id, "repair.post_id");
+  const current = await getPost(ctx, postId, "posts");
+  if (Number(current.revision) !== expectedRevision) throw new GatewayError(409, "revision_conflict", `Post ${postId} changed since it was previewed`, { id: postId, expected_revision: expectedRevision, current_revision: current.revision });
+  const candidates = asArray(repair.candidate_images, "repair.candidate_images").map((value, index) => asObject(value, `repair.candidate_images[${index}]`));
+  if (!candidates.length || candidates.length > MAX_IMAGES_PER_CALL) throw new GatewayError(409, "repair_preview_invalid", "Repair preview has no valid candidate images");
+  const refetched: Array<{ bytes: Uint8Array; mimeType: string; url: string; candidate: JsonObject }> = [];
+  for (const candidate of candidates) {
+    const image = await fetchImage(cleanText(candidate.resolved_url || candidate.source_url, "repair candidate URL", 4000, true)!);
+    const actualHash = await hashBytes(image.bytes);
+    if (actualHash !== String(candidate.sha256) || image.mimeType !== String(candidate.mime_type)) {
+      throw new GatewayError(409, "repair_source_changed", "A reviewed source image changed or expired; create a new preview before applying", { source_url: candidate.source_url, resolved_url: image.url });
+    }
+    refetched.push({ ...image, candidate });
+  }
+  const uploadedPaths: string[] = [];
+  try {
+    for (const [index, image] of refetched.entries()) {
+      const extension = repairedMediaExtension(image.mimeType);
+      const digest = String(image.candidate.sha256).slice(0, 24);
+      const path = `posts/${postId}/${repairId}/${String(index + 1).padStart(2, "0")}-${digest}.${extension}`;
+      await uploadRepairedMedia(path, image);
+      uploadedPaths.push(path);
+    }
+    const newImage = uploadedPaths.map((path) => storagePathUrl(REPAIRED_MEDIA_BUCKET, path)).join(",");
+    const updateQuery = new URLSearchParams({ id: `eq.${postId}`, revision: `eq.${expectedRevision}` });
+    const update = await adminRequest(`/rest/v1/swipes?${updateQuery}`, { method: "PATCH", headers: { Prefer: "return=representation" }, json: { image: newImage } });
+    const updatedRows = Array.isArray(update.data) ? update.data : [];
+    if (!updatedRows.length) {
+      const latest = await getPost(ctx, postId, "posts");
+      throw new GatewayError(409, "revision_conflict", `Post ${postId} changed while the repair was being applied`, { expected_revision: expectedRevision, current_revision: latest.revision });
+    }
+    const updated = stripInternal(updatedRows[0]);
+    await adminRequest(`/rest/v1/swipeardy_agent_image_repairs?repair_id=eq.${encodeURIComponent(repairId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { status: "applied", applied_object_paths: uploadedPaths, applied_at: new Date().toISOString(), updated_at: new Date().toISOString() } });
+    const result = { dry_run: false, mode: "posts", repair_id: repairId, record: updated, repaired_image_urls: imageList(updated.image), idempotent_replay: false };
+    await writeAudit(ctx, "images.repair.apply", String(postId), current, updated, { repair_id: repairId, object_paths: uploadedPaths });
+    await storeIdempotentResult(ctx, "images.repair.apply", key, replay.requestHash, result);
+    return result;
+  } catch (error) {
+    if (uploadedPaths.length) {
+      try { await removeUploadedRepairedMedia(uploadedPaths); }
+      catch { /* DB was not updated, but surface an audit trail for any rare cleanup failure. */ await writeAudit(ctx, "images.repair.cleanup_failed", String(postId), null, { repair_id: repairId, object_paths: uploadedPaths }, { reason: "post update failed after upload" }); }
+    }
+    throw error;
+  }
+}
+
+export async function repairPostImages(ctx: RequestContext, args: unknown): Promise<JsonObject> {
+  requireScope(ctx.agent, "write");
+  const input = asObject(args, "arguments");
+  const phase = cleanText(input.phase, "phase", 20, true);
+  const key = requireIdempotency(input);
+  if (phase === "preview") {
+    const postId = cleanInteger(input.post_id, "post_id");
+    const expectedRevision = cleanInteger(input.expected_revision, "expected_revision");
+    const sourceUrls = repairImageUrls(input.source_image_urls);
+    const replay = await readIdempotentResult(ctx, "images.repair.preview", key, { post_id: postId, expected_revision: expectedRevision, source_image_urls: sourceUrls });
+    if (replay.response) {
+      const previous = asObject(replay.response);
+      return { ...previous, confirmation_token: await repairConfirmationToken(ctx, cleanText(previous.repair_id, "repair_id", 100, true)!), idempotent_replay: true };
+    }
+    const preview = await createRepairPreview(ctx, input);
+    const persisted = { ...preview };
+    delete persisted.confirmation_token;
+    await storeIdempotentResult(ctx, "images.repair.preview", key, replay.requestHash, persisted);
+    return preview;
+  }
+  if (phase === "apply") return await applyRepairPreview(ctx, input);
+  throw new GatewayError(400, "invalid_input", "phase must be preview or apply");
 }
 
 export async function postToolResult(ctx: RequestContext, record: SwipeRow, includeImages: boolean, maxImages: number): Promise<ToolResult> {
@@ -613,7 +919,7 @@ async function countForMode(mode: string): Promise<number | null> {
 
 export async function status(ctx: RequestContext): Promise<JsonObject> {
   requireScope(ctx.agent, "read");
-  return { service: "Swipe Ardy Agent Gateway", version: "1.0.0", region: Deno.env.get("SUPABASE_REGION") || "ap-northeast-1", agent: { name: ctx.agent.name, scopes: ctx.agent.scopes }, counts: { posts: await countForMode("posts") } };
+  return { service: "Swipe Ardy Agent Gateway", version: "1.1.0", region: Deno.env.get("SUPABASE_REGION") || "ap-northeast-1", agent: { name: ctx.agent.name, scopes: ctx.agent.scopes }, counts: { posts: await countForMode("posts") }, features: { image_health: true, browser_discovered_image_repair: true } };
 }
 
 export async function executeTool(name: string, args: unknown, ctx: RequestContext): Promise<ToolResult> {
@@ -630,6 +936,8 @@ export async function executeTool(name: string, args: unknown, ctx: RequestConte
       const values = asObject(input, "arguments");
       return await getPostImage(ctx, values.post_id, values.mode, values.image_index);
     }
+    case "scan_image_health": return { content: [{ type: "text", text: JSON.stringify(await scanImageHealth(ctx, input)) }] };
+    case "repair_post_images": return { content: [{ type: "text", text: JSON.stringify(await repairPostImages(ctx, input)) }] };
     case "create_post": return { content: [{ type: "text", text: JSON.stringify(await createPost(ctx, input)) }] };
     case "update_post": return { content: [{ type: "text", text: JSON.stringify(await updatePost(ctx, input)) }] };
     case "delete_posts": return { content: [{ type: "text", text: JSON.stringify(await deletePosts(ctx, input)) }] };
