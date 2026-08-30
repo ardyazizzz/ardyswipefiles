@@ -2,7 +2,7 @@ export const openApiDocument = {
   openapi: "3.1.0",
   info: {
     title: "Swipe Ardy Agent Gateway",
-    version: "1.1.0",
+    version: "1.2.0",
     description: "Scoped AI-agent access to Swipe Ardy. MCP is preferred for multimodal image analysis; REST/OpenAPI is the portable fallback.",
   },
   servers: [{ url: "https://dmhiitzunsdqyxopqsby.supabase.co/functions/v1/swipe-ardy-agent" }],
@@ -34,6 +34,7 @@ export const openApiDocument = {
     "/api/v1/curate": { post: { summary: "Preview or atomically apply up to 100 curation patches", responses: { "200": { description: "Preview or updated records" }, "409": { description: "Revision conflict" } } } },
     "/api/v1/images/health": { post: { summary: "Read-only bounded health probe for explicit Posts-mode media URLs", responses: { "200": { description: "Per-media healthy, broken, or uncheckable status" } } } },
     "/api/v1/images/repair": { post: { summary: "Preview or apply a public-browser-discovered Posts-mode image repair", parameters: [{ name: "Idempotency-Key", in: "header", schema: { type: "string" }}], responses: { "200": { description: "Preview metadata or revision-checked repaired record" }, "409": { description: "Revision conflict or source changed" }, "410": { description: "Preview expired" } } } },
+    "/api/v1/images/repair-batch": { post: { summary: "Preview or apply a bounded batch of public-browser-discovered image repairs", description: "Up to 25 Posts per batch. Preview returns one reviewed manifest; apply runs with concurrency capped at five and reports per-item success or failure.", parameters: [{ name: "Idempotency-Key", in: "header", schema: { type: "string" }}], responses: { "200": { description: "Batch manifest with per-item outcomes" }, "409": { description: "Revision conflict or changed source on one or more items" }, "410": { description: "Batch preview expired" } } } },
     "/api/v1/filters": { get: { summary: "Read mode filter config", responses: { "200": { description: "Filter definitions and colors" } } }, put: { summary: "Replace mode filter config", responses: { "200": { description: "Updated config or preview" } } } },
     "/api/v1/views": { get: { summary: "Read saved views", responses: { "200": { description: "Saved views" } } } },
   },

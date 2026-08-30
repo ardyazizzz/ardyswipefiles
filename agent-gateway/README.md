@@ -23,6 +23,7 @@ protected request still requires a separate hashed token for the calling agent.
 | `get_post_image` | Fetch one image for vision/OCR | HTTPS-only, private-host block, 5 MB limit |
 | `scan_image_health` | Probe explicit Posts-mode media | Read-only, max 25 posts and 8 media/post; reports healthy, broken, or uncheckable |
 | `repair_post_images` | Archive browser-discovered replacement images and update one Post | Preview + human confirmation, 15-minute token, byte hash, immutable Storage paths, revision check |
+| `bulk_repair_post_images` | Repair an already-discovered batch of Posts | Preview manifest + one approval, max 25 Posts / 25 candidate URLs, max 5 concurrent item repairs, per-item result and revision check |
 | `create_post` / `update_post` | Write Posts-mode records | Idempotency, dry-run, revision check |
 | `delete_posts` | Delete Posts-mode records | Two-step confirmation, 30-day Trash |
 | `list_trash` / `restore_post` | Review or recover deletion | Expiry and ID-conflict checks |
@@ -75,6 +76,31 @@ matches the reviewed preview. It then copies the bytes to a new immutable path
 in Swipe Ardy Storage and changes only the Post's comma-separated `image` field.
 If the post revision or source bytes changed, it stops without updating the row.
 It cannot recreate media that has been deleted from every public source.
+
+### Bounded bulk repair workflow
+
+Use `bulk_repair_post_images` only after an agent/browser has already discovered
+public replacement image URLs. It is not a server-side scraper and never receives
+cookies or login credentials.
+
+1. Build a batch of up to 25 Posts and up to 25 total candidate image URLs.
+   Each item has `post_id`, `expected_revision`, and `source_image_urls`.
+2. Call with `phase: "preview"` and one fresh idempotency key. The gateway
+   downloads and hash-checks candidates with bounded concurrency, then returns a
+   single manifest. Some items may be `failed`; they are never applied.
+3. Review the whole manifest with the user. The returned batch token is valid
+   for 15 minutes.
+4. Call with `phase: "apply"`, `batch_id`, that token, and a new idempotency
+   key. At most five independent items run at once. Every item separately
+   refetches its reviewed bytes and checks its own revision before updating.
+5. Read the returned manifest. Successful items are archived at immutable
+   Storage paths. Non-transient failures need a new preview; transient failures
+   can be resumed with another fresh idempotency key before the token expires.
+
+This is intentionally a sequence of small resumable batches rather than one
+700-item HTTP request, because Supabase Edge Functions have hard execution-time
+limits. It is much faster than one-post-at-a-time repair while preserving a
+clear per-item audit trail.
 
 ## Codex setup
 

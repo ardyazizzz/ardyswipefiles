@@ -34,7 +34,7 @@ $searchResult = Invoke-McpRequest 5 'tools/call' @{ name = 'search_posts'; argum
 
 $expectedTools = @(
   'status', 'search_posts', 'get_post', 'get_post_image', 'create_post',
-  'scan_image_health', 'repair_post_images', 'update_post', 'delete_posts', 'list_trash', 'restore_post', 'export_posts',
+  'scan_image_health', 'repair_post_images', 'bulk_repair_post_images', 'update_post', 'delete_posts', 'list_trash', 'restore_post', 'export_posts',
   'curate_posts', 'list_filters', 'update_filter_config', 'list_views'
 )
 $advertisedTools = @($toolsResult.result.tools | ForEach-Object { $_.name })

@@ -11,8 +11,8 @@
   },
   "authentication": { "scheme": "bearer", "prefix": "swa_", "identity": "one-revocable-token-per-agent", "secret_reference": "client-local-environment" },
   "transport": { "mcp": "streamable-http", "parallel_tool_calls": false },
-  "capabilities": ["status", "search_posts", "get_post", "get_post_image", "scan_image_health", "repair_post_images", "create_post", "update_post", "delete_posts", "list_trash", "restore_post", "export_posts", "curate_posts", "list_filters", "update_filter_config", "list_views"],
+  "capabilities": ["status", "search_posts", "get_post", "get_post_image", "scan_image_health", "repair_post_images", "bulk_repair_post_images", "create_post", "update_post", "delete_posts", "list_trash", "restore_post", "export_posts", "curate_posts", "list_filters", "update_filter_config", "list_views"],
   "mode_support": { "read": ["posts", "creators", "websites", "snippets"], "write_first_phase": ["posts"] },
-  "safety": { "writes_require_idempotency": true, "updates_require_expected_revision": true, "deletes_are_two_step_and_recoverable": true, "delete_retention_days": 30, "image_max_bytes": 5242880, "image_health_is_read_only": true, "image_repairs_require_preview_confirmation": true, "image_repair_source": "public HTTPS URL discovered by the calling agent's own browser" },
+  "safety": { "writes_require_idempotency": true, "updates_require_expected_revision": true, "deletes_are_two_step_and_recoverable": true, "delete_retention_days": 30, "image_max_bytes": 5242880, "image_health_is_read_only": true, "image_repairs_require_preview_confirmation": true, "bulk_image_repair_max_posts": 25, "bulk_image_repair_max_candidate_urls": 25, "bulk_image_repair_max_concurrency": 5, "image_repair_source": "public HTTPS URL discovered by the calling agent's own browser" },
   "client_configs": { "codex": ".codex/config.toml", "hermes": "agent-gateway/hermes.example.yaml", "claude_code": "agent-gateway/claude.example.json" }
 }

@@ -36,6 +36,13 @@ Claude Code, and later MCP clients can work from the same contract.
 - Treat `repair_post_images` preview metadata as a proposal. Obtain human
   approval before its separate apply call. Apply requires the reviewed revision,
   a short-lived token, a fresh idempotency key, and a byte-for-byte source check.
+- For an already-discovered campaign, use `bulk_repair_post_images` in bounded
+  batches only: at most 25 Posts, 25 candidate URLs total, and five concurrent
+  item repairs. Preview returns one manifest for human approval; apply still
+  checks every item's revision and reports partial failures individually. Resume
+  only transient failures with a fresh idempotency key before the 15-minute
+  batch token expires. Never treat the bulk tool as permission to scrape a site,
+  use cookies, or overwrite failed items.
 
 ## Knowledge handoff
 

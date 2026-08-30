@@ -38,6 +38,9 @@ const MAX_IMAGES_PER_CALL = 4;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_HEALTH_POSTS_PER_CALL = 25;
 const MAX_HEALTH_IMAGES_PER_POST = 8;
+const MAX_BULK_REPAIR_ITEMS = 25;
+const MAX_BULK_REPAIR_SOURCE_URLS = 25;
+const MAX_BULK_REPAIR_CONCURRENCY = 5;
 const REPAIR_CONFIRMATION_MS = 15 * 60 * 1000;
 const REPAIRED_MEDIA_BUCKET = "swipeardy-repaired-media";
 const ALLOWED_PATCH_FIELDS = new Set([
@@ -108,6 +111,12 @@ export const toolDefinitions = [
     description: "Two-step Posts-mode image repair. Preview public browser-discovered source_image_urls first; after human review, apply with the returned confirmation token. Apply copies verified bytes into Swipe Ardy Storage and revision-checks the image update. This never controls a browser or uses LinkedIn credentials.",
     inputSchema: { type: "object", required: ["phase", "idempotency_key"], properties: { phase: { type: "string", enum: ["preview", "apply"] }, post_id: { type: "integer", minimum: 1 }, expected_revision: { type: "integer", minimum: 1 }, source_image_urls: { type: "array", items: { type: "string", format: "uri" }, minItems: 1, maxItems: MAX_IMAGES_PER_CALL }, repair_id: { type: "string", format: "uuid" }, confirmation_token: { type: "string", minLength: 20, maxLength: 200 }, idempotency_key: { type: "string", minLength: 8, maxLength: 200 } }, additionalProperties: false },
     annotations: { title: "Preview or apply Swipe Ardy image repair", readOnlyHint: false, destructiveHint: false, idempotentHint: true },
+  },
+  {
+    name: "bulk_repair_post_images",
+    description: "Bounded batch image repair for up to 25 Posts. Preview browser-discovered candidates as one manifest, obtain one human approval, then apply with at most five concurrent item repairs. Every item is revision-checked and failures are returned without overwriting unrelated posts.",
+    inputSchema: { type: "object", required: ["phase", "idempotency_key"], properties: { phase: { type: "string", enum: ["preview", "apply"] }, items: { type: "array", minItems: 1, maxItems: MAX_BULK_REPAIR_ITEMS, items: { type: "object", required: ["post_id", "expected_revision", "source_image_urls"], properties: { post_id: { type: "integer", minimum: 1 }, expected_revision: { type: "integer", minimum: 1 }, source_image_urls: { type: "array", minItems: 1, maxItems: MAX_IMAGES_PER_CALL, items: { type: "string", format: "uri" } } }, additionalProperties: false } }, batch_id: { type: "string", format: "uuid" }, confirmation_token: { type: "string", minLength: 20, maxLength: 200 }, concurrency: { type: "integer", minimum: 1, maximum: MAX_BULK_REPAIR_CONCURRENCY, default: MAX_BULK_REPAIR_CONCURRENCY }, idempotency_key: { type: "string", minLength: 8, maxLength: 200 } }, additionalProperties: false },
+    annotations: { title: "Preview or apply bounded Swipe Ardy bulk image repair", readOnlyHint: false, destructiveHint: false, idempotentHint: true },
   },
   {
     name: "create_post",
@@ -604,10 +613,10 @@ async function readImageBytes(response: Response): Promise<Uint8Array> {
   return bytes;
 }
 
-async function fetchImage(urlValue: string): Promise<{ bytes: Uint8Array; mimeType: string; url: string }> {
+async function fetchImage(urlValue: string, timeoutMilliseconds = 20000): Promise<{ bytes: Uint8Array; mimeType: string; url: string }> {
   const parsed = parsePublicHttpsUrl(urlValue);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMilliseconds);
   let response: Response;
   try { response = await fetch(parsed, { signal: controller.signal, redirect: "follow", headers: { "User-Agent": "SwipeArdy-Agent-Gateway/1.0" } }); }
   catch { throw new GatewayError(502, "image_fetch_failed", "Image could not be fetched"); }
@@ -709,6 +718,20 @@ async function uploadRepairedMedia(path: string, image: { bytes: Uint8Array; mim
     headers: { "Content-Type": image.mimeType, "x-upsert": "false", "Cache-Control": "public, max-age=31536000, immutable" },
     body: image.bytes,
   });
+}
+
+async function uploadRepairedMediaIfAbsent(path: string, image: { bytes: Uint8Array; mimeType: string }): Promise<boolean> {
+  try {
+    await uploadRepairedMedia(path, image);
+    return true;
+  } catch (error) {
+    // A retry can reach the same immutable content-addressed path after the
+    // original request completed its upload but before it persisted the result.
+    // The path contains the reviewed SHA-256, so treating that collision as an
+    // existing approved object is safe and avoids rewriting the object.
+    if (error instanceof GatewayError && error.status === 409) return false;
+    throw error;
+  }
 }
 
 async function removeUploadedRepairedMedia(paths: string[]): Promise<void> {
@@ -879,6 +902,312 @@ export async function repairPostImages(ctx: RequestContext, args: unknown): Prom
   throw new GatewayError(400, "invalid_input", "phase must be preview or apply");
 }
 
+type BulkRepairInput = {
+  postId: number;
+  expectedRevision: number;
+  sourceUrls: string[];
+};
+
+function repairErrorMetadata(error: unknown): JsonObject {
+  if (error instanceof GatewayError) return { code: error.code, status: error.status, message: error.message, retryable: isTransientRepairError(error) };
+  return { code: "repair_failed", status: 500, message: error instanceof Error ? error.message : "Unknown repair failure", retryable: true };
+}
+
+function sameUrlList(left: string[], right: string[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function bulkRepairSummary(items: JsonObject[]): JsonObject {
+  const count = (status: string) => items.filter((item) => item.status === status).length;
+  return {
+    total: items.length,
+    ready: count("previewed"),
+    applied: count("applied"),
+    failed: count("failed"),
+    pending: count("previewed") + count("applying"),
+  };
+}
+
+function bulkItemCanResume(item: JsonObject): boolean {
+  if (item.status === "previewed") return true;
+  if (item.status !== "failed") return false;
+  const failure = item.failure;
+  return Boolean(failure && typeof failure === "object" && !Array.isArray(failure) && (failure as JsonObject).retryable === true);
+}
+
+function normalizeBulkRepairItems(value: unknown): BulkRepairInput[] {
+  const values = asArray(value, "items");
+  if (!values.length || values.length > MAX_BULK_REPAIR_ITEMS) {
+    throw new GatewayError(400, "invalid_input", `items must contain between 1 and ${MAX_BULK_REPAIR_ITEMS} entries`);
+  }
+  const seen = new Set<number>();
+  const items = values.map((value, index) => {
+    const item = asObject(value, `items[${index}]`);
+    const postId = cleanInteger(item.post_id, `items[${index}].post_id`);
+    const expectedRevision = cleanInteger(item.expected_revision, `items[${index}].expected_revision`);
+    if (postId < 1 || expectedRevision < 1) throw new GatewayError(400, "invalid_input", `items[${index}] requires positive post_id and expected_revision`);
+    if (seen.has(postId)) throw new GatewayError(400, "invalid_input", `items contains duplicate post_id ${postId}`);
+    seen.add(postId);
+    return { postId, expectedRevision, sourceUrls: repairImageUrls(item.source_image_urls) };
+  });
+  const sourceUrlCount = items.reduce((total, item) => total + item.sourceUrls.length, 0);
+  if (sourceUrlCount > MAX_BULK_REPAIR_SOURCE_URLS) {
+    throw new GatewayError(400, "invalid_input", `A bulk repair batch can contain at most ${MAX_BULK_REPAIR_SOURCE_URLS} candidate image URLs in total; split carousels into a smaller batch`);
+  }
+  return items;
+}
+
+async function mapWithConcurrency<T, U>(values: T[], concurrency: number, worker: (value: T, index: number) => Promise<U>): Promise<U[]> {
+  const results = new Array<U>(values.length);
+  let cursor = 0;
+  const workerCount = Math.min(Math.max(concurrency, 1), values.length);
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const index = cursor;
+      cursor += 1;
+      if (index >= values.length) return;
+      results[index] = await worker(values[index], index);
+    }
+  }));
+  return results;
+}
+
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function isTransientRepairError(error: unknown): boolean {
+  return error instanceof GatewayError && (error.status === 408 || error.status === 429 || error.status >= 500);
+}
+
+async function retryTransientImageFetch(url: string): Promise<{ bytes: Uint8Array; mimeType: string; url: string }> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      return await fetchImage(url, 12000);
+    } catch (error) {
+      lastError = error;
+      if (!isTransientRepairError(error) || attempt === 1) throw error;
+      await sleep(300 * (attempt + 1));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new GatewayError(502, "image_fetch_failed", "Image could not be fetched");
+}
+
+async function bulkRepairConfirmationToken(ctx: RequestContext, batchId: string): Promise<string> {
+  const secret = Deno.env.get("SUPABASE_SECRET_KEYS") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!secret) throw new GatewayError(500, "server_misconfigured", "Supabase admin key is unavailable");
+  const proof = (await sha256Hex(`${secret}:bulk-repair:${ctx.agent.id}:${batchId}`)).slice(0, 48);
+  return `swib_${batchId}_${proof}`;
+}
+
+function batchItemPaths(batchId: string, item: JsonObject): string[] {
+  const postId = cleanInteger(item.post_id, "batch item post_id");
+  const itemIndex = cleanInteger(item.item_index, "batch item index");
+  const candidates = asArray(item.candidate_images, "batch item candidate_images").map((value, index) => asObject(value, `batch item candidate_images[${index}]`));
+  if (!candidates.length || candidates.length > MAX_IMAGES_PER_CALL) throw new GatewayError(409, "batch_preview_invalid", "Batch preview has no valid candidate images");
+  return candidates.map((candidate, imageIndex) => {
+    const digest = cleanText(candidate.sha256, "candidate sha256", 64, true)!;
+    if (!/^[a-f0-9]{64}$/i.test(digest)) throw new GatewayError(409, "batch_preview_invalid", "Batch preview contains an invalid image hash");
+    const extension = repairedMediaExtension(cleanText(candidate.mime_type, "candidate mime_type", 100, true)!);
+    return `posts/${postId}/bulk/${batchId}/${String(itemIndex + 1).padStart(2, "0")}/${String(imageIndex + 1).padStart(2, "0")}-${digest.slice(0, 24)}.${extension}`;
+  });
+}
+
+function bulkBatchMetadata(row: JsonObject): JsonObject {
+  const items = asArray(row.items, "batch items").map((item, index) => asObject(item, `batch items[${index}]`));
+  return {
+    batch_id: row.batch_id,
+    mode: "posts",
+    status: row.status,
+    item_count: row.item_count,
+    summary: row.summary || bulkRepairSummary(items),
+    confirmation_expires_at: row.expires_at,
+    items,
+  };
+}
+
+async function previewBulkRepairItem(ctx: RequestContext, item: BulkRepairInput, itemIndex: number): Promise<JsonObject> {
+  let current: SwipeRow | null = null;
+  try {
+    current = await getPost(ctx, item.postId, "posts");
+    if (Number(current.revision) !== item.expectedRevision) {
+      throw new GatewayError(409, "revision_conflict", `Post ${item.postId} changed since it was read`, { id: item.postId, expected_revision: item.expectedRevision, current_revision: current.revision });
+    }
+    const candidateImages: JsonObject[] = [];
+    for (const sourceUrl of item.sourceUrls) {
+      const image = await retryTransientImageFetch(sourceUrl);
+      candidateImages.push({ source_url: sourceUrl, resolved_url: image.url, mime_type: image.mimeType, size_bytes: image.bytes.byteLength, sha256: await hashBytes(image.bytes) });
+    }
+    return {
+      item_index: itemIndex,
+      post_id: item.postId,
+      expected_revision: item.expectedRevision,
+      source_post_url: current.postUrl || null,
+      original_image_urls: imageList(current.image),
+      candidate_images: candidateImages,
+      status: "previewed",
+      applied_object_paths: [],
+      failure: null,
+    };
+  } catch (error) {
+    return {
+      item_index: itemIndex,
+      post_id: item.postId,
+      expected_revision: item.expectedRevision,
+      source_post_url: current?.postUrl || null,
+      original_image_urls: current ? imageList(current.image) : [],
+      candidate_images: [],
+      status: "failed",
+      applied_object_paths: [],
+      failure: repairErrorMetadata(error),
+    };
+  }
+}
+
+async function createBulkRepairPreview(ctx: RequestContext, items: BulkRepairInput[]): Promise<JsonObject> {
+  const previewItems = await mapWithConcurrency(items, MAX_BULK_REPAIR_CONCURRENCY, (item, index) => previewBulkRepairItem(ctx, item, index));
+  const summary = bulkRepairSummary(previewItems);
+  const expiresAt = new Date(Date.now() + REPAIR_CONFIRMATION_MS).toISOString();
+  const status = Number(summary.ready || 0) > 0 ? "previewed" : "failed";
+  const insert = await adminRequest("/rest/v1/swipeardy_agent_image_repair_batches?select=batch_id,status,item_count,items,summary,expires_at", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    json: { agent_key_id: ctx.agent.id, status, item_count: previewItems.length, items: previewItems, summary, confirmation_hash: "pending", expires_at: expiresAt },
+  });
+  const row = Array.isArray(insert.data) && insert.data[0] ? asObject(insert.data[0], "bulk repair preview") : null;
+  if (!row?.batch_id) throw new GatewayError(502, "bulk_repair_preview_failed", "Supabase did not return a bulk repair batch ID");
+  const confirmationToken = await bulkRepairConfirmationToken(ctx, String(row.batch_id));
+  await adminRequest(`/rest/v1/swipeardy_agent_image_repair_batches?batch_id=eq.${encodeURIComponent(String(row.batch_id))}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { confirmation_hash: await sha256Hex(confirmationToken) } });
+  const result = {
+    dry_run: true,
+    ...bulkBatchMetadata(row),
+    confirmation_token: confirmationToken,
+    instruction: "Review the batch manifest. Only previewed items are eligible. Then call bulk_repair_post_images with phase=apply, batch_id, confirmation_token, and a fresh idempotency_key. Each item remains revision-checked; failures are reported without overwriting other posts.",
+  };
+  await writeAudit(ctx, "images.repair.batch.preview", String(row.batch_id), null, { ...result, confirmation_token: "[redacted]" }, { item_count: previewItems.length, ready_count: summary.ready, failed_count: summary.failed, concurrency: MAX_BULK_REPAIR_CONCURRENCY });
+  return result;
+}
+
+async function applyBulkRepairItem(ctx: RequestContext, batchId: string, item: JsonObject): Promise<JsonObject> {
+  const uploadedPaths: string[] = [];
+  let current: SwipeRow | null = null;
+  try {
+    const postId = cleanInteger(item.post_id, "batch item post_id");
+    const expectedRevision = cleanInteger(item.expected_revision, "batch item expected_revision");
+    if (postId < 1 || expectedRevision < 1) throw new GatewayError(409, "batch_preview_invalid", "Batch preview contains an invalid post ID or revision");
+    const candidates = asArray(item.candidate_images, "batch item candidate_images").map((value, index) => asObject(value, `batch item candidate_images[${index}]`));
+    const paths = batchItemPaths(batchId, item);
+    const desiredUrls = paths.map((path) => storagePathUrl(REPAIRED_MEDIA_BUCKET, path));
+    current = await getPost(ctx, postId, "posts");
+    if (sameUrlList(imageList(current.image), desiredUrls)) {
+      return { ...item, status: "applied", applied_object_paths: paths, applied_at: item.applied_at || current.updated_at || new Date().toISOString(), failure: null, recovered_after_retry: true };
+    }
+    if (Number(current.revision) !== expectedRevision) {
+      throw new GatewayError(409, "revision_conflict", `Post ${postId} changed since the batch preview`, { id: postId, expected_revision: expectedRevision, current_revision: current.revision });
+    }
+    const refetched: Array<{ bytes: Uint8Array; mimeType: string; url: string; candidate: JsonObject }> = [];
+    for (const candidate of candidates) {
+      const image = await retryTransientImageFetch(cleanText(candidate.resolved_url || candidate.source_url, "batch repair candidate URL", 4000, true)!);
+      const actualHash = await hashBytes(image.bytes);
+      if (actualHash !== String(candidate.sha256) || image.mimeType !== String(candidate.mime_type)) {
+        throw new GatewayError(409, "repair_source_changed", "A reviewed source image changed or expired; create a new batch preview before applying", { source_url: candidate.source_url, resolved_url: image.url });
+      }
+      refetched.push({ ...image, candidate });
+    }
+    for (const [index, image] of refetched.entries()) {
+      const wasUploaded = await uploadRepairedMediaIfAbsent(paths[index], image);
+      if (wasUploaded) uploadedPaths.push(paths[index]);
+    }
+    const updateQuery = new URLSearchParams({ id: `eq.${postId}`, revision: `eq.${expectedRevision}` });
+    const update = await adminRequest(`/rest/v1/swipes?${updateQuery}`, { method: "PATCH", headers: { Prefer: "return=representation" }, json: { image: desiredUrls.join(",") } });
+    const updatedRows = Array.isArray(update.data) ? update.data : [];
+    if (!updatedRows.length) {
+      const latest = await getPost(ctx, postId, "posts");
+      if (sameUrlList(imageList(latest.image), desiredUrls)) {
+        return { ...item, status: "applied", applied_object_paths: paths, applied_at: latest.updated_at || new Date().toISOString(), failure: null, recovered_after_retry: true };
+      }
+      throw new GatewayError(409, "revision_conflict", `Post ${postId} changed while the batch was being applied`, { expected_revision: expectedRevision, current_revision: latest.revision });
+    }
+    const updated = stripInternal(updatedRows[0]);
+    const result = { ...item, status: "applied", applied_object_paths: paths, applied_at: new Date().toISOString(), failure: null, record: updated };
+    await writeAudit(ctx, "images.repair.batch.apply", String(postId), current, updated, { batch_id: batchId, object_paths: paths });
+    return result;
+  } catch (error) {
+    if (uploadedPaths.length) {
+      try { await removeUploadedRepairedMedia(uploadedPaths); }
+      catch { await writeAudit(ctx, "images.repair.batch.cleanup_failed", String(item.post_id || ""), null, { batch_id: batchId, object_paths: uploadedPaths }, { reason: "post update failed after upload" }).catch(() => undefined); }
+    }
+    return { ...item, status: "failed", failure: repairErrorMetadata(error), applied_object_paths: item.applied_object_paths || [] };
+  }
+}
+
+async function applyBulkRepairBatch(ctx: RequestContext, input: JsonObject): Promise<JsonObject> {
+  const batchId = cleanText(input.batch_id, "batch_id", 100, true)!;
+  const confirmationToken = cleanText(input.confirmation_token, "confirmation_token", 200, true)!;
+  const key = requireIdempotency(input);
+  const concurrency = Math.min(Math.max(cleanInteger(input.concurrency, "concurrency", MAX_BULK_REPAIR_CONCURRENCY), 1), MAX_BULK_REPAIR_CONCURRENCY);
+  const replay = await readIdempotentResult(ctx, "images.repair.batch.apply", key, { batch_id: batchId, concurrency });
+  if (replay.response) return { ...asObject(replay.response), idempotent_replay: true };
+  const query = new URLSearchParams({ select: "*", batch_id: `eq.${batchId}`, agent_key_id: `eq.${ctx.agent.id}`, limit: "1" });
+  const { data } = await adminRequest(`/rest/v1/swipeardy_agent_image_repair_batches?${query}`);
+  const rows = Array.isArray(data) ? data as JsonObject[] : [];
+  const batch = rows[0];
+  if (!batch) throw new GatewayError(404, "bulk_repair_batch_not_found", "Bulk repair preview was not found for this agent");
+  if (new Date(String(batch.expires_at)).getTime() <= Date.now()) {
+    await adminRequest(`/rest/v1/swipeardy_agent_image_repair_batches?batch_id=eq.${encodeURIComponent(batchId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { status: "expired", updated_at: new Date().toISOString() } });
+    throw new GatewayError(410, "bulk_repair_preview_expired", "Bulk repair preview expired; create a new preview before applying");
+  }
+  if (!["previewed", "applying", "partial", "applied", "failed"].includes(String(batch.status))) {
+    throw new GatewayError(409, "bulk_repair_not_applicable", "Bulk repair preview is no longer available");
+  }
+  if (await sha256Hex(confirmationToken) !== String(batch.confirmation_hash)) throw new GatewayError(403, "invalid_confirmation_token", "Bulk repair confirmation token is invalid");
+  const originalItems = asArray(batch.items, "batch items").map((item, index) => asObject(item, `batch items[${index}]`));
+  const eligible = originalItems.filter(bulkItemCanResume);
+  if (!eligible.length) {
+    const result = { dry_run: false, ...bulkBatchMetadata(batch), idempotent_replay: false, instruction: "This batch has no pending previewed items. Review the manifest; failed items need a new preview with fresh candidates." };
+    await storeIdempotentResult(ctx, "images.repair.batch.apply", key, replay.requestHash, result);
+    return result;
+  }
+  await adminRequest(`/rest/v1/swipeardy_agent_image_repair_batches?batch_id=eq.${encodeURIComponent(batchId)}&agent_key_id=eq.${encodeURIComponent(ctx.agent.id)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, json: { status: "applying", attempt_count: cleanInteger(batch.attempt_count, "batch attempt_count", 0) + 1, updated_at: new Date().toISOString() } });
+  const processedItems = await mapWithConcurrency(originalItems, concurrency, async (item) => bulkItemCanResume(item) ? await applyBulkRepairItem(ctx, batchId, item) : item);
+  const summary = bulkRepairSummary(processedItems);
+  const nextStatus = Number(summary.failed || 0) === 0 && Number(summary.applied || 0) === processedItems.length ? "applied" : Number(summary.applied || 0) > 0 ? "partial" : "failed";
+  const completedAt = nextStatus === "applied" ? new Date().toISOString() : null;
+  const { data: updatedData } = await adminRequest(`/rest/v1/swipeardy_agent_image_repair_batches?batch_id=eq.${encodeURIComponent(batchId)}&agent_key_id=eq.${encodeURIComponent(ctx.agent.id)}&select=batch_id,status,item_count,items,summary,expires_at`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    json: { status: nextStatus, items: processedItems, summary, applied_at: completedAt, updated_at: new Date().toISOString() },
+  });
+  const updatedBatch = Array.isArray(updatedData) && updatedData[0] ? asObject(updatedData[0], "updated bulk repair batch") : { ...batch, status: nextStatus, items: processedItems, summary };
+  const result = { dry_run: false, ...bulkBatchMetadata(updatedBatch), idempotent_replay: false };
+  await writeAudit(ctx, "images.repair.batch.apply", batchId, { status: batch.status, summary: batch.summary }, result, { concurrency, attempted_count: eligible.length, applied_count: summary.applied, failed_count: summary.failed });
+  await storeIdempotentResult(ctx, "images.repair.batch.apply", key, replay.requestHash, result);
+  return result;
+}
+
+export async function bulkRepairPostImages(ctx: RequestContext, args: unknown): Promise<JsonObject> {
+  requireScope(ctx.agent, "write");
+  const input = asObject(args, "arguments");
+  const phase = cleanText(input.phase, "phase", 20, true);
+  const key = requireIdempotency(input);
+  if (phase === "preview") {
+    const items = normalizeBulkRepairItems(input.items);
+    const replay = await readIdempotentResult(ctx, "images.repair.batch.preview", key, { items: items.map((item) => ({ post_id: item.postId, expected_revision: item.expectedRevision, source_image_urls: item.sourceUrls })) });
+    if (replay.response) {
+      const previous = asObject(replay.response);
+      return { ...previous, confirmation_token: await bulkRepairConfirmationToken(ctx, cleanText(previous.batch_id, "batch_id", 100, true)!), idempotent_replay: true };
+    }
+    const preview = await createBulkRepairPreview(ctx, items);
+    const persisted = { ...preview };
+    delete persisted.confirmation_token;
+    await storeIdempotentResult(ctx, "images.repair.batch.preview", key, replay.requestHash, persisted);
+    return preview;
+  }
+  if (phase === "apply") return await applyBulkRepairBatch(ctx, input);
+  throw new GatewayError(400, "invalid_input", "phase must be preview or apply");
+}
+
 export async function postToolResult(ctx: RequestContext, record: SwipeRow, includeImages: boolean, maxImages: number): Promise<ToolResult> {
   const safe = stripInternal(record);
   const content: ToolContent[] = [{ type: "text", text: JSON.stringify({ record: safe }) }];
@@ -920,7 +1249,7 @@ async function countForMode(mode: string): Promise<number | null> {
 
 export async function status(ctx: RequestContext): Promise<JsonObject> {
   requireScope(ctx.agent, "read");
-  return { service: "Swipe Ardy Agent Gateway", version: "1.1.0", region: Deno.env.get("SUPABASE_REGION") || "ap-northeast-1", agent: { name: ctx.agent.name, scopes: ctx.agent.scopes }, counts: { posts: await countForMode("posts") }, features: { image_health: true, browser_discovered_image_repair: true } };
+  return { service: "Swipe Ardy Agent Gateway", version: "1.2.0", region: Deno.env.get("SUPABASE_REGION") || "ap-northeast-1", agent: { name: ctx.agent.name, scopes: ctx.agent.scopes }, counts: { posts: await countForMode("posts") }, features: { image_health: true, browser_discovered_image_repair: true, bounded_bulk_image_repair: true } };
 }
 
 export async function executeTool(name: string, args: unknown, ctx: RequestContext): Promise<ToolResult> {
@@ -939,6 +1268,7 @@ export async function executeTool(name: string, args: unknown, ctx: RequestConte
     }
     case "scan_image_health": return { content: [{ type: "text", text: JSON.stringify(await scanImageHealth(ctx, input)) }] };
     case "repair_post_images": return { content: [{ type: "text", text: JSON.stringify(await repairPostImages(ctx, input)) }] };
+    case "bulk_repair_post_images": return { content: [{ type: "text", text: JSON.stringify(await bulkRepairPostImages(ctx, input)) }] };
     case "create_post": return { content: [{ type: "text", text: JSON.stringify(await createPost(ctx, input)) }] };
     case "update_post": return { content: [{ type: "text", text: JSON.stringify(await updatePost(ctx, input)) }] };
     case "delete_posts": return { content: [{ type: "text", text: JSON.stringify(await deletePosts(ctx, input)) }] };

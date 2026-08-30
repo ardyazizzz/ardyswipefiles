@@ -1,11 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 import { asObject, authenticateAgent, GatewayError, RequestContext } from "./core.ts";
-import { executeTool, getPost, postToolResult, searchPosts, status, toolDefinitions, createPost, updatePost, deletePosts, listTrash, restorePost, exportPosts, curatePosts, listFilters, updateFilterConfig, listViews, scanImageHealth, repairPostImages } from "./gateway.ts";
+import { executeTool, getPost, postToolResult, searchPosts, status, toolDefinitions, createPost, updatePost, deletePosts, listTrash, restorePost, exportPosts, curatePosts, listFilters, updateFilterConfig, listViews, scanImageHealth, repairPostImages, bulkRepairPostImages } from "./gateway.ts";
 import { openApiDocument } from "./openapi.ts";
 
 const SERVER_NAME = "swipeardy";
-const SERVER_VERSION = "1.1.0";
+const SERVER_VERSION = "1.2.0";
 const DEFAULT_PROTOCOL = "2025-06-18";
 const SUPPORTED_PROTOCOLS = new Set(["2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28"]);
 
@@ -93,7 +93,7 @@ async function handleMcp(req: Request, agent: Awaited<ReturnType<typeof authenti
   const protocol = protocolFor(req, body);
   const ctx: RequestContext = { requestId, agent, transport: "mcp" };
   if (method === "notifications/initialized" || method === "initialized") return emptyResponse(req, 202, { "MCP-Protocol-Version": protocol });
-  if (method === "initialize" || method === "server/discover") return rpcSuccess(req, id, { protocolVersion: protocol, capabilities: { tools: { listChanged: false } }, serverInfo: { name: SERVER_NAME, title: "Swipe Ardy Agent Gateway", version: SERVER_VERSION }, instructions: "Use search_posts with mode=posts, creators, websites, or snippets. Use get_post(include_images=true) or get_post_image for direct multimodal analysis. scan_image_health is a bounded read-only probe for explicit Posts IDs. For repair_post_images, the agent itself opens the post in its browser, extracts public image URLs, previews them, obtains human approval, then applies with the short-lived confirmation token and the same revision. The gateway never controls a browser or uses browser credentials. Before editing a post, read its revision and pass expected_revision. Writes require a unique idempotency_key; dry_run previews without changing data. Deletion is two-step and recoverable: preview with delete_posts, then confirm with its short-lived token; deleted posts remain in 30-day Trash and can be restored. Use export_posts for private JSON/CSV/NDJSON/Markdown downloads." }, protocol, modernDirect);
+  if (method === "initialize" || method === "server/discover") return rpcSuccess(req, id, { protocolVersion: protocol, capabilities: { tools: { listChanged: false } }, serverInfo: { name: SERVER_NAME, title: "Swipe Ardy Agent Gateway", version: SERVER_VERSION }, instructions: "Use search_posts with mode=posts, creators, websites, or snippets. Use get_post(include_images=true) or get_post_image for direct multimodal analysis. scan_image_health is a bounded read-only probe for explicit Posts IDs. For repair_post_images, the agent itself opens the post in its browser, extracts public image URLs, previews them, obtains human approval, then applies with the short-lived confirmation token and the same revision. For up to 25 already-discovered candidates, bulk_repair_post_images creates one reviewed batch manifest and applies eligible items with bounded concurrency; every item still has its own revision check and failure result. The gateway never controls a browser or uses browser credentials. Before editing a post, read its revision and pass expected_revision. Writes require a unique idempotency_key; dry_run previews without changing data. Deletion is two-step and recoverable: preview with delete_posts, then confirm with its short-lived token; deleted posts remain in 30-day Trash and can be restored. Use export_posts for private JSON/CSV/NDJSON/Markdown downloads." }, protocol, modernDirect);
   if (method === "ping") return rpcSuccess(req, id, {}, protocol, modernDirect);
   if (method === "tools/list") return rpcSuccess(req, id, { tools: toolDefinitions }, protocol, modernDirect);
   if (method === "tools/call") {
@@ -123,6 +123,7 @@ async function handleRest(req: Request, path: string, url: URL, agent: Awaited<R
   if (req.method === "POST" && path === "/api/v1/curate") return jsonResponse(req, { request_id: requestId, data: await curatePosts(ctx, withHeaderIdempotency(req, await readJson(req))) });
   if (req.method === "POST" && path === "/api/v1/images/health") return jsonResponse(req, { request_id: requestId, data: await scanImageHealth(ctx, await readJson(req)) });
   if (req.method === "POST" && path === "/api/v1/images/repair") return jsonResponse(req, { request_id: requestId, data: await repairPostImages(ctx, withHeaderIdempotency(req, await readJson(req))) });
+  if (req.method === "POST" && path === "/api/v1/images/repair-batch") return jsonResponse(req, { request_id: requestId, data: await bulkRepairPostImages(ctx, withHeaderIdempotency(req, await readJson(req))) });
   const postMatch = path.match(/^\/api\/v1\/posts\/(\d+)$/);
   if (postMatch && req.method === "GET") {
     const record = await getPost(ctx, postMatch[1], url.searchParams.get("mode") || "posts");

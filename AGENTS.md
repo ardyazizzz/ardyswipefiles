@@ -95,6 +95,7 @@ The MCP tool surface is intentionally aligned with SwipeShare:
 | `get_post_image` | Fetch one actual image block for vision/OCR |
 | `scan_image_health` | Read-only bounded health scan for explicit Posts-mode media |
 | `repair_post_images` | Preview then revision-check a public-browser-discovered image repair |
+| `bulk_repair_post_images` | Preview and apply a bounded, resumable batch of image repairs |
 | `create_post` / `update_post` | Idempotent Posts-mode writes with revision checks |
 | `delete_posts` | Two-step deletion into recoverable 30-day Trash |
 | `list_trash` / `restore_post` | Review or restore deleted records |
@@ -130,6 +131,16 @@ apply. The gateway refetches and hash-verifies the reviewed bytes, stores approv
 copies at new immutable Swipe Ardy Storage paths, then updates only the post's
 comma-separated `image` field if that same revision still exists. A changed source
 or revision stops the repair without overwriting the post.
+
+For a larger repair campaign, `bulk_repair_post_images` accepts up to 25 Posts
+and 25 total browser-discovered candidate image URLs in one preview. One reviewed
+batch token approves the eligible items, then the gateway processes at most five
+items concurrently. Each item still refetches and hash-checks its candidate and
+uses its own revision check; an error is returned only for that item, never used
+as permission to overwrite another Post. Transient failures can be resumed with
+a fresh idempotency key while the 15-minute batch approval remains valid. This
+accelerates already-discovered candidates; it does not make the gateway scrape,
+log into, or bypass a source website.
 
 Swipe Ardy currently supports read access to `posts`, `creators`, `websites`, and
 `snippets`; the first write surface is Posts. This is a capability boundary, not a
