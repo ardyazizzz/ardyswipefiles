@@ -114,7 +114,8 @@ image at 5 MB, and return standard MCP image blocks for direct visual analysis.
 
 `scan_image_health` is read-only and never scans the whole library implicitly: an
 agent supplies up to 25 explicit Posts-mode IDs, and the gateway reports each
-image as `healthy`, definitively `broken` (404/410), or `uncheckable`. An
+image as `healthy`, definitively `broken` (404/410), or `uncheckable`. Video
+media is marked `skipped_video` and is never eligible for image repair. An
 `uncheckable` result can mean a CDN rejects lightweight probes; it is not proof
 that the media is missing.
 

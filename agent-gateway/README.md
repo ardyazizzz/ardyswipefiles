@@ -21,7 +21,7 @@ protected request still requires a separate hashed token for the calling agent.
 | `search_posts` | Search any mode (`posts`, `creators`, `websites`, `snippets`) | Paginated, read-only |
 | `get_post` | Read one structured record | Optional real image blocks |
 | `get_post_image` | Fetch one image for vision/OCR | HTTPS-only, private-host block, 5 MB limit |
-| `scan_image_health` | Probe explicit Posts-mode image URLs | Read-only, max 25 posts and 8 images/post; reports healthy, broken, or uncheckable |
+| `scan_image_health` | Probe explicit Posts-mode image URLs | Read-only, max 25 posts and 8 images/post; reports healthy, broken, uncheckable, or skipped video |
 | `repair_post_images` | Archive browser-discovered replacement images and update one Post | Preview + human confirmation, 15-minute token, byte hash, immutable Storage paths, revision check |
 | `create_post` / `update_post` | Write Posts-mode records | Idempotency, dry-run, revision check |
 | `delete_posts` | Delete Posts-mode records | Two-step confirmation, 30-day Trash |
@@ -52,8 +52,9 @@ contract.
 
 `scan_image_health` is intentionally bounded: pass specific Posts-mode IDs and
 it performs lightweight network checks only. A `broken` result is a definite
-404/410. `uncheckable` is not proof that an image is gone; the source may reject
-lightweight requests or require a normal browser.
+404/410. Video media is reported as `skipped_video` and is never eligible for
+this image repair tool. `uncheckable` is not proof that an image is gone; the
+source may reject lightweight requests or require a normal browser.
 
 For a repair, Codex, Hermes, or another browser-capable agent performs the
 browser step itself. The gateway does **not** control the browser, collect
