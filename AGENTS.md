@@ -93,7 +93,7 @@ The MCP tool surface is intentionally aligned with SwipeShare:
 | `search_posts` | Paginated search; pass `mode` explicitly for non-Posts reads |
 | `get_post` | Read one structured record; optionally include image blocks |
 | `get_post_image` | Fetch one actual image block for vision/OCR |
-| `scan_image_health` | Read-only bounded health scan for explicit Posts-mode image URLs |
+| `scan_image_health` | Read-only bounded health scan for explicit Posts-mode media |
 | `repair_post_images` | Preview then revision-check a public-browser-discovered image repair |
 | `create_post` / `update_post` | Idempotent Posts-mode writes with revision checks |
 | `delete_posts` | Two-step deletion into recoverable 30-day Trash |
@@ -112,12 +112,13 @@ image at 5 MB, and return standard MCP image blocks for direct visual analysis.
 
 ### Public-browser image repair
 
-`scan_image_health` is read-only and never scans the whole library implicitly: an
-agent supplies up to 25 explicit Posts-mode IDs, and the gateway reports each
-image as `healthy`, definitively `broken` (404/410), or `uncheckable`. Video
-media is marked `skipped_video` and is never eligible for image repair. An
-`uncheckable` result can mean a CDN rejects lightweight probes; it is not proof
-that the media is missing.
+`scan_image_health` is read-only and never scans the whole library implicitly:
+an agent supplies up to 25 explicit Posts-mode IDs. The gateway probes both
+image and video media and reports each as `healthy`, definitively `broken`
+(404/410), or `uncheckable`. An `uncheckable` result can mean a CDN rejects
+lightweight probes; it is not proof that the media is missing.
+`repair_post_images` remains image-only so a video is never replaced
+accidentally.
 
 For `repair_post_images`, the calling agent—not this gateway—opens the post's
 `postUrl` in its own normal/in-app browser, preferably without login, and extracts

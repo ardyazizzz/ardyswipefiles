@@ -99,7 +99,7 @@ export const toolDefinitions = [
   },
   {
     name: "scan_image_health",
-    description: "Read-only health check for explicit Posts-mode IDs. It probes only the supplied public image URLs; it never changes data and reports broken, healthy, uncheckable, or skipped-video media.",
+    description: "Read-only bounded health check for explicit Posts-mode media. It probes both image and video URLs, never changes data, and reports broken, healthy, or uncheckable media.",
     inputSchema: { type: "object", required: ["post_ids"], properties: { post_ids: { type: "array", items: { type: "integer", minimum: 1 }, minItems: 1, maxItems: MAX_HEALTH_POSTS_PER_CALL }, max_images_per_post: { type: "integer", minimum: 1, maximum: MAX_HEALTH_IMAGES_PER_POST, default: 4 } }, additionalProperties: false },
     annotations: { title: "Scan Swipe Ardy image health", readOnlyHint: true, destructiveHint: false, idempotentHint: true },
   },
@@ -634,7 +634,7 @@ async function hashBytes(bytes: Uint8Array): Promise<string> {
 
 type ImageHealth = {
   url: string;
-  status: "healthy" | "broken" | "uncheckable" | "skipped_video";
+  status: "healthy" | "broken" | "uncheckable";
   http_status: number | null;
   mime_type: string | null;
   resolved_url: string | null;
@@ -676,14 +676,9 @@ async function probeImage(urlValue: string): Promise<ImageHealth> {
   const status = response.status;
   await cancelResponseBody(response);
   if (status === 404 || status === 410) return { url: urlValue, status: "broken", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source returned a definitive missing status" };
-  if (response.ok && Boolean(mimeType?.startsWith("image/"))) return { url: urlValue, status: "healthy", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl };
-  if (response.ok) return { url: urlValue, status: "uncheckable", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source did not identify itself as an image" };
+  if (response.ok && Boolean(mimeType?.startsWith("image/") || mimeType?.startsWith("video/"))) return { url: urlValue, status: "healthy", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl };
+  if (response.ok) return { url: urlValue, status: "uncheckable", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source did not identify itself as image or video media" };
   return { url: urlValue, status: "uncheckable", http_status: status, mime_type: mimeType, resolved_url: resolvedUrl, detail: "source denied or could not satisfy a lightweight probe" };
-}
-
-function likelyVideoUrl(urlValue: string): boolean {
-  const lower = urlValue.toLowerCase().split("?")[0];
-  return lower.includes("video.twimg.com") || /\.(mp4|webm|mov|m4v|avi|mkv)$/.test(lower);
 }
 
 function repairImageUrls(value: unknown): string[] {
@@ -759,13 +754,10 @@ export async function scanImageHealth(ctx: RequestContext, args: unknown): Promi
     const urls = imageList(record.image);
     const scannedUrls = urls.slice(0, maxImages);
     const images: ImageHealth[] = [];
-    for (const url of scannedUrls) {
-      if (likelyVideoUrl(url)) images.push({ url, status: "skipped_video", http_status: null, mime_type: "video/*", resolved_url: url, detail: "video media is not eligible for image repair" });
-      else images.push(await probeImage(url));
-    }
-    const counts = { healthy: images.filter((item) => item.status === "healthy").length, broken: images.filter((item) => item.status === "broken").length, uncheckable: images.filter((item) => item.status === "uncheckable").length, skipped_video: images.filter((item) => item.status === "skipped_video").length };
-    const status = !urls.length ? "no_image" : counts.broken ? "needs_repair" : counts.uncheckable ? "needs_review" : counts.healthy ? "healthy" : "video_only";
-    results.push({ post_id: id, revision: record.revision, post_url: record.postUrl || null, image_count: urls.length, checked_image_count: images.length, omitted_image_count: Math.max(0, urls.length - images.length), status, counts, images });
+    for (const url of scannedUrls) images.push(await probeImage(url));
+    const counts = { healthy: images.filter((item) => item.status === "healthy").length, broken: images.filter((item) => item.status === "broken").length, uncheckable: images.filter((item) => item.status === "uncheckable").length };
+    const status = !urls.length ? "no_media" : counts.broken ? "needs_repair" : counts.uncheckable ? "needs_review" : "healthy";
+    results.push({ post_id: id, revision: record.revision, post_url: record.postUrl || null, media_count: urls.length, checked_media_count: images.length, omitted_media_count: Math.max(0, urls.length - images.length), status, counts, media: images });
   }
   return { mode: "posts", read_only: true, max_images_per_post: maxImages, count: results.length, records: results };
 }

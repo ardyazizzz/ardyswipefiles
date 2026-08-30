@@ -28,10 +28,11 @@ Claude Code, and later MCP clients can work from the same contract.
 - Treat revision conflicts as a signal to reread, not as permission to overwrite.
 - Preview deletes first; confirmation moves snapshots to 30-day Trash.
 - Use `export_posts` for structured machine-readable handoff instead of scraping the UI.
-- For image repair, use `scan_image_health` only on explicit Posts IDs. A
-  browser-capable agent may open a public `postUrl` itself, then pass the
-  discovered HTTPS image URLs to `repair_post_images` for preview. The gateway
-  must never operate a browser, access cookies, or request LinkedIn credentials.
+- For image repair, use `scan_image_health` only on explicit Posts IDs. It
+  checks both image and video media; a browser-capable agent may open a public
+  `postUrl` itself, then pass discovered HTTPS image URLs to
+  `repair_post_images` for preview. The gateway must never operate a browser,
+  access cookies, or request LinkedIn credentials.
 - Treat `repair_post_images` preview metadata as a proposal. Obtain human
   approval before its separate apply call. Apply requires the reviewed revision,
   a short-lived token, a fresh idempotency key, and a byte-for-byte source check.
