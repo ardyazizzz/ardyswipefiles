@@ -580,8 +580,21 @@
   const SB_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/rest/v1';
   const SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
 
+  function sbRequestOptions(opts = {}, token = SB_KEY) {
+    const { headers: extraHeaders, ...requestOpts } = opts || {};
+    const headers = new Headers({
+      apikey: SB_KEY,
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    });
+    if (extraHeaders) {
+      new Headers(extraHeaders).forEach((value, key) => headers.set(key, value));
+    }
+    return { ...requestOpts, headers };
+  }
+
   function sbFetch(path, opts = {}) {
-    return fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', ...opts.headers }, ...opts });
+    return fetch(SB_URL + path, sbRequestOptions(opts));
   }
 
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
@@ -595,10 +608,7 @@
 
   function sbFetchAuth(path, opts = {}) {
     const token = _authToken || SB_KEY;
-    return fetch(SB_URL + path, {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...opts.headers },
-      ...opts
-    });
+    return fetch(SB_URL + path, sbRequestOptions(opts, token));
   }
 
   function updateAuthState(session) {
@@ -942,8 +952,17 @@
     const f = getF(); const c = getFC();
     const body = JSON.stringify({ mode: activeMode, filters: f, colors: c });
     try {
-      await sbFetchAuth('/filter_configs', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body });
-    } catch(e) {}
+      const r = await sbFetchAuth('/filter_configs?on_conflict=mode', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body });
+      if (!r.ok) {
+        const details = await r.text().catch(() => '');
+        console.error('[Swipe.ardy] Filter config save failed:', r.status, details);
+        return false;
+      }
+      return true;
+    } catch(e) {
+      console.error('[Swipe.ardy] Filter config save failed:', e);
+      return false;
+    }
   }
 
   async function loadViewsConfig() {
@@ -954,7 +973,7 @@
   }
 
   function saveViewsConfig() {
-    sbFetchAuth('/views_config', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
+    sbFetchAuth('/views_config?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ id: 1, data: views }) }).catch(()=>{});
   }
 
   function setMode(mode, skipRender) {
@@ -1841,7 +1860,10 @@
 
   async function closeSettings() {
     document.getElementById('settingsOverlay').style.display = 'none';
-    persist(); await saveFilterConfig(); renderFilterBar(); applyFilters(); syncHash();
+    persist();
+    const saved = await saveFilterConfig();
+    renderFilterBar(); applyFilters(); syncHash();
+    if (!saved) showToast('Filters saved locally, but cloud sync failed');
   }
 
   function renderSettingsPanel() {
