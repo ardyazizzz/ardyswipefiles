@@ -786,6 +786,16 @@ Single-post extraction, the LinkedIn Save-button watcher, and page scanning all 
 
 Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A summary such as `Alice and 27 others` resolves to 28 total reactions.
 
+### LinkedIn Extraction Diagnostics
+
+Manual LinkedIn extraction returns a separate structural diagnostic payload to the floating panel.
+The existing Debug section displays it and its existing Copy button copies the full log. The payload
+includes the extension version, card-selection path, selected DOM node and activity ancestry,
+selector match counts, content boundary, engagement-root count, structural data attributes, and
+short engagement-number signals. It deliberately excludes caption and comment bodies. The panel
+removes the diagnostic payload from the editable post data, and `SAVE_SWIPE` reconstructs its item
+from the visible form fields, so diagnostics are never stored in Supabase.
+
 Run `node extension/tests/linkedin-extraction.test.js` after changing LinkedIn selectors, boundary logic, or number parsing.
 
 ---

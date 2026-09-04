@@ -656,6 +656,144 @@
     return null;
   }
 
+  function linkedInDebugDescribeNode(node) {
+    if (!node) return null;
+    var result = { tag: String(node.tagName || '').toLowerCase() || 'unknown' };
+    var cls = '';
+    try { cls = node.getAttribute('class') || ''; } catch (e) {}
+    if (cls) result.classes = cls.replace(/\s+/g, ' ').trim().slice(0, 300);
+    var attrs = ['id', 'role', 'data-view-name', 'data-test-id', 'data-urn', 'data-id'];
+    for (var i = 0; i < attrs.length; i++) {
+      var value = '';
+      try { value = node.getAttribute(attrs[i]) || ''; } catch (e) {}
+      if (value) result[attrs[i]] = String(value).slice(0, 240);
+    }
+    try {
+      var rect = node.getBoundingClientRect();
+      result.rect = {
+        top: Math.round(rect.top),
+        left: Math.round(rect.left),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      };
+    } catch (e) {}
+    return result;
+  }
+
+  function linkedInDebugAncestry(node, limit) {
+    var result = [];
+    var current = node;
+    while (current && result.length < limit) {
+      result.push(linkedInDebugDescribeNode(current));
+      if (current === document.body || current === document.documentElement) break;
+      current = current.parentElement;
+    }
+    return result;
+  }
+
+  function linkedInDebugSelectorCounts(root, selectors) {
+    var result = [];
+    if (!root || !root.querySelectorAll) return result;
+    for (var i = 0; i < selectors.length; i++) {
+      var count = 0;
+      try { count = root.querySelectorAll(selectors[i]).length; } catch (e) {}
+      result.push({ selector: selectors[i], count: count });
+    }
+    return result;
+  }
+
+  function linkedInDebugMetricSignals(root, limit) {
+    var result = [];
+    if (!root || !root.querySelectorAll) return result;
+    var nodes = root.querySelectorAll('span, a, button, [aria-label]');
+    var maxNodes = Math.min(nodes.length, 1200);
+    var metricPattern = /\d[\d\s.,'’]*(?:[kKmMbB])?\s*(?:reactions?|likes?|comments?|replies|reposts?|shares?|reaksi|suka|komentar|balasan|bagikan)|(?:reactions?|likes?|comments?|replies|reposts?|shares?|reaksi|suka|komentar|balasan|bagikan)\s*\d[\d\s.,'’]*(?:[kKmMbB])?/ig;
+    var othersPattern = /(?:and|dan)\s+\d[\d\s.,'’]*(?:[kKmMbB])?\s+(?:others?|lainnya)/ig;
+    for (var i = 0; i < maxNodes && result.length < limit; i++) {
+      var node = nodes[i];
+      var label = '';
+      try { label = node.getAttribute('aria-label') || ''; } catch (e) {}
+      var text = visibleText(node).replace(/\s+/g, ' ').trim();
+      if (text.length > 140) text = '';
+      var combined = (label + ' ' + text).replace(/\s+/g, ' ').trim();
+      var matches = [];
+      var match;
+      metricPattern.lastIndex = 0;
+      while ((match = metricPattern.exec(combined)) && matches.length < 3) matches.push(match[0]);
+      othersPattern.lastIndex = 0;
+      while ((match = othersPattern.exec(combined)) && matches.length < 3) matches.push(match[0]);
+
+      if (matches.length === 0 && /^\d[\d\s.,'’]*(?:[kKmMbB])?$/.test(text)) {
+        var contextClasses = '';
+        var context = node;
+        for (var ci = 0; ci < 3 && context; ci++) {
+          try { contextClasses += ' ' + (context.getAttribute('class') || ''); } catch (e) {}
+          context = context.parentElement;
+        }
+        if (/social|reaction|like|comment|repost|share/i.test(contextClasses)) matches.push(text);
+      }
+      if (matches.length === 0) continue;
+
+      result.push({
+        signal: matches.join(' | ').slice(0, 180),
+        node: linkedInDebugDescribeNode(node),
+        parent: linkedInDebugDescribeNode(node.parentElement)
+      });
+    }
+    return result;
+  }
+
+  function linkedInDebugAttributeInventory(root) {
+    var counts = {};
+    if (!root || !root.querySelectorAll) return [];
+    var nodes = root.querySelectorAll('[data-view-name], [data-test-id]');
+    var maxNodes = Math.min(nodes.length, 800);
+    for (var i = 0; i < maxNodes; i++) {
+      var viewName = nodes[i].getAttribute('data-view-name') || '';
+      var testId = nodes[i].getAttribute('data-test-id') || '';
+      if (viewName) counts['data-view-name=' + viewName] = (counts['data-view-name=' + viewName] || 0) + 1;
+      if (testId) counts['data-test-id=' + testId] = (counts['data-test-id=' + testId] || 0) + 1;
+    }
+    return Object.keys(counts).slice(0, 80).map(function (key) {
+      return { attribute: key.slice(0, 240), count: counts[key] };
+    });
+  }
+
+  function buildLinkedInDiagnostics(activityId, card, cardSource, caption, counts) {
+    var activityNode = null;
+    if (activityId) {
+      activityNode = document.querySelector('[data-urn*="' + activityId + '"], [data-id*="' + activityId + '"]');
+    }
+    var boundary = getLinkedInContentBoundary(card);
+    var engagementRoots = getLinkedInEngagementRoots(card);
+    var parentScope = card;
+    for (var i = 0; i < 3 && parentScope && parentScope.parentElement && parentScope.parentElement !== document.body; i++) {
+      parentScope = parentScope.parentElement;
+    }
+    return {
+      diagnosticVersion: 1,
+      pagePath: location.pathname,
+      activityId: activityId || '',
+      cardSelection: cardSource || 'unknown',
+      activityMatch: linkedInDebugDescribeNode(activityNode),
+      activityAncestry: linkedInDebugAncestry(activityNode, 8),
+      selectedCard: linkedInDebugDescribeNode(card),
+      selectedCardTextLength: visibleText(card).length,
+      selectedCardContainsActivityMatch: !!(card && activityNode && card.contains && card.contains(activityNode)),
+      postRootMatchesOnPage: document.querySelectorAll(LINKEDIN_POST_ROOT_SELECTOR).length,
+      captionLength: (caption || '').length,
+      captionSelectorMatches: linkedInDebugSelectorCounts(card, LINKEDIN_CAPTION_SELECTORS),
+      contentBoundary: linkedInDebugDescribeNode(boundary),
+      engagementRootCount: engagementRoots.length,
+      reactionCandidateCount: card.querySelectorAll('.social-details-social-counts__reactions-count, [aria-label*="reaction" i], [aria-label*="reaksi" i]').length,
+      extractedCounts: counts,
+      metricSignalsInCard: linkedInDebugMetricSignals(card, 12),
+      parentScope: linkedInDebugDescribeNode(parentScope),
+      metricSignalsInParentScope: linkedInDebugMetricSignals(parentScope, 16),
+      structuralAttributesInParentScope: linkedInDebugAttributeInventory(parentScope)
+    };
+  }
+
   function extractCarouselCoversFromCode() {
     try {
       var codeEls = document.querySelectorAll('code');
@@ -756,15 +894,18 @@
     }
 
     var card = activityId ? findCardByActivityId(activityId) : null;
+    var cardSource = card ? 'activity-id' : '';
     LOG&&console.log('[Swipe.ardy cs] Activity ID match:', card ? 'FOUND' : 'NOT FOUND');
 
     if (!card && activityId) {
       card = findCardByTimeElement();
+      if (card) cardSource = 'time-element';
       LOG&&console.log('[Swipe.ardy cs] Time element match:', card ? 'FOUND' : 'NOT FOUND');
     }
 
     if (!card && activityId) {
       card = findCardByEngagement();
+      if (card) cardSource = 'engagement-region';
       LOG&&console.log('[Swipe.ardy cs] Engagement match:', card ? 'FOUND' : 'NOT FOUND');
     }
 
@@ -783,13 +924,19 @@
           if (cards.indexOf(root) === -1) cards.push(root);
         }
       }
+      var fallbackSource = 'post-selector';
       if (cards.length === 0) {
         cards = Array.from(document.querySelectorAll('main'));
-        if (!cards.length) cards = [document.body];
+        fallbackSource = 'main';
+        if (!cards.length) {
+          cards = [document.body];
+          fallbackSource = 'body';
+        }
       }
       cards = cards.filter(function (c) { return visibleText(c).length >= 40; });
       cards.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
       card = cards[0];
+      if (card) cardSource = 'fallback-' + fallbackSource;
       LOG&&console.log('[Swipe.ardy cs] Fallback heuristic: picked card', card.tagName, visibleText(card).slice(0, 60));
     }
 
@@ -829,6 +976,13 @@
     }
     LOG&&console.log('[DEBUG document single]', sDocUrl || 'no PDF URL found');
 
+    var diagnostics = null;
+    try {
+      diagnostics = buildLinkedInDiagnostics(activityId, card, cardSource, text, counts);
+    } catch (diagnosticError) {
+      diagnostics = { diagnosticVersion: 1, error: diagnosticError.message || String(diagnosticError) };
+    }
+
     return {
       author: author,
       text: text,
@@ -840,7 +994,8 @@
       image: image,
       images: carouselImages || [],
       documentUrl: sDocUrl,
-      date: date
+      date: date,
+      __debug: diagnostics
     };
   }
 
@@ -1115,7 +1270,9 @@
         if (platform === 'LinkedIn') {
           extractLinkedIn().then(function(data) {
             LOG&&console.log('[Swipe.ardy cs] EXTRACT -> LinkedIn result', data);
-            sendResponse({ ok: true, data: data });
+            var debug = data && data.__debug ? data.__debug : null;
+            if (data && data.__debug) delete data.__debug;
+            sendResponse({ ok: true, data: data, debug: debug });
           }).catch(function(e) {
             console.error('[Swipe.ardy cs] EXTRACT -> LinkedIn error', e.message);
             sendResponse({ ok: false, error: e.message });
@@ -1599,6 +1756,7 @@
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMetric = extractLinkedInMetric;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
+    window.__SWIPEARDY_TEST_HOOK__.linkedInDebugMetricSignals = linkedInDebugMetricSignals;
   }
 
   setupTwitterScanner();

@@ -190,7 +190,9 @@
     showState('sReady');
     scannedPosts = [];
     $('#scanResults').classList.add('hidden');
-    clog('init', 'Panel opened');
+    var extensionVersion = 'unknown';
+    try { extensionVersion = chrome.runtime.getManifest().version || extensionVersion; } catch (e) {}
+    clog('init', 'Panel opened — extension v' + extensionVersion);
     loadBookmarkAutoSave();
   }
 
@@ -286,6 +288,7 @@
       if (!resp.ok) { clog('EXTRACT', resp.error, 'er'); showError(resp.error || 'Extraction failed.'); return; }
       fillForm(resp.data);
       if (resp.data && resp.data.platform) { currentPlatform = resp.data.platform; setBadge(resp.data.platform); }
+      if (resp.debug) clog('LINKEDIN DIAGNOSTICS', resp.debug);
       clog('EXTRACT', 'Done', 'ok'); showState('sPreview');
     });
   });

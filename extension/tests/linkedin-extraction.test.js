@@ -49,6 +49,8 @@ class FakeNode {
     this.engagementRoots = [];
     this.reactionNodes = [];
     this.labelledNodes = [];
+    this.debugNodes = [];
+    this.parentElement = parent;
   }
 
   getAttribute(name) {
@@ -82,6 +84,7 @@ class FakeNode {
   }
 
   querySelectorAll(selector) {
+    if (selector === 'span, a, button, [aria-label]') return this.debugNodes;
     if (selector === '[aria-label]') return this.labelledNodes;
     if (selector.includes('comments-comment') && selector.includes('social-details')) return this.boundaries;
     if (selector.includes('social-details-social-counts__reactions-count')) return this.reactionNodes;
@@ -116,6 +119,17 @@ assert.equal(hooks.parseCompactNumber('1.234 reactions'), 1234);
 assert.equal(hooks.parseCompactNumber('1.2K reactions'), 1200);
 assert.equal(hooks.parseCompactNumber('1,2K reactions'), 1200);
 assert.equal(hooks.parseCompactNumber('2 M reactions'), 2000000);
+
+{
+  const debugRoot = new FakeNode();
+  const metric = new FakeNode({ text: '34 comments • 5 reposts', parent: debugRoot });
+  const privateComment = new FakeNode({ text: 'Private comment body that must not enter diagnostics.', parent: debugRoot });
+  debugRoot.debugNodes = [metric, privateComment];
+  const signals = plain(hooks.linkedInDebugMetricSignals(debugRoot, 10));
+  assert.equal(signals.length, 1);
+  assert.equal(signals[0].signal, '34 comments | 5 reposts');
+  assert.equal(JSON.stringify(signals).includes('Private comment body'), false);
+}
 
 assert.equal(hooks.extractLinkedInMetric('12 comments', ['comment', 'comments']), 12);
 assert.equal(hooks.extractLinkedInMetric('comments 12', ['comment', 'comments']), 12);
