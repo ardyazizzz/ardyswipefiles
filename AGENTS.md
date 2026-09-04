@@ -7,7 +7,7 @@ Read this first before making any modifications to understand how the pieces con
 
 ## Quick Start (30 seconds)
 
-Vanilla JavaScript single-file app (`index.html`, ~1941 lines) with Supabase backend.
+Vanilla JavaScript single-file app (`index.html`, ~2300 lines) with Supabase backend.
 **No framework, no build tools, zero npm dependencies.**
 
 Four content modes share a unified architecture:
@@ -173,7 +173,7 @@ openAddModal() → user fills form → saveSwipe()
   1. Validate required fields per mode
   2. Build item object with { type: activeMode, id: Date.now(), ... }
   3. unshift into correct array (swipes/creators/websites/snippets)
-  4. persist() to localStorage
+  4. persistData() to localStorage
   5. fetch POST /swipes to Supabase (fire-and-forget, .catch(()=>{}))
   6. closeAddModal() + applyFilters() + showToast()
 ```
@@ -183,7 +183,7 @@ openAddModal() → user fills form → saveSwipe()
 openEditModal(id) → find item in correct array → populate form → updateSwipe()
   1. Validate required fields per mode
   2. Mutate item properties in-place (no unshift)
-  3. persist() + closeEditModal() + applyFilters()
+  3. Invalidate the item's cached search text, then persistData() + closeEditModal() + applyFilters()
   4. fetch PATCH /swipes?id=eq.{id} to Supabase (fire-and-forget)
 ```
 
@@ -192,7 +192,7 @@ openEditModal(id) → find item in correct array → populate form → updateSwi
 deleteSwipe(id)
   1. confirm() dialog
   2. Filter correct array by id (swipes = swipes.filter(...))
-  3. persist() + applyFilters()
+  3. persistData() + applyFilters()
   4. fetch DELETE /swipes?id=eq.{id} to Supabase (fire-and-forget)
 ```
 
@@ -208,12 +208,13 @@ deleteSwipe(id)
    a. start initAuth(), loadSwipes(), loadFilterConfigs(), loadViewsConfig() together
    b. loadSwipes() hydrates localStorage synchronously, then starts Supabase GET /swipes
    c. setMode(activeMode, true)   → skipRender=true, no syncHash
-   d. persist() + renderFilterBar() + applyFilters() → show cached data immediately
+   d. renderFilterBar() + applyFilters() → show cached data immediately without rewriting it
    e. loadFromHash()              → restore state from URL hash (if any)
    f. skipSync = false            → unlock syncHash for user interactions
    g. await all four reads        → remote data/configs finish in the background
-   h. persist() + renderFilterBar() + applyFilters() → reconcile the final snapshot
+   h. renderFilterBar() + applyFilters() → reconcile the final snapshot
    i. subscribeRealtime()         → 3 WebSocket channels
+   j. defer one full persist()     → refresh local cache after the final UI is rendered
 ```
 
 **Key details:** Independent startup reads run in parallel, and cached local data can be used while
@@ -230,7 +231,7 @@ premature hash writes during boot.
 User clicks "Niche: Business" checkbox
   → toggleFilter('Niche', 'Business')
   → getAF()['Niche'] = ['Business']  (adds to active filters)
-  → renderFilterBar() + applyFilters()
+  → persistUIState() + updateFilterControl('Niche') + applyFilters()
   → applyFilters():
      const source = correct mode array (swipes/creators/websites/snippets)
      source.filter(item => {
@@ -242,6 +243,12 @@ User clicks "Niche: Business" checkbox
      })
   → renderCards(filteredData) + syncHash()
 ```
+
+The frequent checkbox path updates only the affected dropdown plus the saved-view/clear-all
+indicators; it does not rebuild the entire filter bar. Search input is debounced by 140 ms.
+When search is empty, `applyFilters()` skips search-string construction entirely. When search
+is active, each item's lowercased searchable text is cached in a `WeakMap` and invalidated on
+in-place item edits or filter-name/value propagation.
 
 **Critical insight:** If Creator mode has active filter `{Niche: ['Business']}`:
 - A Creator item with `filters: {Niche: 'Business'}` → MATCH → shown
@@ -316,7 +323,7 @@ Key matching is **case-insensitive** using TWO strategies: the full filter key (
 ## Sort System
 
 `applySort(val)` sorts the current mode's source array **in-place** (Array.sort mutation).
-`sortSwipes(val)` wraps it: sets `currentSort`, clears `currentViewName`, then `renderFilterBar(); applyFilters(); syncHash()`.
+`sortSwipes(val)` wraps it: sets `currentSort`, clears `currentViewName`, updates only the saved-view control, then `applyFilters(); syncHash()`.
 
 Available sort options per mode (from the `<select class="sort-select">` dropdown):
 
@@ -332,7 +339,7 @@ Available sort options per mode (from the `<select class="sort-select">` dropdow
 
 ## Card Rendering by Mode
 
-Within `renderCards(data)`, each mode has a distinct card template:
+`buildCardHtml(item)` provides a distinct card template for each mode:
 
 **Posts:** Avatar initials, date, media preview (image/video/youtube), engagement badge.
 **Creators:** Avatar image (with initials fallback), platform label, follower count badge.
@@ -343,6 +350,13 @@ Tag rendering is shared across all 4 modes:
 ```js
 tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; ... })
 ```
+
+`renderCards(data)` uses a mode-scoped map keyed by item ID. Unchanged card nodes are moved or
+reused instead of recreating the complete grid with `innerHTML`; changed item markup replaces
+only that card. This preserves already-loaded image/video DOM when filters, sort order, or views
+change. Nodes for temporarily filtered-out items remain reusable, while IDs removed from the
+current mode's source array are pruned. Switching modes resets the map; the first render for that
+mode still uses one batched `innerHTML` parse so startup does not pay for one parser call per card.
 
 ---
 
@@ -409,7 +423,7 @@ batchDeleteSelected():
   1. Auth guard (currentUser check)
   2. confirm("Delete N items? This cannot be undone.")
   3. For each selected ID: filter from correct mode array + fire Supabase DELETE
-  4. persist(), clear selectedIds, exit selectMode
+  4. persistData(), clear selectedIds, exit selectMode
   5. renderFilterBar(), applyFilters(), showToast()
 
 ### Edge Cases
@@ -448,7 +462,7 @@ Each view object: `{ name, mode, filters, sort, density, search }`
 1. `setMode(v.mode, true)` — switch mode (skipRender to avoid premature hash)
 2. Clear active filters for the target mode
 3. Restore filters, sort, density, search from the preset
-4. `persist(); renderFilterBar(); applyFilters(); syncHash()`
+4. `persistUIState(); renderFilterBar(); applyFilters(); syncHash()`
 
 Views are stored in `views[]` array, synced to both localStorage (`swipeardy_views_v1`) and Supabase (`views_config` table, id=1).
 
@@ -480,7 +494,7 @@ Three WebSocket channels via Supabase Realtime v2:
 1. If local change happened <1.5s ago → skip (prevents echo)
 2. Remove item by id from ALL 4 arrays
 3. If not a DELETE, insert into correct array by `item.type`
-4. `persist()` + `applyFilters()`
+4. Queue a 60 ms flush; a burst calls `persistData()` once and renders once only when the active mode was affected
 
 ---
 
@@ -635,7 +649,13 @@ All keys prefixed with `swipeardy_`:
 | **Filter state** | `filter_state_v1` (posts), `creator_filter_state_v1`, `website_filter_state_v1`, `snippet_filter_state_v1` |
 | **UI state** | `mode_v1`, `grid_density_v1`, `views_v1`, `layout_v1`, `numeric_filters_v1`, `dark_v1` |
 
-`persist()` writes ALL keys at once. Called after every state change.
+Persistence is split by ownership so UI-only interactions never stringify all item arrays:
+
+- `persistData()` writes the four item arrays.
+- `persistUIState()` writes mode, active filters, density/layout, and numeric ranges.
+- `persistFilterDefinitions()` writes filter definitions and colors.
+- `persistViewsLocal()` writes saved views.
+- `persist()` calls all four and is reserved for full snapshots and rare cross-domain changes.
 
 ---
 
@@ -809,8 +829,8 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 | Limit | Where | Typical threshold | Notes |
 |---|---|---|---|
 | **Supabase row cap** | `loadSwipes()` fetches `/swipes` with no pagination | default 1,000 rows | "Max rows" raised to 10,000 via dashboard. Still no code pagination — if the number of cards exceeds the Max-rows setting, older cards silently do not load. Code pagination will be needed around ~8,000+. |
-| **localStorage size** | `persist()` serializes the entire dataset (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | `QuotaExceededError` is swallowed silently per-key by individual try/catch blocks. The app continues but localStorage cache becomes stale. Data remains safe in Supabase. Fix later: store only UI prefs in localStorage, or move bulk data to IndexedDB. |
-| **Render-all** | `renderCards()` builds ALL filtered cards into one innerHTML string | noticeable lag at thousands | Images use `loading="lazy"`. No pagination or virtual scrolling. |
+| **localStorage size** | `persistData()` serializes the entire dataset after data mutations (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | UI-only changes use smaller persistence helpers. `QuotaExceededError` is swallowed silently per-key; Supabase data remains safe. IndexedDB is the future option beyond this ceiling. |
+| **Render-all computation** | `renderCards()` still computes markup for all filtered cards, but reconciles keyed DOM nodes | noticeable at many thousands | Unchanged media DOM is reused and images use `loading="lazy"`; there is still no pagination or virtual scrolling. |
 | **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
 | **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). **Gotcha:** `authenticated` role also needs explicit `GRANT` on tables — RLS alone returns 403 on writes. |
 
@@ -844,7 +864,7 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 
 6. **Direct variable access.** Never access `filters`, `filterColors`, `activeFilters` directly. Always use `getF()`, `getFC()`, `getAF()`.
 
-7. **`persist()` swallowing errors.** `persist()` uses `try/catch(e){}` — if localStorage is full or corrupted, errors are silently swallowed. The app continues but state may not save.
+7. **Persistence helpers swallowing errors.** The four scoped helpers use `try/catch(e){}` — if localStorage is full or corrupted, errors are silently swallowed. The app continues but the affected local cache may not save.
 
 8. **`AUTH_EMAIL` must match Supabase dashboard.** The hardcoded email in `AUTH_EMAIL` must exactly match the user created in the Supabase Auth dashboard. If you change it in code without updating the dashboard, login will always fail.
 

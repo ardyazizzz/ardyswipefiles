@@ -600,6 +600,25 @@
   const SB_PROJECT = 'https://dmhiitzunsdqyxopqsby.supabase.co';
   const sbRTC = supabase.createClient(SB_PROJECT, SB_KEY);
   let _localChange = 0;
+  let realtimeSwipeFlushTimer = null;
+  let realtimeSwipeRenderNeeded = false;
+
+  function rowMode(row) {
+    if (!row) return null;
+    if (row.type === 'creators' || row.type === 'websites' || row.type === 'snippets') return row.type;
+    return 'posts';
+  }
+
+  function scheduleRealtimeSwipeFlush(shouldRender) {
+    realtimeSwipeRenderNeeded = realtimeSwipeRenderNeeded || shouldRender;
+    if (realtimeSwipeFlushTimer) return;
+    realtimeSwipeFlushTimer = setTimeout(() => {
+      realtimeSwipeFlushTimer = null;
+      persistData();
+      if (realtimeSwipeRenderNeeded) applyFilters();
+      realtimeSwipeRenderNeeded = false;
+    }, 60);
+  }
 
   /* ===== Auth (Password Cerdas) ===== */
   const AUTH_EMAIL = 'ardy@swipeardy.com';
@@ -684,6 +703,7 @@
     const { eventType, new: newRow, old: oldRow } = payload;
     const id = (oldRow && oldRow.id) || (newRow && newRow.id);
     if (!id) return;
+    const shouldRender = rowMode(oldRow) === activeMode || rowMode(newRow) === activeMode;
     [swipes, creators, websites, snippets].forEach(arr => {
       const i = arr.findIndex(x => x.id === id);
       if (i !== -1) arr.splice(i, 1);
@@ -694,7 +714,7 @@
       else if (newRow.type === 'snippets') snippets.unshift(newRow);
       else swipes.unshift(newRow);
     }
-    persist(); applyFilters();
+    scheduleRealtimeSwipeFlush(shouldRender);
   }
 
   function handleFilterConfigChange(payload) {
@@ -704,13 +724,13 @@
     else if (row.mode === 'creators') { creatorFilters = Object.assign({}, creatorFilters, row.filters); Object.keys(creatorFilters).forEach(k => { if (!row.filters[k]) delete creatorFilters[k]; }); creatorFilterColors = Object.assign({}, creatorFilterColors, row.colors); Object.keys(creatorFilterColors).forEach(k => { if (!row.colors[k]) delete creatorFilterColors[k]; }); }
     else if (row.mode === 'websites') { websiteFilters = Object.assign({}, websiteFilters, row.filters); Object.keys(websiteFilters).forEach(k => { if (!row.filters[k]) delete websiteFilters[k]; }); websiteFilterColors = Object.assign({}, websiteFilterColors, row.colors); Object.keys(websiteFilterColors).forEach(k => { if (!row.colors[k]) delete websiteFilterColors[k]; }); }
     else if (row.mode === 'snippets') { snippetFilters = Object.assign({}, snippetFilters, row.filters); Object.keys(snippetFilters).forEach(k => { if (!row.filters[k]) delete snippetFilters[k]; }); snippetFilterColors = Object.assign({}, snippetFilterColors, row.colors); Object.keys(snippetFilterColors).forEach(k => { if (!row.colors[k]) delete snippetFilterColors[k]; }); }
-    persist(); renderFilterBar(); applyFilters();
+    persistFilterDefinitions(); renderFilterBar(); applyFilters();
   }
 
   function handleViewsChange(payload) {
     if (!payload.new) return;
     views = payload.new.data;
-    persist(); renderFilterBar();
+    persistViewsLocal(); renderFilterBar();
   }
 
   function subscribeRealtime() {
@@ -795,28 +815,44 @@
   ];
 
   function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-  function persist() {
+  function persistData() {
     try { localStorage.setItem(LS_SWIPES, JSON.stringify(swipes)); } catch(e) {}
     try { localStorage.setItem(LS_CREATORS, JSON.stringify(creators)); } catch(e) {}
     try { localStorage.setItem(LS_WEBSITES, JSON.stringify(websites)); } catch(e) {}
     try { localStorage.setItem(LS_SNIPPETS, JSON.stringify(snippets)); } catch(e) {}
+  }
+
+  function persistUIState() {
     try { localStorage.setItem(LS_MODE, JSON.stringify(activeMode)); } catch(e) {}
-    try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {}
-    try { localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); } catch(e) {}
     try { localStorage.setItem(LS_FILTER_STATE, JSON.stringify(activeFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); } catch(e) {}
     try { localStorage.setItem(LS_CREATOR_FILTER_STATE, JSON.stringify(creatorActiveFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); } catch(e) {}
     try { localStorage.setItem(LS_WEBSITE_FILTER_STATE, JSON.stringify(websiteActiveFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_SNIPPET_FILTERS, JSON.stringify(snippetFilters)); } catch(e) {}
-    try { localStorage.setItem(LS_SNIPPET_FILTER_COLORS, JSON.stringify(snippetFilterColors)); } catch(e) {}
     try { localStorage.setItem(LS_SNIPPET_FILTER_STATE, JSON.stringify(snippetActiveFilters)); } catch(e) {}
     try { localStorage.setItem(LS_GRID_DENSITY, gridDensity); } catch(e) {}
     try { localStorage.setItem(LS_LAYOUT, JSON.stringify(layoutMode)); } catch(e) {}
-    try { localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {}
     try { localStorage.setItem(LS_NUMERIC_FILTERS, JSON.stringify(numericFilters)); } catch(e) {}
+  }
+
+  function persistFilterDefinitions() {
+    try { localStorage.setItem(LS_FILTERS, JSON.stringify(filters)); } catch(e) {}
+    try { localStorage.setItem(LS_FILTER_COLORS, JSON.stringify(filterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATOR_FILTERS, JSON.stringify(creatorFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_CREATOR_FILTER_COLORS, JSON.stringify(creatorFilterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITE_FILTERS, JSON.stringify(websiteFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_WEBSITE_FILTER_COLORS, JSON.stringify(websiteFilterColors)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPET_FILTERS, JSON.stringify(snippetFilters)); } catch(e) {}
+    try { localStorage.setItem(LS_SNIPPET_FILTER_COLORS, JSON.stringify(snippetFilterColors)); } catch(e) {}
+  }
+
+  function persistViewsLocal() {
+    try { localStorage.setItem(LS_VIEWS, JSON.stringify(views)); } catch(e) {}
+  }
+
+  function persist() {
+    persistData();
+    persistUIState();
+    persistFilterDefinitions();
+    persistViewsLocal();
   }
 
   function showToast(msg) {
@@ -910,6 +946,9 @@
   let startupSyncActive = false;
   const startupLocalSwipeChanges = new Map();
   let searchRefreshTimer = null;
+  const searchableTextCache = new WeakMap();
+  let renderedCardMode = null;
+  const renderedCardNodes = new Map();
 
   function cloneStartupSwipe(item) {
     if (!item || typeof item !== 'object') return item;
@@ -1055,7 +1094,7 @@
     document.getElementById('addBtn').innerHTML = `<i class="ri-add-line"></i> Add ${noun}`;
     document.getElementById('searchInput').placeholder = `Search ${noun}s...`;
     if (!skipRender) {
-      persist();
+      persistUIState();
       renderFilterBar();
       applyFilters();
       syncHash();
@@ -1100,13 +1139,13 @@
   function cycleDensity() {
     gridDensity = (gridDensity + 1) % 2;
     currentViewName = null;
-    persist(); applyDensity(); renderFilterBar(); syncHash();
+    persistUIState(); applyDensity(); renderFilterBar(); syncHash();
   }
 
   function toggleLayout() {
     layoutMode = layoutMode === 'grid' ? 'masonry' : 'grid';
     currentViewName = null;
-    persist(); applyDensity(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); applyDensity(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function densityLabel() {
@@ -1164,7 +1203,7 @@
     if (v.density !== undefined) { gridDensity = v.density; applyDensity(); }
     if (v.search !== undefined) { document.getElementById('searchInput').value = v.search; }
     currentViewName = v.name;
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   let savingView = false;
@@ -1195,7 +1234,7 @@
     views.push(preset);
     currentViewName = name;
     savingView = false;
-    persist(); saveViewsConfig(); renderFilterBar();
+    persistViewsLocal(); saveViewsConfig(); renderFilterBar();
     showToast('View saved ✓');
   }
 
@@ -1235,14 +1274,14 @@
     if (!newName || newName === views[index].name) { renderViewsEditor(); return; }
     if (currentViewName === views[index].name) currentViewName = newName;
     views[index].name = newName;
-    persist(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
+    persistViewsLocal(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
   }
 
   function deleteView(index) {
     if (!confirm('Delete "' + views[index].name + '"?')) return;
     if (currentViewName === views[index].name) currentViewName = null;
     views.splice(index, 1);
-    persist(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
+    persistViewsLocal(); saveViewsConfig(); renderViewsEditor(); renderFilterBar();
   }
 
   function loadFromHash() {
@@ -1279,7 +1318,7 @@
     if (activeMode === 'posts') activeFilters = newFilters; else if (activeMode === 'creators') creatorActiveFilters = newFilters; else if (activeMode === 'websites') websiteActiveFilters = newFilters; else snippetActiveFilters = newFilters;
     if (searchVal) document.getElementById('searchInput').value = searchVal;
     currentViewName = null;
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); renderFilterBar(); applyFilters(); syncHash();
     setTimeout(() => showToast('<i class="ri-share-line"></i> Viewing shared filters · <span style="cursor:pointer;text-decoration:underline" onclick="showSaveViewPrompt()">Save as view</span>'), 400);
   }
 
@@ -1338,10 +1377,10 @@
     </div>`;
     html += `<div class="dropdown" id="dd-views">
       <button class="dropdown-btn ${currentViewName ? 'active' : ''}" onclick="toggleDD('views')">
-        ${currentViewName || 'Unsaved view'} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
+        <span class="dropdown-label">${currentViewName || 'Unsaved view'}</span> <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
       </button>
       <div class="dropdown-menu" id="menu-views">
-        ${currentViewName ? `<div class="dropdown-item" onclick="currentViewName=null;renderFilterBar()">Unsaved view</div>` : ''}
+        <div class="dropdown-item views-unsaved-option" style="display:${currentViewName ? 'flex' : 'none'}" onclick="currentViewName=null;renderFilterBar()">Unsaved view</div>
         ${views.map((v,i) => `
           <div class="dropdown-item" onclick="applyView(${i})" style="justify-content:space-between">
             <span>${v.name}</span>
@@ -1367,17 +1406,17 @@
       else if (selected.length > 1) btnText = `${selected[0]} +${selected.length - 1} more`;
       html += `<div class="dropdown" id="dd-${key}">
         <button class="dropdown-btn ${selected.length ? 'active' : ''}" onclick="toggleDD('${safeKey}')">
-          ${btnText} <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
+          <span class="dropdown-label">${btnText}</span> <i class="ri-arrow-down-s-line" style="font-size:14px"></i>
         </button>
         <div class="dropdown-menu" id="menu-${key}">
-          ${getF()[key].map(opt => {
+          ${getF()[key].map((opt, optIndex) => {
             const safeOpt = opt.replace(/'/g, "\\'");
             const isChecked = selected.includes(opt);
-            return `<div class="dropdown-item ${isChecked ? 'selected' : ''}" onclick="toggleFilter('${safeKey}','${safeOpt}')">
-              ${opt} ${isChecked ? '<i class="ri-check-line" style="font-size:13px"></i>' : ''}
+            return `<div class="dropdown-item filter-option ${isChecked ? 'selected' : ''}" data-option-index="${optIndex}" onclick="toggleFilter('${safeKey}','${safeOpt}')">
+              ${opt} ${isChecked ? '<i class="ri-check-line filter-check" style="font-size:13px"></i>' : ''}
             </div>`;
           }).join('')}
-          ${selected.length ? `<div class="dropdown-item" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0" onclick="clearCategoryFilters('${safeKey}')">Clear ${key}</div>` : ''}
+          <div class="dropdown-item filter-clear" style="color:var(--text-tertiary);border-top:1px solid var(--border);margin-top:4px;padding-top:8px;border-radius:0;display:${selected.length ? 'flex' : 'none'}" onclick="clearCategoryFilters('${safeKey}')">Clear ${key}</div>
         </div>
       </div>`;
     });
@@ -1419,8 +1458,63 @@
     html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-column-line" style="font-size:13px"></i></button>`;
     html += `<button class="btn-ghost ${selectMode ? 'active' : ''}" id="selectToggle" style="padding:6px 10px" onclick="toggleSelectMode()" title="Select cards"><i class="ri-checkbox-multiple-line" style="font-size:13px"></i></button>`;
     const totalSelected = Object.values(getAF()).reduce((s, a) => s + a.length, 0);
-    if (totalSelected) html += `<button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
+    html += `<button class="btn-ghost" id="clearAllFiltersBtn" style="padding:6px 10px;font-size:11px;display:${totalSelected ? 'inline-flex' : 'none'}" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
+  }
+
+  function updateViewsControl() {
+    const dropdown = document.getElementById('dd-views');
+    if (!dropdown) return;
+    const button = dropdown.querySelector(':scope > .dropdown-btn');
+    const label = button && button.querySelector('.dropdown-label');
+    if (button) button.classList.toggle('active', !!currentViewName);
+    if (label) label.textContent = currentViewName || 'Unsaved view';
+    const unsavedOption = dropdown.querySelector('.views-unsaved-option');
+    if (unsavedOption) unsavedOption.style.display = currentViewName ? 'flex' : 'none';
+  }
+
+  function updateClearAllFiltersButton() {
+    const button = document.getElementById('clearAllFiltersBtn');
+    if (!button) return;
+    const totalSelected = Object.values(getAF()).reduce((sum, values) => sum + values.length, 0);
+    button.style.display = totalSelected ? 'inline-flex' : 'none';
+  }
+
+  function updateFilterControl(key) {
+    const dropdown = document.getElementById('dd-' + key);
+    const options = getF()[key];
+    if (!dropdown || !options) {
+      renderFilterBar();
+      return;
+    }
+    const selected = getAF()[key] || [];
+    const button = dropdown.querySelector(':scope > .dropdown-btn');
+    const label = button && button.querySelector('.dropdown-label');
+    let buttonText = key;
+    if (selected.length === 1) buttonText = selected[0];
+    else if (selected.length > 1) buttonText = selected[0] + ' +' + (selected.length - 1) + ' more';
+    if (button) button.classList.toggle('active', selected.length > 0);
+    if (label) label.textContent = buttonText;
+
+    options.forEach((option, index) => {
+      const optionElement = dropdown.querySelector('.filter-option[data-option-index="' + index + '"]');
+      if (!optionElement) return;
+      const isSelected = selected.includes(option);
+      optionElement.classList.toggle('selected', isSelected);
+      const existingCheck = optionElement.querySelector('.filter-check');
+      if (isSelected && !existingCheck) {
+        const check = document.createElement('i');
+        check.className = 'ri-check-line filter-check';
+        check.style.fontSize = '13px';
+        optionElement.appendChild(check);
+      } else if (!isSelected && existingCheck) {
+        existingCheck.remove();
+      }
+    });
+    const clearButton = dropdown.querySelector('.filter-clear');
+    if (clearButton) clearButton.style.display = selected.length ? 'flex' : 'none';
+    updateViewsControl();
+    updateClearAllFiltersButton();
   }
 
   function toggleDD(key) {
@@ -1441,28 +1535,29 @@
     else af[key].splice(idx, 1);
     if (!af[key].length) delete af[key];
     currentViewName = null;
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); updateFilterControl(key); applyFilters(); syncHash();
   }
 
   function clearCategoryFilters(key) {
     delete getAF()[key];
     currentViewName = null;
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); updateFilterControl(key); applyFilters(); syncHash();
   }
 
   function handleSearchInput() {
     currentViewName = null;
+    updateViewsControl();
     if (searchRefreshTimer) clearTimeout(searchRefreshTimer);
     searchRefreshTimer = setTimeout(() => {
       searchRefreshTimer = null;
-      renderFilterBar(); applyFilters(); syncHash();
+      applyFilters(); syncHash();
     }, 140);
   }
 
   function setNumericFilter(field, el) {
     numericFilters[field] = el.value;
     currentViewName = null;
-    persist(); applyFilters(); syncHash();
+    persistUIState(); updateViewsControl(); applyFilters(); syncHash();
   }
 
   function toggleDark() {
@@ -1477,7 +1572,7 @@
     if (activeMode === 'posts') activeFilters = {}; else if (activeMode === 'creators') creatorActiveFilters = {}; else if (activeMode === 'websites') websiteActiveFilters = {}; else snippetActiveFilters = {};
     numericFilters = { engMin: '', engMax: '', folMin: '', folMax: '' };
     currentViewName = null;
-    persist(); renderFilterBar(); applyFilters(); syncHash();
+    persistUIState(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function applySort(val) {
@@ -1503,8 +1598,28 @@
   function sortSwipes(val) {
     currentSort = val;
     applySort(val);
-    currentViewName = null; renderFilterBar();
+    currentViewName = null; updateViewsControl();
     applyFilters(); syncHash();
+  }
+
+  function getSearchableText(item, mode) {
+    const cached = searchableTextCache.get(item);
+    if (cached && cached.mode === mode) return cached.text;
+    const filterValues = [];
+    Object.values(item.filters || {}).forEach(value => {
+      if (Array.isArray(value)) filterValues.push(...value);
+      else if (value) filterValues.push(value);
+    });
+    const fields = mode === 'posts'
+      ? [item.text, item.author, item.platform, ...filterValues, item.postUrl]
+      : mode === 'creators'
+      ? [item.text, item.author, item.platform, ...filterValues, item.postUrl, String(item.followers || '')]
+      : mode === 'websites'
+      ? [item.text, item.author, ...filterValues, item.postUrl]
+      : [item.text, ...filterValues];
+    const text = fields.filter(Boolean).join(' ').toLowerCase();
+    searchableTextCache.set(item, { mode, text });
+    return text;
   }
 
   function applyFilters() {
@@ -1512,16 +1627,7 @@
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
     const activeFilterEntries = Object.entries(getAF()).filter(([, values]) => values && values.length);
     const data = source.filter(s => {
-      const filterVals = []; Object.values(s.filters || {}).forEach(v => { if (Array.isArray(v)) filterVals.push(...v); else if (v) filterVals.push(v); });
-      const searchFields = activeMode === 'posts'
-        ? [s.text, s.author, s.platform, ...filterVals, s.postUrl]
-        : activeMode === 'creators'
-        ? [s.text, s.author, s.platform, ...filterVals, s.postUrl, String(s.followers || '')]
-        : activeMode === 'websites'
-        ? [s.text, s.author, ...filterVals, s.postUrl]
-        : [s.text, ...filterVals];
-      const searchStr = searchFields.filter(Boolean).join(' ').toLowerCase();
-      if (q && !searchStr.includes(q)) return false;
+      if (q && !getSearchableText(s, activeMode).includes(q)) return false;
       if (activeMode === 'posts') {
         const eng = (s.reactions||0) + (s.comments||0) + (s.reposts||0);
         if (numericFilters.engMin !== '' && eng < Number(numericFilters.engMin)) return false;
@@ -1561,19 +1667,7 @@
     renderCards(data);
   }
 
-  function renderCards(data) {
-    const grid = document.getElementById('cardGrid');
-    const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
-    const noResultsLabel = `No ${noun}s match your filters`;
-    if (!data.length) {
-      grid.innerHTML = `<div class="empty-state">
-        <i class="ri-file-search-line"></i>
-        <p>${noResultsLabel}</p>
-        <small>Try adjusting your filters or add a new ${noun}</small>
-      </div>`;
-      return;
-    }
-    grid.innerHTML = data.map(s => {
+  function buildCardHtml(s) {
       const av = getAv(s.author);
       const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { const seen = new Set(); if (Array.isArray(v)) v.forEach(x => { if (x && !seen.has(x)) { seen.add(x); tags.push([k,x]); } }); else if (v) tags.push([k,v]); });
       const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M1.75024 0H22.2502v8.25h-2.5V2.5h-6.5v19H19V24H5v-2.5h5.7502v-19H4.25024v5.75h-2.5V0Z" clip-rule="evenodd"/></svg>`;
@@ -1678,7 +1772,78 @@
           `<div class="card-engagement-bar" style="justify-content:flex-end"><button class="card-btn" onclick="deleteSwipe(${s.id})" title="Delete"><i class="ri-delete-bin-line"></i></button></div>`
         }
       </div>`;
-    }).join('');
+  }
+
+  function createCardNode(html) {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    const node = template.content.firstElementChild;
+    node.__swipeardyHtml = html;
+    return node;
+  }
+
+  function renderCards(data) {
+    const grid = document.getElementById('cardGrid');
+    const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
+    if (renderedCardMode !== activeMode) {
+      renderedCardMode = activeMode;
+      renderedCardNodes.clear();
+      grid.replaceChildren();
+    }
+
+    const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
+    const liveIds = new Set(source.map(item => String(item.id)));
+    renderedCardNodes.forEach((node, key) => {
+      if (liveIds.has(key)) return;
+      if (node.parentNode === grid) node.remove();
+      renderedCardNodes.delete(key);
+    });
+
+    if (!data.length) {
+      const emptyStateKey = 'empty-' + noun;
+      if (grid.dataset.renderState !== emptyStateKey) {
+        grid.innerHTML = `<div class="empty-state">
+          <i class="ri-file-search-line"></i>
+          <p>No ${noun}s match your filters</p>
+          <small>Try adjusting your filters or add a new ${noun}</small>
+        </div>`;
+        grid.dataset.renderState = emptyStateKey;
+      }
+      return;
+    }
+
+    delete grid.dataset.renderState;
+    const renderedItems = data.map(item => ({
+      key: String(item.id),
+      html: buildCardHtml(item)
+    }));
+
+    // A first/full mode render is faster as one parser pass. Later renders use
+    // the keyed map below so unchanged media nodes remain alive.
+    if (!renderedCardNodes.size) {
+      grid.innerHTML = renderedItems.map(item => item.html).join('');
+      Array.from(grid.children).forEach((node, index) => {
+        const item = renderedItems[index];
+        node.__swipeardyHtml = item.html;
+        renderedCardNodes.set(item.key, node);
+      });
+      return;
+    }
+
+    const desiredNodes = renderedItems.map(item => {
+      let node = renderedCardNodes.get(item.key);
+      if (!node || node.__swipeardyHtml !== item.html) {
+        node = createCardNode(item.html);
+        renderedCardNodes.set(item.key, node);
+      }
+      return node;
+    });
+
+    desiredNodes.forEach((node, index) => {
+      const currentNode = grid.children[index];
+      if (currentNode !== node) grid.insertBefore(node, currentNode || null);
+    });
+    while (grid.children.length > desiredNodes.length) grid.lastElementChild.remove();
   }
 
   function deleteSwipe(id) {
@@ -1695,7 +1860,7 @@
     } else {
       snippets = snippets.filter(x => x.id !== id);
     }
-    persist(); applyFilters();
+    persistData(); applyFilters();
     sbFetchAuth('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(()=>{});
     showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' deleted');
     if (selectedIds.has(id)) { selectedIds.delete(id); updateBatchBar(); }
@@ -1743,7 +1908,7 @@
       else snippets = snippets.filter(function(x) { return x.id !== id; });
       sbFetchAuth('/swipes?id=eq.' + id, { method: 'DELETE' }).catch(function(){});
     });
-    persist(); selectedIds.clear(); selectMode = false;
+    persistData(); selectedIds.clear(); selectMode = false;
     document.getElementById('batchBar').classList.remove('show');
     renderFilterBar(); applyFilters();
     showToast(count + ' ' + label + 's deleted');
@@ -1816,22 +1981,22 @@
     rememberStartupSwipeChange(item.id, 'upsert', item);
     if (isWebsite) {
       websites.unshift(item);
-      persist(); closeAddModal(); applyFilters();
+      persistData(); closeAddModal(); applyFilters();
       sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Website saved ✓');
     } else if (isCreator) {
       creators.unshift(item);
-      persist(); closeAddModal(); applyFilters();
+      persistData(); closeAddModal(); applyFilters();
       sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Creator saved ✓');
     } else if (isSnippet) {
       snippets.unshift(item);
-      persist(); closeAddModal(); applyFilters();
+      persistData(); closeAddModal(); applyFilters();
       sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Snippet saved ✓');
     } else {
       swipes.unshift(item);
-      persist(); closeAddModal(); applyFilters();
+      persistData(); closeAddModal(); applyFilters();
       sbFetchAuth('/swipes', { method: 'POST', body: sbBody }).catch(()=>{});
       showToast('Swipe saved ✓');
     }
@@ -1932,7 +2097,8 @@
     const id = editingId;
     const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts, followers: s.followers });
     rememberStartupSwipeChange(id, 'upsert', s);
-    persist(); closeEditModal(); applyFilters();
+    searchableTextCache.delete(s);
+    persistData(); closeEditModal(); applyFilters();
     sbFetchAuth('/swipes?id=eq.' + id, { method: 'PATCH', body }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
   }
@@ -1941,7 +2107,8 @@
 
   async function closeSettings() {
     document.getElementById('settingsOverlay').style.display = 'none';
-    persist();
+    persistFilterDefinitions();
+    persistUIState();
     const saved = await saveFilterConfig();
     renderFilterBar(); applyFilters(); syncHash();
     if (!saved) showToast('Filters saved locally, but cloud sync failed');
@@ -2007,6 +2174,7 @@
         delete view.filters[oldKey];
       }
     });
+    affected.forEach(item => searchableTextCache.delete(item));
     persist(); saveFilterConfig();
     affected.forEach(item => {
       rememberStartupSwipeChange(item.id, 'upsert', item);
@@ -2044,6 +2212,7 @@
         view.filters[key] = view.filters[key].map(v => v === oldOpt ? newOpt : v);
       }
     });
+    affected.forEach(item => searchableTextCache.delete(item));
     persist(); saveFilterConfig();
     affected.forEach(item => {
       rememberStartupSwipeChange(item.id, 'upsert', item);
@@ -2056,7 +2225,7 @@
   function deleteFilterGroup(key) {
     if (!confirm(`Delete the "${key}" filter?`)) return;
     delete getF()[key]; delete getAF()[key]; delete getFC()[key];
-    persist(); saveFilterConfig();
+    persistFilterDefinitions(); persistUIState(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -2070,7 +2239,7 @@
     if (!getFC()[key]) getFC()[key] = {};
     getFC()[key][val] = COLOR_PALETTE[getF()[key].length % COLOR_PALETTE.length];
     input.value = '';
-    persist(); saveFilterConfig();
+    persistFilterDefinitions(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -2079,14 +2248,14 @@
     f[key] = f[key].filter(o => o !== opt);
     if (fc[key]) delete fc[key][opt];
     if (af[key]) { af[key] = af[key].filter(v => v !== opt); if (!af[key].length) delete af[key]; }
-    persist(); saveFilterConfig();
+    persistFilterDefinitions(); persistUIState(); saveFilterConfig();
     renderSettingsPanel();
   }
 
   function setOptionColor(key, opt, color) {
     if (!getFC()[key]) getFC()[key] = {};
     getFC()[key][opt] = color;
-    persist(); saveFilterConfig();
+    persistFilterDefinitions(); saveFilterConfig();
   }
 
   function addFilterGroup() {
@@ -2094,7 +2263,7 @@
     const name = input.value.trim();
     if (!name || getF()[name]) return;
     getF()[name] = []; input.value = '';
-    persist(); saveFilterConfig();
+    persistFilterDefinitions(); saveFilterConfig();
     renderSettingsPanel();
   }
 
@@ -2135,13 +2304,14 @@
     const viewsConfigPromise = loadViewsConfig();
 
     setMode(activeMode, true);
-    persist(); renderFilterBar(); applyFilters();
+    renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
 
     await Promise.all([authPromise, swipesPromise, filterConfigsPromise, viewsConfigPromise]);
-    persist(); renderFilterBar(); applyFilters();
+    renderFilterBar(); applyFilters();
     subscribeRealtime();
+    setTimeout(persist, 0);
   })();
 </script>
 </body>
