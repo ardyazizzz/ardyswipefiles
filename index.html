@@ -166,6 +166,9 @@
     .grid.masonry.dense { column-count: 5; }
     @media (max-width: 800px) { .grid.masonry { column-count: 3; } }
     @media (max-width: 500px) { .grid.masonry { column-count: 2; } }
+    /* Keep the regular grid's offscreen subtrees out of style/layout/paint work.
+       Masonry remains opt-out because column balancing depends on card heights. */
+    .grid:not(.masonry) > .card { content-visibility: auto; contain-intrinsic-size: auto 360px; }
 
     .card { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow); }
@@ -201,6 +204,8 @@
     .img-wrap { position: relative; background: var(--bg-secondary); overflow: hidden; }
     .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.15; transform: scale(1.1); pointer-events: none; }
     .card-img { position: relative; z-index: 1; width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
+    .media-deferred { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+    .media-deferred .card-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; background: #000; }
     .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); object-fit: contain; animation: lbIn 0.22s var(--ease); }
     @keyframes lbIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
@@ -949,6 +954,7 @@
   const searchableTextCache = new WeakMap();
   let renderedCardMode = null;
   const renderedCardNodes = new Map();
+  let deferredMediaObserver = null;
 
   function cloneStartupSwipe(item) {
     if (!item || typeof item !== 'object') return item;
@@ -1327,7 +1333,8 @@
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
 
-  function getMedia(url, postUrl) {
+  function getMedia(url, postUrl, imagePriority) {
+    imagePriority = imagePriority || 'low';
     if (!url) return '';
     if (url.indexOf(',') !== -1) {
       var urls = url.split(',').map(function(u){ return u.trim(); }).filter(function(u){ return u; });
@@ -1337,7 +1344,7 @@
         var h = '<div class="card-hero-wrap">';
         h += '<div class="card-hero-track" onscroll="updateCarouselBadge(this)">';
         for (var i = 0; i < urls.length; i++) {
-          h += '<div class="slide"><div class="img-bg" style=\'background-image:url("' + urls[i] + '")\'></div><img src="' + urls[i] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" /></div>';
+          h += '<div class="slide"><div class="img-bg media-bg-lazy" data-bg-url="' + encodeURIComponent(urls[i]) + '"></div><img src="' + urls[i] + '" alt="" loading="lazy" decoding="async" fetchpriority="' + imagePriority + '" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" /></div>';
         }
         h += '</div>';
         h += '<div class="card-hero-badge">1 / ' + urls.length + '</div>';
@@ -1347,14 +1354,14 @@
     }
     if (/video\.twimg\.com/.test(url)) {
       var proxy = 'https://swipe-proxy.ardyazizrw.workers.dev/?url=' + encodeURIComponent(url);
-      return `<video class="card-video" muted playsinline controls preload="none" loop src="${proxy}"></video>`;
+      return `<div class="media-deferred" data-media-type="video" data-media-src="${encodeURIComponent(proxy)}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
     }
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (yt) return `<iframe class="card-video" src="https://www.youtube.com/embed/${yt[1]}" loading="lazy" allowfullscreen></iframe>`;
+    if (yt) return `<div class="media-deferred" data-media-type="iframe" data-media-src="${encodeURIComponent('https://www.youtube.com/embed/' + yt[1])}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
     const vm = url.match(/vimeo\.com\/(\d+)/);
-    if (vm) return `<iframe class="card-video" src="https://player.vimeo.com/video/${vm[1]}" loading="lazy" allowfullscreen></iframe>`;
-    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video class="card-video" muted playsinline controls preload="none" loop src="${url}"></video>`;
-    return `<div class="img-wrap"><div class="img-bg" style="background-image:url(&quot;${url}&quot;)"></div><img src="${url}" alt="" class="card-img" loading="lazy" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" /></div>`;
+    if (vm) return `<div class="media-deferred" data-media-type="iframe" data-media-src="${encodeURIComponent('https://player.vimeo.com/video/' + vm[1])}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
+    if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<div class="media-deferred" data-media-type="video" data-media-src="${encodeURIComponent(url)}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
+    return `<div class="img-wrap"><div class="img-bg media-bg-lazy" data-bg-url="${encodeURIComponent(url)}"></div><img src="${url}" alt="" class="card-img" loading="lazy" decoding="async" fetchpriority="${imagePriority}" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" /></div>`;
   }
 
   function updateCarouselBadge(track) {
@@ -1365,6 +1372,59 @@
     if (idx < 0) idx = 0;
     if (idx >= total) idx = total - 1;
     badge.textContent = (idx + 1) + ' / ' + total;
+  }
+
+  function unobserveDeferredMedia(root) {
+    if (!deferredMediaObserver || !root || !root.querySelectorAll) return;
+    root.querySelectorAll('[data-media-observed]').forEach(target => deferredMediaObserver.unobserve(target));
+  }
+
+  function hydrateDeferredMedia(target) {
+    if (!target || target.dataset.mediaHydrated === '1') return;
+    let src = '';
+    try { src = decodeURIComponent(target.dataset.mediaSrc || target.dataset.bgUrl || ''); } catch (e) { return; }
+    if (target.classList.contains('media-bg-lazy')) {
+      if (!src) return;
+      target.style.backgroundImage = 'url("' + src.replace(/"/g, '\\"') + '")';
+    } else if (target.classList.contains('media-deferred')) {
+      if (!src) return;
+      if (target.dataset.mediaType === 'iframe') {
+        const frame = document.createElement('iframe');
+        frame.className = 'card-video';
+        frame.src = src;
+        frame.loading = 'lazy';
+        frame.allowFullscreen = true;
+        target.replaceChildren(frame);
+      } else {
+        const video = document.createElement('video');
+        video.className = 'card-video';
+        video.muted = true;
+        video.playsInline = true;
+        video.controls = true;
+        video.preload = 'none';
+        video.loop = true;
+        video.src = src;
+        target.replaceChildren(video);
+      }
+    }
+    target.dataset.mediaHydrated = '1';
+    if (deferredMediaObserver) deferredMediaObserver.unobserve(target);
+  }
+
+  function observeDeferredMedia(root) {
+    if (!root || !root.querySelectorAll) return;
+    const targets = root.querySelectorAll('.media-deferred:not([data-media-observed]), .media-bg-lazy:not([data-media-observed])');
+    if (!targets.length) return;
+    if (!deferredMediaObserver && typeof IntersectionObserver === 'function') {
+      deferredMediaObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) hydrateDeferredMedia(entry.target); });
+      }, { rootMargin: '900px 0px' });
+    }
+    targets.forEach(target => {
+      target.dataset.mediaObserved = '1';
+      if (deferredMediaObserver) deferredMediaObserver.observe(target);
+      else hydrateDeferredMedia(target);
+    });
   }
 
   function renderFilterBar() {
@@ -1667,8 +1727,9 @@
     renderCards(data);
   }
 
-  function buildCardHtml(s) {
+  function buildCardHtml(s, cardIndex) {
       const av = getAv(s.author);
+      const imagePriority = cardIndex < 8 ? 'auto' : 'low';
       const tags = []; Object.entries(s.filters || {}).forEach(([k,v]) => { const seen = new Set(); if (Array.isArray(v)) v.forEach(x => { if (x && !seen.has(x)) { seen.add(x); tags.push([k,x]); } }); else if (v) tags.push([k,v]); });
       const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M1.75024 0H22.2502v8.25h-2.5V2.5h-6.5v19H19V24H5v-2.5h5.7502v-19H4.25024v5.75h-2.5V0Z" clip-rule="evenodd"/></svg>`;
       const isSel = selectMode && selectedIds.has(s.id);
@@ -1723,7 +1784,7 @@
             <div class="card-top">
               <div class="card-author">
                 ${s.image
-                  ? `<img src="${s.image}" class="avatar" style="width:32px;height:32px;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="" />
+                  ? `<img src="${s.image}" class="avatar" style="width:32px;height:32px;object-fit:cover" loading="lazy" decoding="async" fetchpriority="${imagePriority}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="" />
                      <div class="avatar" style="background:${av.bg};color:${av.color};display:none">${getInitials(s.author)}</div>`
                   : `<div class="avatar" style="background:${av.bg};color:${av.color}">${getInitials(s.author)}</div>`
                 }
@@ -1760,9 +1821,9 @@
         </div>
         ${(s.reactions || s.comments || s.reposts) ?
           `<div class="card-media-wrap">
-            ${s.image ? getMedia(s.image, s.postUrl) : `<div class="card-placeholder">${icon}</div>`}
+            ${s.image ? getMedia(s.image, s.postUrl, imagePriority) : `<div class="card-placeholder">${icon}</div>`}
           </div>` :
-          (s.image ? getMedia(s.image, s.postUrl) : `<div class="card-placeholder">${icon}</div>`)
+          (s.image ? getMedia(s.image, s.postUrl, imagePriority) : `<div class="card-placeholder">${icon}</div>`)
         }
         <div class="card-footer">
           <div class="card-tags">${tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; const s = c ? `background:${c}18;color:${c};border-color:${c}30` : ''; return `<span class="card-tag"${s ? ` style="${s}"` : ''}>${v}</span>`; }).join('')}</div>
@@ -1786,6 +1847,7 @@
     const grid = document.getElementById('cardGrid');
     const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     if (renderedCardMode !== activeMode) {
+      renderedCardNodes.forEach(node => unobserveDeferredMedia(node));
       renderedCardMode = activeMode;
       renderedCardNodes.clear();
       grid.replaceChildren();
@@ -1795,6 +1857,7 @@
     const liveIds = new Set(source.map(item => String(item.id)));
     renderedCardNodes.forEach((node, key) => {
       if (liveIds.has(key)) return;
+      unobserveDeferredMedia(node);
       if (node.parentNode === grid) node.remove();
       renderedCardNodes.delete(key);
     });
@@ -1813,9 +1876,9 @@
     }
 
     delete grid.dataset.renderState;
-    const renderedItems = data.map(item => ({
+    const renderedItems = data.map((item, index) => ({
       key: String(item.id),
-      html: buildCardHtml(item)
+      html: buildCardHtml(item, index)
     }));
 
     // A first/full mode render is faster as one parser pass. Later renders use
@@ -1826,6 +1889,7 @@
         const item = renderedItems[index];
         node.__swipeardyHtml = item.html;
         renderedCardNodes.set(item.key, node);
+        observeDeferredMedia(node);
       });
       return;
     }
@@ -1833,8 +1897,10 @@
     const desiredNodes = renderedItems.map(item => {
       let node = renderedCardNodes.get(item.key);
       if (!node || node.__swipeardyHtml !== item.html) {
+        if (node) unobserveDeferredMedia(node);
         node = createCardNode(item.html);
         renderedCardNodes.set(item.key, node);
+        observeDeferredMedia(node);
       }
       return node;
     });

@@ -358,18 +358,30 @@ change. Nodes for temporarily filtered-out items remain reusable, while IDs remo
 current mode's source array are pruned. Switching modes resets the map; the first render for that
 mode still uses one batched `innerHTML` parse so startup does not pay for one parser call per card.
 
+Regular (non-masonry) post grids also set `content-visibility: auto` with an intrinsic card-size
+estimate, allowing the browser to skip style/layout/paint work for far-off cards. Masonry is
+intentionally excluded because its column balancing depends on measured card heights. Heavy media
+is mounted progressively: video and iframe elements start as lightweight placeholders, and image
+background layers are initially empty. `observeDeferredMedia()` hydrates those elements through an
+`IntersectionObserver` with a 900px look-ahead; browsers without IntersectionObserver hydrate them
+immediately. Native images use lazy loading, async decoding, and low fetch priority except for the
+first few visible-order cards.
+
 ---
 
 ### Media Pipeline — getMedia(url, postUrl)
 
 `getMedia()` renders the media preview in posts mode cards, checked in this order:
 1. Empty `url` → returns `''` (no media)
-2. Comma-separated URLs (multi-image) → split by comma, render `<div class="card-thumbs">` with `<img class="thumb-img">` thumbnails in a horizontal scrollable row. Each thumbnail calls `openImageLightboxMulti(index, urlsStr)` on click.
-3. `video.twimg.com` → `<video>` proxied through a Cloudflare Worker (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
-4. YouTube (`youtube.com/watch` or `youtu.be`) → `<iframe>` embed
-5. Vimeo (`vimeo.com`) → `<iframe>` embed
-6. Direct video files (`.mp4`/`.webm`/`.mov`) → `<video muted playsinline controls preload="none" loop>`
-7. Fallback → `<img loading="lazy">` with `onclick` lightbox (single-quote escaped), `onerror` hide, and `.card-img` class
+2. Comma-separated URLs (multi-image) → split by comma, render `<div class="card-thumbs">` with lazy/async `<img class="thumb-img">` thumbnails plus deferred background layers in a horizontal scrollable row. Each thumbnail calls `openImageLightboxMulti(index, urlsStr)` on click.
+3. `video.twimg.com` → a deferred `<video>` placeholder; hydration uses the Cloudflare Worker proxy (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
+4. YouTube (`youtube.com/watch` or `youtu.be`) → a deferred `<iframe>` placeholder
+5. Vimeo (`vimeo.com`) → a deferred `<iframe>` placeholder
+6. Direct video files (`.mp4`/`.webm`/`.mov`) → a deferred `<video muted playsinline controls preload="none" loop>` placeholder
+7. Fallback → an `<img loading="lazy" decoding="async">` with a deferred background layer, `onclick` lightbox (single-quote escaped), `onerror` hide, and `.card-img` class
+
+`observeDeferredMedia()` is called whenever a card node is first created or replaced. Hydrated media
+is never recreated during keyed filter/sort updates, and removed cards are unobserved before pruning.
 
 The `postUrl` parameter is received by `getMedia()` but currently unused inside the function.
 
@@ -830,7 +842,7 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 |---|---|---|---|
 | **Supabase row cap** | `loadSwipes()` fetches `/swipes` with no pagination | default 1,000 rows | "Max rows" raised to 10,000 via dashboard. Still no code pagination — if the number of cards exceeds the Max-rows setting, older cards silently do not load. Code pagination will be needed around ~8,000+. |
 | **localStorage size** | `persistData()` serializes the entire dataset after data mutations (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | UI-only changes use smaller persistence helpers. `QuotaExceededError` is swallowed silently per-key; Supabase data remains safe. IndexedDB is the future option beyond this ceiling. |
-| **Render-all computation** | `renderCards()` still computes markup for all filtered cards, but reconciles keyed DOM nodes | noticeable at many thousands | Unchanged media DOM is reused and images use `loading="lazy"`; there is still no pagination or virtual scrolling. |
+| **Render-all computation** | `renderCards()` still computes markup for all filtered cards, but reconciles keyed DOM nodes | noticeable at many thousands | Unchanged media DOM is reused; regular grids let the browser skip far-off card work with `content-visibility:auto`, and heavy media is IntersectionObserver-deferred. There is still no pagination or virtual scrolling. |
 | **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
 | **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). **Gotcha:** `authenticated` role also needs explicit `GRANT` on tables — RLS alone returns 403 on writes. |
 
