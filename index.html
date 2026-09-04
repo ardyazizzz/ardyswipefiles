@@ -427,7 +427,7 @@
       <button class="btn-ghost" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode" style="padding:8px 11px"><i class="ri-moon-line"></i></button>
       <div class="search-box" onclick="document.getElementById('searchInput').focus()">
         <i class="ri-search-line"></i>
-        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="currentViewName=null;renderFilterBar();applyFilters();syncHash()" />
+        <input type="text" placeholder="Search swipes..." id="searchInput" oninput="handleSearchInput()" />
       </div>
       <button class="btn-ghost" id="manageFiltersBtn" onclick="openSettings()">
         <i class="ri-equalizer-line"></i> Manage filters
@@ -904,7 +904,75 @@
   if (activeMode !== 'posts' && activeMode !== 'creators' && activeMode !== 'websites' && activeMode !== 'snippets') activeMode = 'posts';
   let dataReady = false;
 
+  // During startup, render local data immediately while the remote snapshot
+  // loads. Keep a small mutation journal so a slow read cannot erase a local
+  // save, update, or delete that happens in the meantime.
+  let startupSyncActive = false;
+  const startupLocalSwipeChanges = new Map();
+  let searchRefreshTimer = null;
+
+  function cloneStartupSwipe(item) {
+    if (!item || typeof item !== 'object') return item;
+    const clone = Object.assign({}, item);
+    if (item.filters && typeof item.filters === 'object') {
+      clone.filters = Object.assign({}, item.filters);
+      Object.keys(clone.filters).forEach(key => {
+        if (Array.isArray(clone.filters[key])) clone.filters[key] = clone.filters[key].slice();
+      });
+    }
+    return clone;
+  }
+
+  function findSwipeAcrossModes(id) {
+    const key = String(id);
+    return [swipes, creators, websites, snippets].reduce((found, arr) => found || arr.find(item => String(item.id) === key), null);
+  }
+
+  function rememberStartupSwipeChange(id, action, item) {
+    if (!startupSyncActive || id === undefined || id === null) return;
+    startupLocalSwipeChanges.set(String(id), {
+      action,
+      item: action === 'delete' ? null : cloneStartupSwipe(item || findSwipeAcrossModes(id))
+    });
+  }
+
+  function assignSwipeRows(rows) {
+    swipes = [];
+    creators = [];
+    websites = [];
+    snippets = [];
+    (rows || []).forEach(item => {
+      if (item.type === 'creators') creators.push(item);
+      else if (item.type === 'websites') websites.push(item);
+      else if (item.type === 'snippets') snippets.push(item);
+      else swipes.push(item);
+    });
+  }
+
+  function mergeStartupRemoteRows(rows) {
+    const remoteIds = new Set();
+    const merged = [];
+    (rows || []).forEach(item => {
+      const key = String(item.id);
+      remoteIds.add(key);
+      const localChange = startupLocalSwipeChanges.get(key);
+      if (!localChange) merged.push(item);
+      else if (localChange.action !== 'delete') merged.push(localChange.item || findSwipeAcrossModes(item.id) || item);
+    });
+
+    // A newly-created row may not exist in the remote snapshot yet while its
+    // fire-and-forget POST is still in flight.
+    startupLocalSwipeChanges.forEach((localChange, key) => {
+      if (localChange.action === 'delete' || remoteIds.has(key)) return;
+      const localItem = localChange.item || findSwipeAcrossModes(key);
+      if (localItem) merged.unshift(localItem);
+    });
+    assignSwipeRows(merged);
+  }
+
   async function loadSwipes() {
+    startupSyncActive = true;
+    startupLocalSwipeChanges.clear();
     swipes = load(LS_SWIPES, null) || DEFAULT_SWIPES;
     creators = load(LS_CREATORS, null) || DEFAULT_CREATORS;
     websites = load(LS_WEBSITES, null) || DEFAULT_WEBSITES;
@@ -912,15 +980,12 @@
     try {
       const r = await fetch(SB_URL + '/swipes?order=id.desc', { cache: 'no-store', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
       if (r.ok) { const data = await r.json(); if (data && data.length) {
-        swipes = []; creators = []; websites = []; snippets = [];
-        data.forEach(item => {
-          if (item.type === 'creators') creators.push(item);
-          else if (item.type === 'websites') websites.push(item);
-          else if (item.type === 'snippets') snippets.push(item);
-          else swipes.push(item);
-        });
+        if (startupLocalSwipeChanges.size) mergeStartupRemoteRows(data);
+        else assignSwipeRows(data);
       }}
     } catch(e) {}
+    startupSyncActive = false;
+    startupLocalSwipeChanges.clear();
     dataReady = true;
   }
   function loadCreators() {
@@ -1385,6 +1450,15 @@
     persist(); renderFilterBar(); applyFilters(); syncHash();
   }
 
+  function handleSearchInput() {
+    currentViewName = null;
+    if (searchRefreshTimer) clearTimeout(searchRefreshTimer);
+    searchRefreshTimer = setTimeout(() => {
+      searchRefreshTimer = null;
+      renderFilterBar(); applyFilters(); syncHash();
+    }, 140);
+  }
+
   function setNumericFilter(field, el) {
     numericFilters[field] = el.value;
     currentViewName = null;
@@ -1434,8 +1508,9 @@
   }
 
   function applyFilters() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
     const source = activeMode === 'posts' ? swipes : activeMode === 'creators' ? creators : activeMode === 'websites' ? websites : snippets;
+    const activeFilterEntries = Object.entries(getAF()).filter(([, values]) => values && values.length);
     const data = source.filter(s => {
       const filterVals = []; Object.values(s.filters || {}).forEach(v => { if (Array.isArray(v)) filterVals.push(...v); else if (v) filterVals.push(v); });
       const searchFields = activeMode === 'posts'
@@ -1457,11 +1532,13 @@
         if (numericFilters.folMin !== '' && fol < Number(numericFilters.folMin)) return false;
         if (numericFilters.folMax !== '' && fol > Number(numericFilters.folMax)) return false;
       }
-      for (const key of Object.keys(getAF())) {
-        if (getAF()[key] && getAF()[key].length) {
-          const itemVal = s.filters[key];
+      for (const [key, selectedValues] of activeFilterEntries) {
+        const itemVal = s.filters && s.filters[key];
+        if (itemVal !== undefined) {
           const itemVals = Array.isArray(itemVal) ? itemVal : (itemVal ? [itemVal] : []);
-          if (!itemVals.some(v => getAF()[key].includes(v))) return false;
+          if (!itemVals.some(v => selectedValues.includes(v))) return false;
+        } else {
+          return false;
         }
       }
       return true;
@@ -1608,6 +1685,7 @@
     if (!currentUser) return;
     const label = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     if (!confirm('Delete this ' + label + '?')) return;
+    rememberStartupSwipeChange(id, 'delete');
     if (activeMode === 'posts') {
       swipes = swipes.filter(x => x.id !== id);
     } else if (activeMode === 'creators') {
@@ -1658,6 +1736,7 @@
     if (!confirm('Delete ' + count + ' ' + label + 's? This cannot be undone.')) return;
     _localChange = Date.now();
     selectedIds.forEach(function(id) {
+      rememberStartupSwipeChange(id, 'delete');
       if (activeMode === 'posts') swipes = swipes.filter(function(x) { return x.id !== id; });
       else if (activeMode === 'creators') creators = creators.filter(function(x) { return x.id !== id; });
       else if (activeMode === 'websites') websites = websites.filter(function(x) { return x.id !== id; });
@@ -1734,6 +1813,7 @@
     const followers = parseInt(document.getElementById('f-followers').value) || 0;
     const item = { id: Date.now(), type: activeMode, author, date, platform, filters: sf, text, image, postUrl, reactions, comments, reposts, followers };
     const sbBody = JSON.stringify({ id: item.id, type: item.type, author: item.author, date: item.date, platform: item.platform, filters: item.filters, text: item.text, image: item.image, postUrl: item.postUrl, reactions: item.reactions, comments: item.comments, reposts: item.reposts, followers: item.followers });
+    rememberStartupSwipeChange(item.id, 'upsert', item);
     if (isWebsite) {
       websites.unshift(item);
       persist(); closeAddModal(); applyFilters();
@@ -1851,6 +1931,7 @@
     s.platform = isWebsite ? 'Web' : isSnippet ? '' : (s.filters && s.filters['Platform'] ? s.filters['Platform'] : '');
     const id = editingId;
     const body = JSON.stringify({ id: s.id, type: s.type || activeMode, author: s.author, date: s.date, platform: s.platform, filters: s.filters, text: s.text, image: s.image, postUrl: s.postUrl, reactions: s.reactions, comments: s.comments, reposts: s.reposts, followers: s.followers });
+    rememberStartupSwipeChange(id, 'upsert', s);
     persist(); closeEditModal(); applyFilters();
     sbFetchAuth('/swipes?id=eq.' + id, { method: 'PATCH', body }).catch(()=>{});
     showToast(isSnippet ? 'Snippet updated ✓' : isWebsite ? 'Website updated ✓' : isCreator ? 'Creator updated ✓' : 'Swipe updated ✓');
@@ -1928,6 +2009,7 @@
     });
     persist(); saveFilterConfig();
     affected.forEach(item => {
+      rememberStartupSwipeChange(item.id, 'upsert', item);
       const body = JSON.stringify({ filters: item.filters });
       sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
     });
@@ -1964,6 +2046,7 @@
     });
     persist(); saveFilterConfig();
     affected.forEach(item => {
+      rememberStartupSwipeChange(item.id, 'upsert', item);
       const body = JSON.stringify({ filters: item.filters });
       sbFetchAuth('/swipes?id=eq.' + item.id, { method: 'PATCH', body }).catch(()=>{});
     });
@@ -2043,14 +2126,21 @@
   })();
 
   (async function init() {
-    await initAuth();
-    await loadSwipes();
-    await loadFilterConfigs();
-    await loadViewsConfig();
+    // Start independent reads together. loadSwipes() hydrates the arrays from
+    // localStorage before its first await, so the cached UI can render while
+    // Supabase refreshes in the background.
+    const authPromise = initAuth();
+    const swipesPromise = loadSwipes();
+    const filterConfigsPromise = loadFilterConfigs();
+    const viewsConfigPromise = loadViewsConfig();
+
     setMode(activeMode, true);
     persist(); renderFilterBar(); applyFilters();
     loadFromHash();
     skipSync = false;
+
+    await Promise.all([authPromise, swipesPromise, filterConfigsPromise, viewsConfigPromise]);
+    persist(); renderFilterBar(); applyFilters();
     subscribeRealtime();
   })();
 </script>

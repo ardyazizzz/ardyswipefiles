@@ -205,20 +205,22 @@ deleteSwipe(id)
 2. applyDensity()                 (sync)
 3. [loading placeholder shown]   (sync)
 4. init() (async IIFE):
-   a. await initAuth()            → check Supabase session, set data-auth attribute on <body>
-   b. await loadSwipes()          → localStorage first, then Supabase GET /swipes
-   c. await loadFilterConfigs()   → Supabase GET /filter_configs → merge into local state
-   d. await loadViewsConfig()     → Supabase GET /views_config → replace views array
-   e. setMode(activeMode, true)   → skipRender=true, no syncHash
-   f. persist()                   → write everything to localStorage
-   g. renderFilterBar() + applyFilters()  → full render with data
-   h. loadFromHash()              → restore state from URL hash (if any)
-   i. skipSync = false            → unlock syncHash for user interactions
-   j. subscribeRealtime()         → 3 WebSocket channels
+   a. start initAuth(), loadSwipes(), loadFilterConfigs(), loadViewsConfig() together
+   b. loadSwipes() hydrates localStorage synchronously, then starts Supabase GET /swipes
+   c. setMode(activeMode, true)   → skipRender=true, no syncHash
+   d. persist() + renderFilterBar() + applyFilters() → show cached data immediately
+   e. loadFromHash()              → restore state from URL hash (if any)
+   f. skipSync = false            → unlock syncHash for user interactions
+   g. await all four reads        → remote data/configs finish in the background
+   h. persist() + renderFilterBar() + applyFilters() → reconcile the final snapshot
+   i. subscribeRealtime()         → 3 WebSocket channels
 ```
 
-**Key detail:** `setMode` is called with `skipRender=true` to avoid premature hash writes during boot.
-The hash is read by `loadFromHash()` which runs AFTER all data is loaded and rendered.
+**Key details:** Independent startup reads run in parallel, and cached local data can be used while
+the network is slow. If a user saves, edits, or deletes a swipe before the remote `/swipes` snapshot
+arrives, a small startup mutation journal preserves that local change while merging the snapshot;
+the remote response never blindly overwrites it. `setMode` is called with `skipRender=true` to avoid
+premature hash writes during boot.
 
 ---
 
