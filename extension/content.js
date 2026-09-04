@@ -14,7 +14,7 @@
     if (!card) return;
     try {
       var data = extractLinkedInFromCard(card);
-      if (!data || !data.author) return;
+      if (!data || !data.author || (!data.text && !data.image && !data.documentUrl)) return;
       data.platform = 'LinkedIn';
       data.filters = { Platform: 'LinkedIn' };
       chrome.runtime.sendMessage({ type: 'SAVE_SWIPE', data: data }, function (resp) {
@@ -56,7 +56,7 @@
   function extractLinkedInFromCard(card) {
     var author = extractLinkedInAuthor(card);
     var text = extractLinkedInSnippet(card);
-    var counts = extractLinkedInCounts(card, '');
+    var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
     var btnCarouselImages = scanLinkedInImage(card);
     LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
@@ -147,21 +147,41 @@
 
   function parseCompactNumber(text) {
     if (!text) return 0;
-    var cleaned = String(text).replace(/\u00a0/g, ' ').trim();
-    var m = cleaned.match(/([\d,.]+)\s*([kKmM]?)/);
+    var cleaned = String(text).replace(/[\u00a0\u2007\u202f]/g, ' ').trim();
+    var m = cleaned.match(/(\d[\d\s.,'’]*)\s*([kKmMbB]?)(?=\s|\b|$)/);
     if (!m) return 0;
-    var num = parseFloat(m[1].replace(/,/g, ''));
-    if (isNaN(num)) return 0;
+    var raw = m[1].replace(/[\s'’]/g, '');
     var suffix = m[2].toLowerCase();
+
+    if (suffix) {
+      var lastDot = raw.lastIndexOf('.');
+      var lastComma = raw.lastIndexOf(',');
+      var separatorIndex = Math.max(lastDot, lastComma);
+      if (separatorIndex !== -1) {
+        var fractionalDigits = raw.length - separatorIndex - 1;
+        if (fractionalDigits > 0 && fractionalDigits <= 2) {
+          raw = raw.slice(0, separatorIndex).replace(/[.,]/g, '') + '.' + raw.slice(separatorIndex + 1).replace(/[.,]/g, '');
+        } else {
+          raw = raw.replace(/[.,]/g, '');
+        }
+      }
+    } else {
+      // Engagement counts without a suffix are integers. LinkedIn localizes
+      // thousands separators, so both "1,234" and "1.234" mean 1234 here.
+      raw = raw.replace(/[.,]/g, '');
+    }
+
+    var num = parseFloat(raw);
+    if (isNaN(num)) return 0;
     if (suffix === 'k') num *= 1000;
     if (suffix === 'm') num *= 1000000;
+    if (suffix === 'b') num *= 1000000000;
     return Math.round(num);
   }
 
   function parseIntFromAria(el) {
     var label = el.getAttribute('aria-label') || '';
-    var m = label.match(/([\d,.]+)/);
-    return m ? parseCompactNumber(m[1]) : 0;
+    return parseCompactNumber(label);
   }
 
   function extractCountFromButton(el) {
@@ -244,6 +264,79 @@
     return '';
   }
 
+  var LINKEDIN_POST_ROOT_SELECTOR = 'div.feed-shared-update-v2, div.occludable-update, div[data-urn*="urn:li:activity:"], div[data-id^="urn:li:activity:"]';
+  var LINKEDIN_COMMENT_SELECTOR = '.comments-comment-item, .comments-comments-list, .comments-comment-entity, .comments-replies-list, [class*="comments-comment"], [class*="comments-repl"], [data-id*="urn:li:comment"]';
+  var LINKEDIN_ENGAGEMENT_SELECTOR = '.social-details-social-counts, .social-details-social-activity, .feed-shared-social-action-bar, .update-components-social-activity, [class*="social-details-social-counts"], [class*="social-details-social-activity"], [class*="social-action-bar"]';
+  var LINKEDIN_COUNT_REGION_SELECTOR = '.social-details-social-counts, .feed-shared-social-action-bar, [class*="social-details-social-counts"], [class*="social-action-bar"]';
+  var LINKEDIN_CAPTION_SELECTORS = [
+    '[data-test-id="main-feed-activity-card__commentary"] .break-words',
+    '[data-test-id="main-feed-activity-card__commentary"]',
+    '[data-view-name="feed-commentary"] .break-words',
+    '[data-view-name="feed-commentary"]',
+    '.update-components-text .break-words',
+    '.feed-shared-update-v2__description-wrapper .break-words',
+    '.update-components-text',
+    '.feed-shared-update-v2__description-wrapper',
+    '.feed-shared-inline-show-more-text',
+    '.feed-shared-text',
+    '.update-components-update-v2__commentary'
+  ];
+
+  function getLinkedInPostRoot(node) {
+    if (!node || !node.closest) return null;
+    return node.closest(LINKEDIN_POST_ROOT_SELECTOR) || node.closest('article');
+  }
+
+  function belongsToLinkedInPost(node, card) {
+    if (!node || !card) return false;
+    var cardRoot = getLinkedInPostRoot(card) || card;
+    var nodeRoot = getLinkedInPostRoot(node);
+    return !nodeRoot || nodeRoot === cardRoot;
+  }
+
+  function isLinkedInCommentNode(node, card) {
+    if (!node || !node.closest) return false;
+    var commentRoot = node.closest(LINKEDIN_COMMENT_SELECTOR);
+    return !!(commentRoot && (!card || !card.contains || card.contains(commentRoot)));
+  }
+
+  function isNodeBefore(a, b) {
+    if (!a || !b || !a.compareDocumentPosition) return false;
+    return !!(a.compareDocumentPosition(b) & 4); // DOCUMENT_POSITION_FOLLOWING
+  }
+
+  function getLinkedInContentBoundary(card) {
+    if (!card || !card.querySelectorAll) return null;
+    var nodes = card.querySelectorAll(LINKEDIN_ENGAGEMENT_SELECTOR + ', ' + LINKEDIN_COMMENT_SELECTOR);
+    var first = null;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (!belongsToLinkedInPost(node, card)) continue;
+      if (!first || isNodeBefore(node, first)) first = node;
+    }
+    return first;
+  }
+
+  function isSafeLinkedInCaptionNode(node, card, boundary) {
+    if (!node || !belongsToLinkedInPost(node, card)) return false;
+    if (isLinkedInCommentNode(node, card)) return false;
+    if (node.closest && node.closest(LINKEDIN_ENGAGEMENT_SELECTOR)) return false;
+    if (!boundary) return true;
+    if (node === boundary) return false;
+    if (node.contains && node.contains(boundary)) return false;
+    if (boundary.contains && boundary.contains(node)) return false;
+    return isNodeBefore(node, boundary);
+  }
+
+  function isSpecificLinkedInCaptionSelector(selector) {
+    return selector.indexOf('main-feed-activity-card__commentary') !== -1 ||
+      selector.indexOf('feed-commentary') !== -1 ||
+      selector.indexOf('description-wrapper') !== -1 ||
+      selector.indexOf('feed-shared-inline-show-more-text') !== -1 ||
+      selector.indexOf('feed-shared-text') !== -1 ||
+      selector.indexOf('update-components-update-v2__commentary') !== -1;
+  }
+
   function findLinkedInEngagementBoundary(text) {
     if (!text) return -1;
 
@@ -306,10 +399,9 @@
     var boundaryLabel = '';
     for (var bi = 0; bi < boundaries.length; bi++) {
       var idx = text.indexOf(boundaries[bi]);
-      if (idx !== -1) {
+      if (idx !== -1 && (boundaryIndex === -1 || idx < boundaryIndex)) {
         boundaryIndex = idx;
         boundaryLabel = boundaries[bi];
-        break;
       }
     }
     var engagementIndex = findLinkedInEngagementBoundary(text);
@@ -356,30 +448,22 @@
   }
 
   function extractLinkedInCaptionFromSelectors(card) {
-    var selectors = [
-      '.update-components-text .break-words',
-      '.feed-shared-update-v2__description-wrapper .break-words',
-      '.update-components-text',
-      '.feed-shared-update-v2__description-wrapper',
-      '.feed-shared-inline-show-more-text',
-      '.feed-shared-text',
-      '.update-components-update-v2__commentary'
-    ];
-    var blacklist = ['following', 'premium', 'promoted', 'reposted this', 'visit my website', 'subscribe'];
-    for (var i = 0; i < selectors.length; i++) {
-      var nodes = card.querySelectorAll(selectors[i]);
+    var boundary = getLinkedInContentBoundary(card);
+    for (var i = 0; i < LINKEDIN_CAPTION_SELECTORS.length; i++) {
+      var selector = LINKEDIN_CAPTION_SELECTORS[i];
+      // Generic update-components-text classes are also used by comments.
+      // Without a structural footer/comment boundary they are ambiguous.
+      if (!boundary && !isSpecificLinkedInCaptionSelector(selector)) continue;
+      var nodes = card.querySelectorAll(selector);
       for (var j = 0; j < nodes.length; j++) {
         var node = nodes[j];
+        if (!isSafeLinkedInCaptionNode(node, card, boundary)) continue;
         var txt = visibleText(node);
-        if (!txt || txt.length < 20) continue;
-        // Do not accidentally select text from an expanded comment subtree.
-        if (node.closest && node.closest('.comments-comment-item, .comments-comments-list, [class*="comments-comment"]')) continue;
-        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
-        var lower = txt.toLowerCase();
-        if (blacklist.filter(function (w) { return lower.indexOf(w) !== -1; }).length >= 3) continue;
+        if (!txt) continue;
+        txt = txt.replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
         var cleaned = cleanSnippet(txt);
         if (!cleaned) continue;
-        LOG&&console.log('[Swipe.ardy cs] Caption selector hit:', selectors[i], '->', cleaned.slice(0, 150));
+        LOG&&console.log('[Swipe.ardy cs] Caption selector hit:', selector, '->', cleaned.slice(0, 150));
         return cleaned;
       }
     }
@@ -387,186 +471,89 @@
   }
 
   function extractLinkedInSnippet(card) {
-    // Prefer LinkedIn's caption container. Broad card text also contains
-    // reaction summaries, action buttons, and (when expanded) comments.
+    // Captions must come from a top-level commentary node before the post's
+    // engagement/comments boundary. If LinkedIn changes its DOM, fail closed
+    // instead of treating a comment or nested post as the caption.
     var selectorCaption = extractLinkedInCaptionFromSelectors(card);
     if (selectorCaption) return selectorCaption;
-
-    var fullText = visibleText(card);
-    var postText = getPostAreaText(fullText);
-
-    if (postText) {
-      var tsMatch = postText.match(/\d+[hmdw]o?\s*·\s*|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?\s*·\s*/i);
-      if (tsMatch) {
-        var afterTs = postText.slice(postText.indexOf(tsMatch[0]) + tsMatch[0].length).trim();
-        // Strip LinkedIn header junk that appears between timestamp and content
-        afterTs = afterTs.replace(/^(?:Follow|Connect|Connect with[^\n"]*?|Visible to anyone[^\n]*|View profile[^\n"]*?)\s*/i, '').trim();
-        var cleaned = cleanSnippet(afterTs);
-        LOG&&console.log('[Swipe.ardy cs] Snippet from after timestamp ->', cleaned.slice(0, 200));
-        if (cleaned.length > 20) return cleaned;
-      }
-
-      var lines = postText.split('\n');
-      var captionLines = [];
-      var pastTimestamp = false;
-      for (var li = 0; li < lines.length; li++) {
-        var line = lines[li].trim();
-        if (!line) continue;
-        if (line.indexOf('\u2022') === 0 || line.indexOf('•') === 0) continue;
-        if (/^\d+[hmdw]o?|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?/i.test(line)) { pastTimestamp = true; continue; }
-        if (!pastTimestamp && line.length <= 60) continue;
-        if (pastTimestamp) captionLines.push(line);
-      }
-      if (captionLines.length > 0) {
-        var snippet = captionLines.join(' ').replace(/\s+/g, ' ').trim();
-        var cleaned2 = cleanSnippet(snippet);
-        LOG&&console.log('[Swipe.ardy cs] Snippet from lines after timestamp ->', cleaned2.slice(0, 200));
-        if (cleaned2.length > 20) return cleaned2;
-      }
-    }
-
-    var selectors = [
-      '.update-components-text .break-words',
-      '.update-components-text',
-      '.feed-shared-update-v2__description-wrapper',
-      '.feed-shared-inline-show-more-text',
-      '.feed-shared-text',
-      '.update-components-update-v2__commentary'
-    ];
-    var blacklist = ['following', 'premium', 'promoted', 'reposted this', 'visit my website', 'subscribe'];
-    for (var i = 0; i < selectors.length; i++) {
-      var nodes = card.querySelectorAll(selectors[i]);
-      for (var j = 0; j < nodes.length; j++) {
-        var txt = visibleText(nodes[j]);
-        if (!txt || txt.length < 20) continue;
-        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\s+/g, ' ').trim();
-        var lower = txt.toLowerCase();
-        if (blacklist.filter(function (w) { return lower.indexOf(w) !== -1; }).length >= 3) continue;
-        LOG&&console.log('[Swipe.ardy cs] Snippet selector hit:', selectors[i], '->', txt.slice(0, 150));
-        return cleanSnippet(txt);
-      }
-    }
-    LOG&&console.log('[Swipe.ardy cs] Snippet: NO selectors matched — tried', selectors);
+    LOG&&console.log('[Swipe.ardy cs] Snippet: no safe top-level caption matched');
     return '';
   }
 
-  function extractLinkedInCounts(card, postAreaText) {
+  function extractLinkedInMetric(text, terms) {
+    if (!text) return 0;
+    var escaped = terms.map(function (term) { return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
+    var number = "\\d[\\d\\s.,'’]*(?:[kKmMbB])?";
+    var patterns = [
+      new RegExp('(' + number + ')\\s*(?:' + escaped + ')\\b', 'i'),
+      new RegExp('(?:' + escaped + ')\\s*(' + number + ')', 'i')
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var match = String(text).match(patterns[i]);
+      if (match) {
+        var value = parseCompactNumber(match[1]);
+        if (value) return value;
+      }
+    }
+    return 0;
+  }
+
+  function getLinkedInEngagementRoots(card) {
+    var roots = [];
+    var seen = [];
+    var nodes = card.querySelectorAll(LINKEDIN_COUNT_REGION_SELECTOR);
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (!belongsToLinkedInPost(node, card) || isLinkedInCommentNode(node, card)) continue;
+      if (seen.indexOf(node) !== -1) continue;
+      seen.push(node);
+      roots.push(node);
+    }
+    return roots;
+  }
+
+  function extractLinkedInCounts(card) {
     var reactions = 0, comments = 0, reposts = 0;
+    var commentTerms = ['comment', 'comments', 'reply', 'replies', 'komentar', 'komentari', 'balasan'];
+    var repostTerms = ['repost', 'reposts', 'shared', 'share', 'shares', 'retweet', 'retweets', 'bagikan', 'dibagikan', 'posting ulang'];
+    var reactionTerms = ['reaction', 'reactions', 'like', 'likes', 'reaksi', 'suka'];
+    var roots = getLinkedInEngagementRoots(card);
 
-    var rNode = card.querySelector('.social-details-social-counts__reactions-count');
-    if (rNode) reactions = parseCompactNumber(visibleText(rNode).trim());
-
-    var allCountItems = card.querySelectorAll('[class*="social-details"] span, [class*="social-counts"] span');
-    for (var ac = 0; ac < allCountItems.length; ac++) {
-      var label = (allCountItems[ac].getAttribute('aria-label') || '').toLowerCase();
-      var txt = visibleText(allCountItems[ac]).trim();
-      var num = parseCompactNumber(txt);
-      if (!num || num < 1) continue;
-      if (/^0+$/.test(txt)) continue;
-      if (/comment|repl/i.test(label) && !comments) comments = num;
-      if (/repost|share|retweet/i.test(label) && !reposts) reposts = num;
-      if (/reaction|like/i.test(label) && !reactions) reactions = num;
+    // Dedicated reaction count nodes have the highest confidence.
+    var reactionNodes = card.querySelectorAll('.social-details-social-counts__reactions-count, [aria-label*="reaction" i], [aria-label*="reaksi" i]');
+    for (var rn = 0; rn < reactionNodes.length && !reactions; rn++) {
+      var reactionNode = reactionNodes[rn];
+      if (!belongsToLinkedInPost(reactionNode, card) || isLinkedInCommentNode(reactionNode, card)) continue;
+      if (!roots.some(function (root) { return root === reactionNode || (root.contains && root.contains(reactionNode)); })) continue;
+      var reactionText = (reactionNode.getAttribute('aria-label') || '') + ' ' + visibleText(reactionNode);
+      reactions = extractLinkedInMetric(reactionText, reactionTerms) || parseCompactNumber(visibleText(reactionNode));
     }
 
-    LOG&&console.log('[Swipe.ardy cs] Direct count query:', { reactions: reactions, comments: comments, reposts: reposts });
-
-    var searchText = postAreaText || visibleText(card);
-    LOG&&console.log('[Swipe.ardy cs] Count search text FULL:', searchText);
-
-    var searchLines = searchText.split('\n');
-    var bareNumbers = [];
-    for (var bli = 0; bli < searchLines.length; bli++) {
-      var bl = searchLines[bli].trim();
-      if (/^\d{1,6}$/.test(bl)) {
-        bareNumbers.push(parseInt(bl, 10));
-      } else {
-        if (bareNumbers.length >= 2) break;
-        bareNumbers = [];
+    for (var ri = 0; ri < roots.length; ri++) {
+      var root = roots[ri];
+      var labelled = root.querySelectorAll('[aria-label]');
+      for (var li = 0; li < labelled.length; li++) {
+        var label = labelled[li].getAttribute('aria-label') || '';
+        if (!comments) comments = extractLinkedInMetric(label, commentTerms);
+        if (!reposts) reposts = extractLinkedInMetric(label, repostTerms);
+        if (!reactions) reactions = extractLinkedInMetric(label, reactionTerms);
       }
-    }
-    LOG&&console.log('[Swipe.ardy cs] Bare number sequence found:', bareNumbers);
-    if (bareNumbers.length >= 3) {
-      reactions = bareNumbers[0];
-      comments = bareNumbers[1];
-      reposts = bareNumbers[2];
-    } else if (bareNumbers.length === 2) {
-      reactions = bareNumbers[0];
-      comments = bareNumbers[1];
-    }
 
-    var skipSearchText = searchText;
-    var mrIdx = skipSearchText.indexOf('Most relevant') !== -1 ? skipSearchText.indexOf('Most relevant') : skipSearchText.indexOf('most relevant');
-    if (mrIdx !== -1) skipSearchText = skipSearchText.slice(0, mrIdx);
-    LOG&&console.log('[Swipe.ardy cs] Truncated search text (first 200):', skipSearchText.slice(0, 200));
-
-    var commentTerms = ['comment', 'comments', 'komentar', 'komentari'];
-    var repostTerms = ['repost', 'reposts', 'shared', 'share', 'shares'];
-    var reactionTerms = ['reaction', 'reactions', 'like', 'likes'];
-    var allTerms = commentTerms.concat(repostTerms).concat(reactionTerms);
-
-    var normalized = skipSearchText.replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ');
-    var segments = normalized.split(/[\n\u2022\u00b7|]+/).map(function (s) { return s.trim(); }).filter(Boolean);
-
-    LOG&&console.log('[Swipe.ardy cs] Count segments:', segments.slice(0, 30));
-
-    function extractByTerms(text, terms) {
-      if (!text) return 0;
-      var escaped = terms.map(function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
-      var patterns = [
-        new RegExp('([\\d,.KkMm]+)\\s*(?:' + escaped + ')', 'i'),
-        new RegExp('(?:' + escaped + ')\\s*([\\d,.KkMm]+)', 'i')
-      ];
-      for (var pi = 0; pi < patterns.length; pi++) {
-        var match = text.match(patterns[pi]);
-        if (match) {
-          var n = parseCompactNumber(match[1]);
-          if (n) return n;
-        }
-      }
-      return 0;
-    }
-
-    function extractFromSegments(terms) {
+      var segments = visibleText(root).replace(/[\u00a0\u2007\u202f]/g, ' ').split(/[\n\u2022\u00b7|]+/).map(function (segment) { return segment.trim(); }).filter(Boolean);
       for (var si = 0; si < segments.length; si++) {
-        var found = extractByTerms(segments[si], terms);
-        if (found) return found;
+        if (!comments) comments = extractLinkedInMetric(segments[si], commentTerms);
+        if (!reposts) reposts = extractLinkedInMetric(segments[si], repostTerms);
+        if (!reactions) reactions = extractLinkedInMetric(segments[si], reactionTerms);
       }
-      return 0;
-    }
 
-    comments = extractFromSegments(commentTerms) || comments;
-    reposts = extractFromSegments(repostTerms) || reposts;
-    reactions = extractFromSegments(reactionTerms) || reactions;
-
-    if (!reactions) {
-      var othersPatterns = [
-        /(?:and\s+)?([\d,.KkMm]+)\s+others/i,
-        /(?:dan\s+)?([\d,.KkMm]+)\s+lainnya/i
-      ];
-      for (var oi = 0; oi < othersPatterns.length; oi++) {
-        var om = normalized.match(othersPatterns[oi]);
-        if (om) { reactions = parseCompactNumber(om[1]); if (reactions) break; }
-      }
-    }
-
-    if (!reactions) {
-      var lines = segments.length ? segments : normalized.split('\n');
-      for (var li = 0; li < lines.length; li++) {
-        var lower = lines[li].toLowerCase();
-        if (!allTerms.some(function (t) { return lower.indexOf(t) !== -1; })) continue;
-        var nums = (lines[li].match(/([\d,.KkMm]+)/g) || []).map(parseCompactNumber).filter(Boolean);
-        if (nums.length >= 1 && nums[0] !== comments && nums[0] !== reposts) {
-          reactions = nums[0];
-          break;
+      if (!reactions) {
+        var summary = visibleText(root).replace(/[\u00a0\u2007\u202f]/g, ' ');
+        var others = summary.match(/(?:and|dan)\s+(\d[\d\s.,'’]*(?:[kKmMbB])?)\s+(?:others?|lainnya)\b/i);
+        if (others) {
+          var otherCount = parseCompactNumber(others[1]);
+          if (otherCount) reactions = otherCount + 1;
         }
       }
-    }
-
-    var rNode2 = card.querySelector('[aria-label*="reaction"]');
-    if (!reactions && rNode2) {
-      var label = rNode2.getAttribute('aria-label') || '';
-      var am = label.match(/([\d,.]+)/);
-      if (am) reactions = parseCompactNumber(am[1]);
     }
 
     LOG&&console.log('[Swipe.ardy cs] Counts extracted:', { reactions: reactions, comments: comments, reposts: reposts });
@@ -815,7 +802,7 @@
 
     var author = extractLinkedInAuthor(card);
     var text = extractLinkedInSnippet(card);
-    var counts = extractLinkedInCounts(card, postText);
+    var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
     // Try LinkedIn carousel FIRST — searches <code> JSON (global, not tied to card)
     var carouselImages = await extractCarouselImages();
@@ -1218,41 +1205,7 @@
   }
 
   function scanLinkedInSnippet(card) {
-    // Keep page-scan extraction on the same precise caption path as
-    // single-post extraction so engagement footer text cannot leak into saves.
-    var selectorCaption = extractLinkedInCaptionFromSelectors(card);
-    if (selectorCaption) return selectorCaption;
-
-    var selectors = [
-      '.update-components-text .break-words',
-      '.update-components-text',
-      '.feed-shared-update-v2__description-wrapper',
-      '.feed-shared-inline-show-more-text',
-      '.feed-shared-text',
-      '.update-components-update-v2__commentary'
-    ];
-    var blacklist = ['following', 'premium', 'promoted', 'reposted this', 'visit my website', 'follow', 'message', 'subscribe'];
-    for (var s = 0; s < selectors.length; s++) {
-      var nodes = card.querySelectorAll(selectors[s]);
-      for (var i = 0; i < nodes.length; i++) {
-        var el = nodes[i];
-        var txt = visibleText(el);
-        if (!txt || txt.length < 20) continue;
-        txt = txt.replace(/\b(Premium|Following|Follow)\b/gi, '').replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
-        var lower = txt.toLowerCase();
-        var polluted = true;
-        var hitCount = 0;
-        for (var b = 0; b < blacklist.length; b++) {
-          if (lower.indexOf(blacklist[b]) !== -1) hitCount++;
-        }
-        polluted = hitCount >= 3;
-        if (polluted) continue;
-        var cleaned = cleanSnippet(txt);
-        if (!cleaned) continue;
-        return cleaned;
-      }
-    }
-    return '';
+    return extractLinkedInCaptionFromSelectors(card);
   }
 
   function scanLinkedInTime(card) {
@@ -1372,7 +1325,7 @@
         seenKeys[dedupKey] = true;
 
         var author = scanLinkedInAuthor(root);
-        var counts = extractLinkedInCounts(root, '');
+        var counts = extractLinkedInCounts(root);
         var images = scanLinkedInImage(root);
         var image = images.length > 0 ? images.join(',') : extractLinkedInImage(root);
 
@@ -1636,6 +1589,16 @@
       });
     }
     return posts;
+  }
+
+  // Exposed only when the regression test harness creates this object before
+  // loading the content script. Normal extension pages never define it.
+  if (window.__SWIPEARDY_TEST_HOOK__) {
+    window.__SWIPEARDY_TEST_HOOK__.parseCompactNumber = parseCompactNumber;
+    window.__SWIPEARDY_TEST_HOOK__.cleanSnippet = cleanSnippet;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMetric = extractLinkedInMetric;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
   }
 
   setupTwitterScanner();

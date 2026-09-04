@@ -651,6 +651,7 @@ If you change the item schema in index.html, you MUST update the extension too.
 - `content/panel.js` — Floating panel UI injected by extension icon
 - `content/x-bookmark-watcher.js` — X bookmark detection + toasts
 - `content/x-graphql-interceptor.js` — X fetch interceptor (runs in MAIN world)
+- `tests/linkedin-extraction.test.js` — Dependency-free LinkedIn caption/count regression tests
 
 ## Extension Message & Save Flow
 
@@ -750,25 +751,26 @@ Both `scanLinkedInImage()` and `extractLinkedInImage()` filter out unwanted imag
 | `comment-image` | Both | LinkedIn comment attachments |
 | `/ghost/` | Both | LinkedIn ghost placeholders |
 
-### `cleanSnippet()` Boundary Ordering
+### Caption Ownership and Boundaries
 
-`cleanSnippet()` truncates extracted text at the first boundary string found. **Boundary order matters** — boundaries are checked in array order, not text position order. Boundaries that appear EARLIER in the extracted text must be FIRST in the array:
+`extractLinkedInCaptionFromSelectors()` accepts text only when the candidate:
 
-```
-['Activate to view larger image', 'Add a comment', 'Open Emoji Keyboard', 
- 'Like Reply', 'Like\nReply', 'Load more comments', 'Reaction button',
- 'Most relevant', 'most relevant', ...]
-```
+- belongs to the same top-level LinkedIn post as the card being scanned,
+- is outside comment and engagement containers,
+- appears before the first engagement/comment boundary in DOM order, and
+- comes from a caption-specific selector when no structural boundary is available.
 
-If `Most relevant` were first, it would match LATE in the text (after comment section), keeping unwanted UI chrome. Putting `Activate to view larger image` and `Add a comment` first ensures truncation happens right after the post content.
+Single-post extraction, the LinkedIn Save-button watcher, and page scanning all use this same path. There is deliberately no whole-card/timestamp fallback: when the current LinkedIn DOM does not expose a trustworthy caption node, extraction returns an empty caption instead of saving a comment or nested repost.
 
-### Timestamp Detection
+`cleanSnippet()` remains a final text cleanup. When several known UI/footer markers are present, it truncates at the marker with the earliest position in the extracted text; the order of the marker array is not significant.
 
-`extractLinkedInSnippet()` finds the post timestamp to separate header from content. The regex handles both formats:
-- `5mo •` (abbreviated)
-- `5 months ago •` (full text)
+### Engagement Count Isolation
 
-After the timestamp, LinkedIn header junk (`Follow`, `Connect`, `Visible to anyone...`) is stripped before returning the caption.
+`extractLinkedInCounts()` reads only dedicated social-count/action-bar regions belonging to the same top-level post. Accessible labels are preferred, followed by text segments inside those regions. Caption text, expanded comments, nested posts, and arbitrary bare-number sequences are never used as engagement data. Lower-confidence fallbacks only fill missing values and never overwrite a count already found from a stronger source.
+
+Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A summary such as `Alice and 27 others` resolves to 28 total reactions.
+
+Run `node extension/tests/linkedin-extraction.test.js` after changing LinkedIn selectors, boundary logic, or number parsing.
 
 ---
 
