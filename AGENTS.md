@@ -774,15 +774,15 @@ Both `scanLinkedInImage()` and `extractLinkedInImage()` filter out unwanted imag
 - belongs to the same top-level LinkedIn post as the card being scanned,
 - is outside comment and engagement containers,
 - appears before the first engagement/comment boundary in DOM order, and
-- comes from a caption-specific selector when no structural boundary is available.
+- comes from a caption-specific selector, or from the bounded structural fallback when LinkedIn exposes only hashed classes.
 
-Single-post extraction, the LinkedIn Save-button watcher, and page scanning all use this same path. There is deliberately no whole-card/timestamp fallback: when the current LinkedIn DOM does not expose a trustworthy caption node, extraction returns an empty caption instead of saving a comment or nested repost.
+Single-post extraction, the LinkedIn Save-button watcher, and page scanning all use this same path. Single-post extraction has a bounded structural fallback for LinkedIn DOM variants that omit the known class/data markers: it anchors on the post's engagement summary and Like/Comment/Repost/Send action row, rejects `main`/`body`, and removes carousel/footer metadata before accepting text. It never falls back to an unbounded whole-card/body caption.
 
 `cleanSnippet()` remains a final text cleanup. When several known UI/footer markers are present, it truncates at the marker with the earliest position in the extracted text; the order of the marker array is not significant.
 
 ### Engagement Count Isolation
 
-`extractLinkedInCounts()` reads only dedicated social-count/action-bar regions belonging to the same top-level post. Accessible labels are preferred, followed by text segments inside those regions. Caption text, expanded comments, nested posts, and arbitrary bare-number sequences are never used as engagement data. Lower-confidence fallbacks only fill missing values and never overwrite a count already found from a stronger source.
+`extractLinkedInCounts()` reads dedicated social-count/action-bar regions belonging to the same top-level post, or a bounded structural engagement summary when LinkedIn omits those class markers. Accessible labels are preferred, followed by text segments inside those regions; a bare reaction number is accepted only inside that bounded summary. Caption text, expanded comments, nested posts, and arbitrary page-wide number sequences are never used as engagement data. Lower-confidence fallbacks only fill missing values and never overwrite a count already found from a stronger source.
 
 Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A summary such as `Alice and 27 others` resolves to 28 total reactions.
 

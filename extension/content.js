@@ -282,6 +282,156 @@
     '.update-components-update-v2__commentary'
   ];
 
+  function linkedInNodeText(node) {
+    if (!node) return '';
+    var label = '';
+    try { label = node.getAttribute('aria-label') || ''; } catch (e) {}
+    return (label + ' ' + visibleText(node)).replace(/[\u00a0\u2007\u202f]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function linkedInMetricKinds(text) {
+    var normalized = String(text || '').replace(/[\u00a0\u2007\u202f]/g, ' ').replace(/\s+/g, ' ').trim();
+    var kinds = {};
+    if (/\band\s+\d[\d\s.,'’]*(?:[kKmMbB])?\s+(?:others?|lainnya)\b/i.test(normalized) ||
+        /\b\d[\d\s.,'’]*(?:[kKmMbB])?\s*(?:reactions?|likes?|reacted)\b/i.test(normalized)) kinds.reactions = true;
+    if (/\b\d[\d\s.,'’]*(?:[kKmMbB])?\s*(?:comments?|replies|komentar|komentari|balasan)\b/i.test(normalized)) kinds.comments = true;
+    if (/\b\d[\d\s.,'’]*(?:[kKmMbB])?\s*(?:reposts?|shares?|retweets?|dibagikan|posting ulang)\b/i.test(normalized)) kinds.reposts = true;
+    return kinds;
+  }
+
+  function linkedInMetricKindCount(kinds) {
+    return (kinds.reactions ? 1 : 0) + (kinds.comments ? 1 : 0) + (kinds.reposts ? 1 : 0);
+  }
+
+  function collectLinkedInMetricNodes(scope) {
+    if (!scope || !scope.querySelectorAll) return [];
+    var nodes = [];
+    if (scope.getAttribute && linkedInMetricKindCount(linkedInMetricKinds(linkedInNodeText(scope)))) nodes.push(scope);
+    var candidates = scope.querySelectorAll('span, a, p, button, [role="button"], [aria-label]');
+    for (var i = 0; i < candidates.length; i++) {
+      var node = candidates[i];
+      var text = linkedInNodeText(node);
+      if (!text || text.length > 220 || !linkedInMetricKindCount(linkedInMetricKinds(text))) continue;
+      // Prefer the small text/label node. Large wrappers can contain a
+      // caption sentence that happens to mention "comments".
+      if (node.children && node.children.length > 2) continue;
+      if (nodes.indexOf(node) === -1) nodes.push(node);
+    }
+    return nodes;
+  }
+
+  function linkedInActionKinds(scope) {
+    var kinds = {};
+    if (!scope || !scope.querySelectorAll) return kinds;
+    var controls = scope.querySelectorAll('button, [role="button"], a');
+    for (var i = 0; i < controls.length; i++) {
+      var text = linkedInNodeText(controls[i]);
+      if (!text || text.length > 100) continue;
+      if (/\blike\b|\breaction\b|\bsuka\b/i.test(text)) kinds.like = true;
+      if (/\bcomment\b|\bkomentar\b/i.test(text)) kinds.comment = true;
+      if (/\brepost\b|\bshare\b|\bretweet\b|\bbagikan\b|\bposting ulang\b/i.test(text)) kinds.repost = true;
+      if (/\bsend\b|\bkirim\b/i.test(text)) kinds.send = true;
+    }
+    return kinds;
+  }
+
+  function linkedInHasPostActionRow(scope) {
+    var kinds = linkedInActionKinds(scope);
+    if (kinds.like && kinds.comment && kinds.repost && kinds.send) return true;
+    var text = visibleText(scope).replace(/\s+/g, ' ');
+    return /\blike\b.{0,120}\bcomment\b.{0,120}\brepost\b.{0,120}\bsend\b/i.test(text) ||
+      /\bsuka\b.{0,120}\bkomentar\b.{0,120}\b(?:posting ulang|bagikan)\b.{0,120}\bkirim\b/i.test(text);
+  }
+
+  function linkedInIsTooBroadScope(node) {
+    if (!node) return true;
+    var tag = String(node.tagName || '').toLowerCase();
+    if (tag === 'main' || tag === 'body' || tag === 'html') return true;
+    var id = '';
+    try { id = node.getAttribute('id') || ''; } catch (e) {}
+    return id === 'workspace';
+  }
+
+  function findLinkedInStructuralEngagementRoot(scope) {
+    if (!scope || !scope.querySelectorAll) return null;
+    var metricNodes = collectLinkedInMetricNodes(scope);
+    var fallback = null;
+    for (var mi = 0; mi < metricNodes.length; mi++) {
+      var current = metricNodes[mi].parentElement || metricNodes[mi].parentNode;
+      for (var depth = 0; current && depth < 14; depth++) {
+        if (linkedInIsTooBroadScope(current)) break;
+        var kinds = linkedInMetricKinds(linkedInNodeText(metricNodes[mi]));
+        var hasActions = linkedInHasPostActionRow(current);
+        var textLength = visibleText(current).length;
+        var hasMedia = !!(current.querySelectorAll && current.querySelectorAll('img, video, iframe').length);
+        if (hasActions && (textLength >= 120 || hasMedia)) return current;
+        if (!fallback && hasActions) fallback = current;
+        if (!fallback && linkedInMetricKindCount(kinds) >= 1 && textLength >= 80 && textLength < 2500) fallback = current;
+        current = current.parentElement || current.parentNode;
+      }
+    }
+    return fallback;
+  }
+
+  function structuralCardScore(card) {
+    var textLength = Math.min(visibleText(card).length, 3000);
+    var actions = linkedInActionKinds(card);
+    var actionCount = (actions.like ? 1 : 0) + (actions.comment ? 1 : 0) + (actions.repost ? 1 : 0) + (actions.send ? 1 : 0);
+    var media = card.querySelectorAll ? card.querySelectorAll('img, video, iframe').length : 0;
+    var score = actionCount * 100 + Math.min(textLength, 800) / 20 + Math.min(media, 3) * 20;
+    try {
+      var rect = card.getBoundingClientRect();
+      var viewportCenter = (window.innerHeight || 900) / 2;
+      score -= Math.min(Math.abs((rect.top + rect.bottom) / 2 - viewportCenter), 1200) / 100;
+    } catch (e) {}
+    return score;
+  }
+
+  function findLinkedInStructuralCard() {
+    if (!document || !document.querySelectorAll) return null;
+    var metricNodes = collectLinkedInMetricNodes(document);
+    var candidates = [];
+    for (var i = 0; i < metricNodes.length; i++) {
+      var card = findLinkedInStructuralEngagementRoot(metricNodes[i].parentElement || metricNodes[i]);
+      if (!card || linkedInIsTooBroadScope(card) || candidates.indexOf(card) !== -1) continue;
+      if (!linkedInHasPostActionRow(card)) continue;
+      candidates.push(card);
+    }
+    candidates.sort(function (a, b) { return structuralCardScore(b) - structuralCardScore(a); });
+    return candidates[0] || null;
+  }
+
+  function removeLinkedInCarouselMetadata(text) {
+    var pageMatch = /\bPage\s+\d+\s+of\s+\d+\b/i.exec(text || '');
+    if (!pageMatch) return text || '';
+    var afterPage = String(text).slice(pageMatch.index);
+    var pagesMatch = /\b\d+\s+pages?\b/i.exec(afterPage);
+    var metricMatch = /\b\d[\d\s.,'’]*(?:[kKmMbB])?\s+(?:reactions?|comments?|reposts?|shares?)\b/i.exec(afterPage);
+    if (pagesMatch && metricMatch) return String(text).slice(0, pageMatch.index).trim();
+    return text || '';
+  }
+
+  function extractLinkedInStructuralCaption(card) {
+    if (!card) return '';
+    var fullText = visibleText(card);
+    var postText = getPostAreaText(fullText) || fullText;
+    if (!postText) return '';
+    var candidates = [];
+    var timestamp = postText.match(/\d+[hmdw]o?\s*·\s*|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?\s*·\s*/i);
+    if (timestamp) candidates.push(postText.slice(timestamp.index + timestamp[0].length).trim());
+    candidates.push(postText);
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = candidates[i]
+        .replace(/^(?:Follow|Connect|Connect with[^\n]*|Visible to anyone[^\n]*|View profile[^\n]*)\s*/i, '')
+        .replace(/\bRepost\s+[\s\S]{0,120}?\bto help someone in your network\.?\s*/i, '')
+        .trim();
+      candidate = removeLinkedInCarouselMetadata(candidate);
+      var cleaned = cleanSnippet(candidate);
+      if (cleaned) return cleaned;
+    }
+    return '';
+  }
+
   function getLinkedInPostRoot(node) {
     if (!node || !node.closest) return null;
     return node.closest(LINKEDIN_POST_ROOT_SELECTOR) || node.closest('article');
@@ -308,6 +458,7 @@
   function getLinkedInContentBoundary(card) {
     if (!card || !card.querySelectorAll) return null;
     var nodes = card.querySelectorAll(LINKEDIN_ENGAGEMENT_SELECTOR + ', ' + LINKEDIN_COMMENT_SELECTOR);
+    if (!nodes.length) nodes = collectLinkedInMetricNodes(card);
     var first = null;
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
@@ -368,8 +519,20 @@
       }
     }
 
+    // New LinkedIn layouts may flatten the summary into text such as
+    // "958 reactions 385 comments 96 reposts" without a semantic footer
+    // class. Treat the first explicit reaction count as a boundary only when
+    // another engagement count or the action row follows nearby.
+    var explicitReaction = /\b\d[\d\s.,'’]*(?:[kKmMbB])?\s+reactions?\b/i.exec(text);
+    if (explicitReaction) {
+      var nearbySummary = text.slice(explicitReaction.index, explicitReaction.index + 220);
+      if (/\b\d[\d\s.,'’]*(?:[kKmMbB])?\s+(?:comments?|reposts?|shares?)\b/i.test(nearbySummary) || actionIndex !== -1) {
+        if (reactionIndex === -1 || explicitReaction.index < reactionIndex) reactionIndex = explicitReaction.index;
+      }
+    }
+
     var commentIndex = -1;
-    var commentPattern = /\b\d[\d,.]*\s+comments?\b/gi;
+    var commentPattern = /\b\d[\d\s.,'’]*(?:[kKmMbB])?\s+comments?\b/gi;
     var commentMatch;
     while ((commentMatch = commentPattern.exec(text))) {
       if (actionIndex === -1 || commentMatch.index < actionIndex) commentIndex = commentMatch.index;
@@ -476,6 +639,11 @@
     // instead of treating a comment or nested post as the caption.
     var selectorCaption = extractLinkedInCaptionFromSelectors(card);
     if (selectorCaption) return selectorCaption;
+    var structuralCaption = extractLinkedInStructuralCaption(card);
+    if (structuralCaption) {
+      LOG&&console.log('[Swipe.ardy cs] Snippet structural fallback hit:', structuralCaption.slice(0, 150));
+      return structuralCaption;
+    }
     LOG&&console.log('[Swipe.ardy cs] Snippet: no safe top-level caption matched');
     return '';
   }
@@ -509,7 +677,35 @@
       seen.push(node);
       roots.push(node);
     }
+    if (!roots.length) {
+      var structuralRoot = findLinkedInStructuralEngagementRoot(card);
+      if (structuralRoot) roots.push(structuralRoot);
+    }
     return roots;
+  }
+
+  function extractLinkedInBareReactionCount(root, comments, reposts) {
+    if (!root || !root.querySelectorAll) return 0;
+    var nodes = root.querySelectorAll('span, a, p, [aria-label]');
+    for (var i = 0; i < nodes.length; i++) {
+      var text = visibleText(nodes[i]).replace(/[\u00a0\u2007\u202f]/g, ' ').trim();
+      if (!/^\d[\d.,'’\s]{0,20}$/.test(text)) continue;
+      var value = parseCompactNumber(text);
+      if (value && value !== comments && value !== reposts) return value;
+    }
+    var normalized = visibleText(root).replace(/[\u00a0\u2007\u202f]/g, ' ').replace(/\s+/g, ' ').trim();
+    var inlineSummary = normalized.match(/\b(\d[\d.,'’]*)\s+\d[\d.,'’]*\s+comments?\b/i);
+    if (inlineSummary) {
+      var inlineValue = parseCompactNumber(inlineSummary[1]);
+      if (inlineValue && inlineValue !== comments && inlineValue !== reposts) return inlineValue;
+    }
+    var segments = normalized.split(/[\n\u2022\u00b7|]+/).map(function (segment) { return segment.trim(); });
+    for (var si = 0; si < segments.length; si++) {
+      if (!/^\d[\d.,'’\s]{0,20}$/.test(segments[si])) continue;
+      var segmentValue = parseCompactNumber(segments[si]);
+      if (segmentValue && segmentValue !== comments && segmentValue !== reposts) return segmentValue;
+    }
+    return 0;
   }
 
   function extractLinkedInCounts(card) {
@@ -554,6 +750,8 @@
           if (otherCount) reactions = otherCount + 1;
         }
       }
+
+      if (!reactions) reactions = extractLinkedInBareReactionCount(root, comments, reposts);
     }
 
     LOG&&console.log('[Swipe.ardy cs] Counts extracted:', { reactions: reactions, comments: comments, reposts: reposts });
@@ -907,6 +1105,12 @@
       card = findCardByEngagement();
       if (card) cardSource = 'engagement-region';
       LOG&&console.log('[Swipe.ardy cs] Engagement match:', card ? 'FOUND' : 'NOT FOUND');
+    }
+
+    if (!card) {
+      card = findLinkedInStructuralCard();
+      if (card) cardSource = 'structural-signals';
+      LOG&&console.log('[Swipe.ardy cs] Structural signal match:', card ? 'FOUND' : 'NOT FOUND');
     }
 
     if (!card) {
@@ -1756,6 +1960,9 @@
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMetric = extractLinkedInMetric;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
+    window.__SWIPEARDY_TEST_HOOK__.findLinkedInEngagementBoundary = findLinkedInEngagementBoundary;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInStructuralCaption = extractLinkedInStructuralCaption;
+    window.__SWIPEARDY_TEST_HOOK__.findLinkedInStructuralEngagementRoot = findLinkedInStructuralEngagementRoot;
     window.__SWIPEARDY_TEST_HOOK__.linkedInDebugMetricSignals = linkedInDebugMetricSignals;
   }
 
