@@ -25,6 +25,19 @@
     '.brand{display:flex;align-items:center;gap:8px;margin-bottom:12px}' +
     '.brand-icon{width:22px;height:22px;border-radius:6px;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}' +
     '.brand-name{font-size:14px;font-weight:700;color:#14181f}' +
+    '.auto-save-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 9px;margin:-2px 0 12px;border:1px solid #e7e9ee;border-radius:9px;background:#f7f8fa;text-align:left}' +
+    '.auto-save-row.paused{background:#fff7ed;border-color:#fed7aa}' +
+    '.auto-save-title{font-size:11px;font-weight:650;color:#394150}' +
+    '.auto-save-status{font-size:9px;color:#7b8493;margin-top:1px}' +
+    '.auto-save-row.paused .auto-save-status{color:#c2410c}' +
+    '.switch{position:relative;width:32px;height:18px;display:inline-flex;flex-shrink:0}' +
+    '.switch input{position:absolute;opacity:0;width:1px;height:1px}' +
+    '.switch-track{position:absolute;inset:0;border-radius:999px;background:#c3c8d2;cursor:pointer;transition:background .18s}' +
+    '.switch-track:after{content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(15,23,42,.28);transition:transform .18s}' +
+    '.switch input:checked+.switch-track{background:#4f46e5}' +
+    '.switch input:checked+.switch-track:after{transform:translateX(14px)}' +
+    '.switch input:focus-visible+.switch-track{box-shadow:0 0 0 3px rgba(79,70,229,.18)}' +
+    '.switch input:disabled+.switch-track{opacity:.55;cursor:wait}' +
     '.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid}' +
     '.badge.linkedin{border-color:#eef0fe;color:#4f46e5;background:#eef0fe}' +
     '.badge.twitter{border-color:#e7e9ee;color:#5b6472;background:#f4f5f7}' +
@@ -79,6 +92,7 @@
         '<div class="brand-name">Swipe.ardy</div>' +
         '<span class="badge hidden" id="badge"></span>' +
       '</div>' +
+      '<div class="auto-save-row" id="bookmarkAutoRow"><div><div class="auto-save-title">Auto-save X bookmarks</div><div class="auto-save-status" id="bookmarkAutoStatus">Checking...</div></div><label class="switch" title="Toggle automatic X bookmark saving"><input type="checkbox" id="bookmarkAutoToggle" aria-label="Auto-save X bookmarks"><span class="switch-track"></span></label></div>' +
       '<div id="sCheck" class="state"><div class="spinner"></div><p>Checking page...</p></div>' +
       '<div id="sUnsupported" class="state hidden"><div class="state-icon">&#9888;</div><p>This page is not supported.</p><p class="hint">Navigate to a LinkedIn, Twitter/X, or Pinterest page.</p></div>' +
       '<div id="sReady" class="state hidden">' +
@@ -105,6 +119,24 @@
   var scannedPosts = [];
   var currentPlatform = '';
   var minimized = false;
+
+  function renderBookmarkAutoSave(enabled) {
+    var toggle = $('#bookmarkAutoToggle');
+    var row = $('#bookmarkAutoRow');
+    toggle.checked = enabled;
+    row.classList.toggle('paused', !enabled);
+    $('#bookmarkAutoStatus').textContent = enabled ? 'On — new bookmarks save automatically' : 'Paused — bookmarks will not be saved';
+  }
+
+  function loadBookmarkAutoSave() {
+    chrome.runtime.sendMessage({ type: 'SWIPEAR:DY_BOOKMARK_AUTO_GET' }, function (resp) {
+      if (chrome.runtime.lastError || !resp || !resp.ok) {
+        $('#bookmarkAutoStatus').textContent = 'Status unavailable';
+        return;
+      }
+      renderBookmarkAutoSave(resp.enabled !== false);
+    });
+  }
 
   function showState(name) {
     var all = shadow.querySelectorAll('.state');
@@ -159,6 +191,7 @@
     scannedPosts = [];
     $('#scanResults').classList.add('hidden');
     clog('init', 'Panel opened');
+    loadBookmarkAutoSave();
   }
 
   // Drag
@@ -190,6 +223,24 @@
 
   // Close
   $('#closeBtn').addEventListener('click', function () { host.remove(); window.__SWIPEARDY_PANEL__ = false; });
+
+  // X bookmark auto-save toggle
+  $('#bookmarkAutoToggle').addEventListener('change', function () {
+    var toggle = $('#bookmarkAutoToggle');
+    var requested = toggle.checked;
+    toggle.disabled = true;
+    $('#bookmarkAutoStatus').textContent = requested ? 'Turning on...' : 'Pausing...';
+    chrome.runtime.sendMessage({ type: 'SWIPEAR:DY_BOOKMARK_AUTO_SET', enabled: requested }, function (resp) {
+      toggle.disabled = false;
+      if (chrome.runtime.lastError || !resp || !resp.ok) {
+        renderBookmarkAutoSave(!requested);
+        $('#bookmarkAutoStatus').textContent = 'Could not update setting';
+        return;
+      }
+      renderBookmarkAutoSave(resp.enabled !== false);
+      clog('X BOOKMARKS', resp.enabled === false ? 'Auto-save paused' : 'Auto-save enabled', 'ok');
+    });
+  });
 
   // Scan
   $('#scanBtn').addEventListener('click', function () {

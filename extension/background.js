@@ -111,10 +111,69 @@ var BOOKMARK_POLL_ALARM = 'swipeardyBookmarkPoll';
 var BOOKMARK_POLL_PERIOD_MINUTES = 2;
 var BOOKMARK_POLL_THROTTLE_MS = 30 * 1000;
 var STORAGE_LAST_POLL_KEY = 'swipeardyLastPollAt';
+var STORAGE_BOOKMARK_AUTO_SAVE_KEY = 'swipeardyBookmarkAutoSaveEnabled';
 var lastTabId = null;
+
+function getBookmarkAutoSaveEnabled() {
+  return new Promise(function (resolve) {
+    var defaults = {};
+    defaults[STORAGE_BOOKMARK_AUTO_SAVE_KEY] = true;
+    chrome.storage.local.get(defaults, function (data) {
+      resolve(data[STORAGE_BOOKMARK_AUTO_SAVE_KEY] !== false);
+    });
+  });
+}
+
+function syncBookmarkPollAlarm(enabled) {
+  return new Promise(function (resolve) {
+    if (enabled) {
+      ensureBookmarkPollAlarm();
+      resolve();
+      return;
+    }
+    chrome.alarms.clear(BOOKMARK_POLL_ALARM, function () { resolve(); });
+  });
+}
+
+function setBookmarkAutoSaveEnabled(enabled) {
+  enabled = enabled !== false;
+  return getBookmarkAutoSaveEnabled().then(function (wasEnabled) {
+    return new Promise(function (resolve) {
+      var update = {};
+      update[STORAGE_BOOKMARK_AUTO_SAVE_KEY] = enabled;
+      if (enabled && !wasEnabled) {
+        // The first snapshot after resuming becomes the new baseline. Tweets
+        // bookmarked while paused are not imported retroactively.
+        update[STORAGE_BASELINE_KEY] = false;
+        update[STORAGE_LAST_POLL_KEY] = 0;
+      }
+      chrome.storage.local.set(update, function () {
+        syncBookmarkPollAlarm(enabled).then(function () {
+          if (enabled && !wasEnabled) {
+            maybePollBookmarks().then(function () { resolve(enabled); });
+          } else {
+            resolve(enabled);
+          }
+        });
+      });
+    });
+  });
+}
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (!message) return;
+  if (message.type === 'SWIPEAR:DY_BOOKMARK_AUTO_GET') {
+    getBookmarkAutoSaveEnabled().then(function (enabled) {
+      sendResponse({ ok: true, enabled: enabled });
+    });
+    return true;
+  }
+  if (message.type === 'SWIPEAR:DY_BOOKMARK_AUTO_SET') {
+    setBookmarkAutoSaveEnabled(message.enabled !== false).then(function (enabled) {
+      sendResponse({ ok: true, enabled: enabled });
+    });
+    return true;
+  }
   if (message.type === 'SAVE_SWIPE') {
     var item = {
       id: Date.now(),
@@ -167,8 +226,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 function handleBookmarkSave(msg, sendResponse) {
-  trySaveBookmark(buildBookmarkItem(msg), msg.tweetId).then(function (result) {
-    sendResponse(result);
+  getBookmarkAutoSaveEnabled().then(function (enabled) {
+    if (!enabled) {
+      return markSeen([msg.tweetId]).then(function () {
+        sendResponse({ ok: true, paused: true });
+      });
+    }
+    return trySaveBookmark(buildBookmarkItem(msg), msg.tweetId).then(function (result) {
+      sendResponse(result);
+    });
   }).catch(function (err) {
     sendResponse({ ok: false, error: err.message });
   });
@@ -338,7 +404,15 @@ function markSeen(ids) {
 function handleBookmarkBatch(bookmarks) {
   if (!Array.isArray(bookmarks) || bookmarks.length === 0) return;
 
-  readSeenSet().then(function (state) {
+  getBookmarkAutoSaveEnabled().then(function (enabled) {
+    if (!enabled) {
+      return markSeen(bookmarks.map(function (bookmark) {
+        return bookmark && bookmark.tweetId;
+      }).filter(Boolean));
+    }
+    return readSeenSet();
+  }).then(function (state) {
+    if (!state) return;
     if (!state.baseline || state.version !== CAPTURE_VERSION) {
       for (var i = 0; i < bookmarks.length; i++) {
         if (bookmarks[i] && bookmarks[i].tweetId) state.seen[bookmarks[i].tweetId] = true;
@@ -356,13 +430,21 @@ function handleBookmarkBatch(bookmarks) {
       if (idx >= toImport.length) {
         return writeSeenSet(Object.keys(state.seen));
       }
-      var b = toImport[idx];
-      return syncBookmarkToSupabase(b).then(function () {
-        state.seen[b.tweetId] = true;
-        return importNext(idx + 1);
-      }).catch(function () {
-        state.seen[b.tweetId] = true;
-        return importNext(idx + 1);
+      return getBookmarkAutoSaveEnabled().then(function (enabled) {
+        if (!enabled) {
+          for (var remaining = idx; remaining < toImport.length; remaining++) {
+            state.seen[toImport[remaining].tweetId] = true;
+          }
+          return writeSeenSet(Object.keys(state.seen));
+        }
+        var b = toImport[idx];
+        return syncBookmarkToSupabase(b).then(function () {
+          state.seen[b.tweetId] = true;
+          return importNext(idx + 1);
+        }).catch(function () {
+          state.seen[b.tweetId] = true;
+          return importNext(idx + 1);
+        });
       });
     }
 
@@ -394,24 +476,31 @@ function ensureBookmarkPollAlarm() {
 }
 
 function maybePollBookmarks() {
-  return new Promise(function (resolve) {
-    var key = {};
-    key[STORAGE_LAST_POLL_KEY] = 0;
-    chrome.storage.local.get(key, function (data) {
-      var last = data[STORAGE_LAST_POLL_KEY] || 0;
-      var now = Date.now();
-      if (now - last < BOOKMARK_POLL_THROTTLE_MS) { resolve(); return; }
-      var set = {};
-      set[STORAGE_LAST_POLL_KEY] = now;
-      chrome.storage.local.set(set, function () {
-        pollBookmarksRefresh().then(resolve).catch(resolve);
+  return getBookmarkAutoSaveEnabled().then(function (enabled) {
+    if (!enabled) return;
+    return new Promise(function (resolve) {
+      var key = {};
+      key[STORAGE_LAST_POLL_KEY] = 0;
+      chrome.storage.local.get(key, function (data) {
+        var last = data[STORAGE_LAST_POLL_KEY] || 0;
+        var now = Date.now();
+        if (now - last < BOOKMARK_POLL_THROTTLE_MS) { resolve(); return; }
+        var set = {};
+        set[STORAGE_LAST_POLL_KEY] = now;
+        chrome.storage.local.set(set, function () {
+          pollBookmarksRefresh().then(resolve).catch(resolve);
+        });
       });
     });
   });
 }
 
-chrome.runtime.onInstalled.addListener(function () { ensureBookmarkPollAlarm(); });
-chrome.runtime.onStartup.addListener(function () { ensureBookmarkPollAlarm(); });
+chrome.runtime.onInstalled.addListener(function () {
+  getBookmarkAutoSaveEnabled().then(syncBookmarkPollAlarm);
+});
+chrome.runtime.onStartup.addListener(function () {
+  getBookmarkAutoSaveEnabled().then(syncBookmarkPollAlarm);
+});
 
 chrome.action.onClicked.addListener(function (tab) {
   if (!tab || !tab.id) return;
@@ -421,7 +510,6 @@ chrome.action.onClicked.addListener(function (tab) {
 
 chrome.alarms.onAlarm.addListener(function (alarm) {
   if (alarm && alarm.name === BOOKMARK_POLL_ALARM) {
-    ensureBookmarkPollAlarm();
     maybePollBookmarks();
   }
 });

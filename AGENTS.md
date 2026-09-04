@@ -652,6 +652,7 @@ If you change the item schema in index.html, you MUST update the extension too.
 - `content/x-bookmark-watcher.js` — X bookmark detection + toasts
 - `content/x-graphql-interceptor.js` — X fetch interceptor (runs in MAIN world)
 - `tests/linkedin-extraction.test.js` — Dependency-free LinkedIn caption/count regression tests
+- `tests/bookmark-auto-save.test.js` — Dependency-free regression tests for the X bookmark auto-save toggle
 
 ## Extension Message & Save Flow
 
@@ -666,8 +667,23 @@ The panel, content script, and background communicate via `chrome.runtime.sendMe
 | `SAVE_SWIPE` | Background directly | Saves extracted data to Supabase (no dedup) |
 | `SWIPEAR:DY_BOOKMARK` | `handleBookmarkSave` → `trySaveBookmark` | Single bookmark save with dedup |
 | `SWIPEAR:DY_BOOKMARK_BATCH` | `handleBookmarkBatch` | Batch bookmark sync |
+| `SWIPEAR:DY_BOOKMARK_AUTO_GET` | `getBookmarkAutoSaveEnabled` | Reads the persistent X bookmark auto-save setting |
+| `SWIPEAR:DY_BOOKMARK_AUTO_SET` | `setBookmarkAutoSaveEnabled` | Updates the setting and starts/stops bookmark polling |
 | `SWIPEAR:DY_BULK_IMPORT` | `handleBulkImport` (dedup per post) | Bulk array save via panel |
 | `SWIPEAR:DY_REFRESH_TEMPLATE` | `saveRefreshTemplate` | Stores X API auth for bookmark polling |
+
+### X Bookmark Auto-Save Toggle
+
+The floating panel exposes a compact `Auto-save X bookmarks` switch. Its state is stored in
+`chrome.storage.local` under `swipeardyBookmarkAutoSaveEnabled` and defaults to enabled so
+existing installations keep their current behavior.
+
+When paused, `background.js` blocks both single bookmark events and GraphQL bookmark batches,
+clears the periodic polling alarm, and performs no Supabase save. Incoming tweet IDs are still
+marked as seen. When auto-save is enabled again, the current bookmark list becomes a fresh
+baseline, so bookmarks added during the pause are not imported retroactively. Manual page scan,
+bulk import, and normal `SAVE_SWIPE` actions remain available while automatic bookmark saving is
+paused.
 
 ### `lastTabId` (Tab Routing)
 

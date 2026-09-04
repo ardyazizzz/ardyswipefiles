@@ -385,6 +385,10 @@
 
     chrome.runtime.sendMessage(payload, function (response) {
       if (!response) return;
+      if (response.paused) {
+        showToast('Swipe.ardy auto-save is paused');
+        return;
+      }
       if (response.ok) {
         showToast(response.duplicate ? 'Already in Swipe.ardy' : 'Saved to Swipe.ardy');
         return;
