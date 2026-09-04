@@ -666,6 +666,19 @@
     return 0;
   }
 
+  function extractLinkedInMutualReactionCount(text) {
+    if (!text) return 0;
+    var normalized = String(text).replace(/[\u00a0\u2007\u202f]/g, ' ').replace(/\s+/g, ' ').trim();
+    // LinkedIn's mutual-reaction label expresses the number of *other*
+    // people, not the total. For example, "Alice and 27 others reacted"
+    // means 28 reactions. This must run before the generic first-number
+    // fallback, otherwise it locks the result to the bare 27.
+    var match = normalized.match(/\b(?:and|dan)\s+(\d[\d\s.,'’]*(?:[kKmMbB])?)\s+(?:others?|lainnya)\b/i);
+    if (!match) return 0;
+    var others = parseCompactNumber(match[1]);
+    return others + 1;
+  }
+
   function getLinkedInEngagementRoots(card) {
     var roots = [];
     var seen = [];
@@ -722,7 +735,7 @@
       if (!belongsToLinkedInPost(reactionNode, card) || isLinkedInCommentNode(reactionNode, card)) continue;
       if (!roots.some(function (root) { return root === reactionNode || (root.contains && root.contains(reactionNode)); })) continue;
       var reactionText = (reactionNode.getAttribute('aria-label') || '') + ' ' + visibleText(reactionNode);
-      reactions = extractLinkedInMetric(reactionText, reactionTerms) || parseCompactNumber(visibleText(reactionNode));
+      reactions = extractLinkedInMutualReactionCount(reactionText) || extractLinkedInMetric(reactionText, reactionTerms) || parseCompactNumber(visibleText(reactionNode));
     }
 
     for (var ri = 0; ri < roots.length; ri++) {
@@ -732,6 +745,7 @@
         var label = labelled[li].getAttribute('aria-label') || '';
         if (!comments) comments = extractLinkedInMetric(label, commentTerms);
         if (!reposts) reposts = extractLinkedInMetric(label, repostTerms);
+        if (!reactions) reactions = extractLinkedInMutualReactionCount(label);
         if (!reactions) reactions = extractLinkedInMetric(label, reactionTerms);
       }
 
@@ -739,17 +753,11 @@
       for (var si = 0; si < segments.length; si++) {
         if (!comments) comments = extractLinkedInMetric(segments[si], commentTerms);
         if (!reposts) reposts = extractLinkedInMetric(segments[si], repostTerms);
+        if (!reactions) reactions = extractLinkedInMutualReactionCount(segments[si]);
         if (!reactions) reactions = extractLinkedInMetric(segments[si], reactionTerms);
       }
 
-      if (!reactions) {
-        var summary = visibleText(root).replace(/[\u00a0\u2007\u202f]/g, ' ');
-        var others = summary.match(/(?:and|dan)\s+(\d[\d\s.,'’]*(?:[kKmMbB])?)\s+(?:others?|lainnya)\b/i);
-        if (others) {
-          var otherCount = parseCompactNumber(others[1]);
-          if (otherCount) reactions = otherCount + 1;
-        }
-      }
+      if (!reactions) reactions = extractLinkedInMutualReactionCount(visibleText(root));
 
       if (!reactions) reactions = extractLinkedInBareReactionCount(root, comments, reposts);
     }
@@ -1958,6 +1966,7 @@
     window.__SWIPEARDY_TEST_HOOK__.parseCompactNumber = parseCompactNumber;
     window.__SWIPEARDY_TEST_HOOK__.cleanSnippet = cleanSnippet;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMetric = extractLinkedInMetric;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMutualReactionCount = extractLinkedInMutualReactionCount;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
     window.__SWIPEARDY_TEST_HOOK__.findLinkedInEngagementBoundary = findLinkedInEngagementBoundary;

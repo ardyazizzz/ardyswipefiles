@@ -163,6 +163,8 @@ assert.equal(hooks.parseCompactNumber('1.234 reactions'), 1234);
 assert.equal(hooks.parseCompactNumber('1.2K reactions'), 1200);
 assert.equal(hooks.parseCompactNumber('1,2K reactions'), 1200);
 assert.equal(hooks.parseCompactNumber('2 M reactions'), 2000000);
+assert.equal(hooks.extractLinkedInMutualReactionCount('Alice and 27 others reacted'), 28);
+assert.equal(hooks.extractLinkedInMutualReactionCount('Alice dan 1,2K lainnya'), 1201);
 
 {
   const debugRoot = new FakeNode();
@@ -292,6 +294,30 @@ assert.equal(
   post.boundaries = [footer];
   post.engagementRoots = [footer];
   assert.deepEqual(plain(hooks.extractLinkedInCounts(post)), { reactions: 28, comments: 0, reposts: 0 });
+}
+
+{
+  const fixture = makePostFixture();
+  const mutualSummary = new FakeNode({
+    text: 'Alice and 27 others',
+    order: 2.1,
+    parent: fixture.footer,
+    ariaLabel: 'Alice and 27 others reacted'
+  });
+  const commentCount = new FakeNode({ text: '156 comments', order: 2.2, parent: fixture.footer, ariaLabel: '156 comments' });
+  const repostCount = new FakeNode({ text: '2 reposts', order: 2.3, parent: fixture.footer, ariaLabel: '2 reposts' });
+
+  fixture.footer.text = 'Alice and 27 others\n156 comments\n2 reposts';
+  fixture.footer.innerText = fixture.footer.text;
+  fixture.footer.textContent = fixture.footer.text;
+  fixture.footer.labelledNodes = [mutualSummary, commentCount, repostCount];
+  fixture.post.reactionNodes = [mutualSummary];
+
+  assert.deepEqual(
+    plain(hooks.extractLinkedInCounts(fixture.post)),
+    { reactions: 28, comments: 156, reposts: 2 },
+    'a mutual-reaction aria label must resolve “Alice and 27 others” to 28, not the bare 27'
+  );
 }
 
 console.log('LinkedIn extraction regression tests passed.');

@@ -818,7 +818,7 @@ Single-post extraction, the LinkedIn Save-button watcher, and page scanning all 
 
 `extractLinkedInCounts()` reads dedicated social-count/action-bar regions belonging to the same top-level post, or a bounded structural engagement summary when LinkedIn omits those class markers. Accessible labels are preferred, followed by text segments inside those regions; a bare reaction number is accepted only inside that bounded summary. Caption text, expanded comments, nested posts, and arbitrary page-wide number sequences are never used as engagement data. Lower-confidence fallbacks only fill missing values and never overwrite a count already found from a stronger source.
 
-Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A summary such as `Alice and 27 others` resolves to 28 total reactions.
+Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A mutual summary such as `Alice and 27 others` resolves to 28 total reactions **before** the generic first-number fallback runs. This matters when LinkedIn exposes the same summary through an `aria-label` ending in `reacted`; treating its bare `27` as the total is incorrect.
 
 ### LinkedIn Extraction Diagnostics
 
