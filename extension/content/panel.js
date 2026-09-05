@@ -275,6 +275,7 @@
       if (resp && resp.ok) {
         var msg = 'Imported ' + (resp.saved || 0) + ' post' + ((resp.saved || 0) !== 1 ? 's' : '');
         if ((resp.duplicates || 0) > 0) msg += ' (' + resp.duplicates + ' duplicate' + (resp.duplicates !== 1 ? 's' : '') + ' skipped)';
+        if ((resp.incomplete || 0) > 0) msg += ' (' + resp.incomplete + ' incomplete carousel' + (resp.incomplete !== 1 ? 's' : '') + ' skipped)';
         $('#scanStatus').textContent = msg; clog('IMPORT', msg, 'ok');
       } else { $('#scanStatus').textContent = 'Import failed'; clog('IMPORT', 'Failed', 'er'); }
     });
@@ -285,7 +286,7 @@
     showState('sExtracting'); clog('EXTRACT', 'Extracting...');
     chrome.runtime.sendMessage({ type: 'EXTRACT' }, function (resp) {
       if (chrome.runtime.lastError || !resp) { clog('EXTRACT', chrome.runtime.lastError ? chrome.runtime.lastError.message : 'No response', 'er'); showError('Could not communicate with the page.'); return; }
-      if (!resp.ok) { clog('EXTRACT', resp.error, 'er'); showError(resp.error || 'Extraction failed.'); return; }
+      if (!resp.ok) { if (resp.debug) clog('LINKEDIN DIAGNOSTICS', resp.debug); clog('EXTRACT', resp.error, 'er'); showError(resp.error || 'Extraction failed.'); return; }
       fillForm(resp.data);
       if (resp.data && resp.data.platform) { currentPlatform = resp.data.platform; setBadge(resp.data.platform); }
       if (resp.debug) clog('LINKEDIN DIAGNOSTICS', resp.debug);

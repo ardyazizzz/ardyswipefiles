@@ -15,6 +15,8 @@
     // LinkedIn document carousels need two manifest requests before all of
     // their pages are known, so this path must stay asynchronous too.
     extractLinkedInFromCard(card).then(function (data) {
+      // Do not auto-save a visible cover as if it were a complete carousel.
+      if (data && data.carouselIncomplete) return;
       if (!data || !data.author || (!data.text && !data.image && !data.documentUrl)) return;
       data.platform = 'LinkedIn';
       data.filters = { Platform: 'LinkedIn' };
@@ -60,9 +62,9 @@
     var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
     var activityId = extractLinkedInActivityId(card);
-    var carouselResult = await extractLinkedInCarouselImages(activityId);
+    var carouselResult = await extractLinkedInCarouselImages(card, activityId);
     var btnCarouselImages = carouselResult.urls;
-    if (btnCarouselImages.length === 0) btnCarouselImages = scanLinkedInImage(card);
+    if (btnCarouselImages.length === 0 && !carouselResult.diagnostic.detectedCarousel) btnCarouselImages = scanLinkedInImage(card);
     LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
     var image = btnCarouselImages.length > 0 ? btnCarouselImages.join(',') : extractLinkedInImage(card);
 
@@ -93,7 +95,8 @@
       image: image,
       images: btnCarouselImages || [],
       documentUrl: btnDocUrl,
-      date: date
+      date: date,
+      carouselIncomplete: !!(carouselResult.diagnostic.detectedCarousel && btnCarouselImages.length === 0)
     };
   }
 
@@ -1054,6 +1057,69 @@
     return uniqueLinkedInMediaUrls(values);
   }
 
+  function linkedInCarouselPageCount(text) {
+    var value = String(text || '').replace(/\s+/g, ' ');
+    var ofMatch = value.match(/\bpage\s+\d+\s+of\s+(\d{1,4})\b/i);
+    if (ofMatch) return parseInt(ofMatch[1], 10) || 0;
+    var pagesMatch = value.match(/\b(\d{1,4})\s+pages?\b/i);
+    return pagesMatch ? (parseInt(pagesMatch[1], 10) || 0) : 0;
+  }
+
+  function linkedInCarouselTitle(text) {
+    var value = String(text || '').replace(/\s+/g, ' ').trim();
+    var match = value.match(/^(.{2,160}?)(?:\s*[·•|]\s*|\s+-\s+)(?:page\s+\d+\s+of\s+|\d{1,4}\s+pages?\b)/i);
+    return match ? match[1].trim().toLowerCase() : '';
+  }
+
+  function linkedInMediaAssetTokens(url) {
+    var tokens = [];
+    var re = /\/(D[A-Za-z0-9_-]{8,})/g;
+    var match;
+    var value = decodeLinkedInMediaUrl(url);
+    while ((match = re.exec(value))) tokens.push(match[1]);
+    return tokens;
+  }
+
+  function linkedInCarouselContext(card, activityId) {
+    var container = card && card.querySelector && card.querySelector('.feed-shared-document__container, .update-components-document__container, [class*="document"], .feed-shared-carousel__container, .update-components-carousel__container, [class*="carousel"]');
+    var containerText = container ? visibleText(container) : '';
+    var expectedPages = linkedInCarouselPageCount(containerText) || linkedInCarouselPageCount(card ? visibleText(card) : '');
+    var ids = activityId ? [String(activityId)] : [];
+    var nodes = card && card.querySelectorAll ? card.querySelectorAll('[data-urn], [data-id], a[href]') : [];
+    for (var i = 0; i < nodes.length; i++) {
+      var values = [nodes[i].getAttribute('data-urn'), nodes[i].getAttribute('data-id'), nodes[i].getAttribute('href')];
+      for (var j = 0; j < values.length; j++) {
+        var matches = String(values[j] || '').match(/urn:li:(?:fsd_)?document:([A-Za-z0-9_-]+)/ig) || [];
+        for (var k = 0; k < matches.length; k++) ids.push(matches[k].toLowerCase());
+      }
+    }
+    var coverTokens = [];
+    var images = card ? scanLinkedInImage(card) : [];
+    for (var ci = 0; ci < images.length; ci++) coverTokens = coverTokens.concat(linkedInMediaAssetTokens(images[ci]));
+    return {
+      detectedCarousel: !!container || expectedPages > 0,
+      expectedPages: expectedPages,
+      title: linkedInCarouselTitle(containerText),
+      ids: ids.filter(function(value, index) { return value && ids.indexOf(value) === index; }),
+      coverTokens: coverTokens.filter(function(value, index) { return value && coverTokens.indexOf(value) === index; })
+    };
+  }
+
+  function linkedInCarouselMatchScore(entry, context, imageUrls, totalCandidates) {
+    var content = String(entry.content || '').toLowerCase();
+    var activityMatch = !!(context.ids[0] && content.indexOf(context.ids[0].toLowerCase()) !== -1);
+    var documentMatch = context.ids.slice(1).some(function(id) { return content.indexOf(id.toLowerCase()) !== -1; });
+    var titleMatch = !!(context.title && content.indexOf(context.title) !== -1);
+    var pageMatch = !!(context.expectedPages && imageUrls.length === context.expectedPages);
+    var coverMatch = false;
+    for (var i = 0; i < imageUrls.length && !coverMatch; i++) {
+      var tokens = linkedInMediaAssetTokens(imageUrls[i]);
+      for (var j = 0; j < tokens.length; j++) if (context.coverTokens.indexOf(tokens[j]) !== -1) { coverMatch = true; break; }
+    }
+    var score = (activityMatch ? 100 : 0) + (documentMatch ? 80 : 0) + (titleMatch ? 60 : 0) + (pageMatch ? 30 : 0) + (coverMatch ? 20 : 0) + (totalCandidates === 1 ? 5 : 0);
+    return { score: score, activityMatch: activityMatch, documentMatch: documentMatch, titleMatch: titleMatch, pageMatch: pageMatch, coverMatch: coverMatch };
+  }
+
   function extractCarouselCoversFromCode(activityId) {
     try {
       var codeEls = document.querySelectorAll('code');
@@ -1071,8 +1137,10 @@
     return [];
   }
 
-  async function extractLinkedInCarouselImages(activityId) {
-    var diagnostic = { attempted: true, activityId: activityId || '', codeManifestCandidates: 0, manifestMatchedToPost: false, masterManifestStatus: '', imageManifestStatus: '', pageCount: 0, fallback: '' };
+  async function extractLinkedInCarouselImages(card, activityId) {
+    var context = linkedInCarouselContext(card, activityId);
+    var diagnostic = { attempted: context.detectedCarousel, detectedCarousel: context.detectedCarousel, expectedPages: context.expectedPages, codeManifestCandidates: 0, resolvedManifestCandidates: 0, pageCount: 0, fallback: '', matches: [] };
+    if (!context.detectedCarousel) return { urls: [], diagnostic: diagnostic };
     var codeEntries = [];
     try {
       var codeEls = document.querySelectorAll('code');
@@ -1082,15 +1150,15 @@
         for (var j = 0; j < urls.length; j++) codeEntries.push({ url: urls[j], content: content });
       }
       diagnostic.codeManifestCandidates = codeEntries.length;
-      // Never use a different feed post's document. An activity match is
-      // required, except on a detail page that has exactly one manifest.
-      var candidates = codeEntries.filter(function(entry) { return activityId && entry.content.indexOf(String(activityId)) !== -1; });
-      if (candidates.length === 0 && codeEntries.length === 1) candidates = codeEntries;
+      // LinkedIn can place this post's activity ID and its document manifest
+      // in different Relay blocks. Resolve each document, then match it using
+      // post-local evidence such as the displayed "17 pages" label.
+      var candidates = codeEntries;
       if (candidates.length === 0) {
-        diagnostic.fallback = codeEntries.length ? 'manifest-not-linked-to-post' : 'no-master-manifest';
-        return { urls: extractCarouselCoversFromCode(activityId), diagnostic: diagnostic };
+        diagnostic.fallback = 'no-master-manifest';
+        return { urls: [], diagnostic: diagnostic };
       }
-      diagnostic.manifestMatchedToPost = true;
+      var resolved = [];
       for (var ci = 0; ci < candidates.length; ci++) {
         var resp = await fetch(candidates[ci].url, { credentials: 'include' });
         diagnostic.masterManifestStatus = String(resp.status);
@@ -1104,18 +1172,28 @@
         if (!imgResp.ok) continue;
         var imageUrls = extractLinkedInCarouselPageUrls(await imgResp.json());
         if (imageUrls.length > 0) {
-          diagnostic.pageCount = imageUrls.length;
-          return { urls: imageUrls, diagnostic: diagnostic };
+          resolved.push({ entry: candidates[ci], urls: imageUrls });
+          continue;
         }
         diagnostic.imageManifestStatus += ':no-pages';
       }
+      diagnostic.resolvedManifestCandidates = resolved.length;
+      for (var ri = 0; ri < resolved.length; ri++) {
+        resolved[ri].match = linkedInCarouselMatchScore(resolved[ri].entry, context, resolved[ri].urls, resolved.length);
+        diagnostic.matches.push({ pageCount: resolved[ri].urls.length, score: resolved[ri].match.score, activity: resolved[ri].match.activityMatch, document: resolved[ri].match.documentMatch, title: resolved[ri].match.titleMatch, cover: resolved[ri].match.coverMatch, expectedPages: resolved[ri].match.pageMatch });
+      }
+      var acceptable = resolved.filter(function(candidate) { return !context.expectedPages || candidate.urls.length === context.expectedPages; });
+      acceptable.sort(function(a, b) { return b.match.score - a.match.score; });
+      if (acceptable.length && !(acceptable.length > 1 && acceptable[0].match.score === acceptable[1].match.score)) {
+        diagnostic.pageCount = acceptable[0].urls.length;
+        return { urls: acceptable[0].urls, diagnostic: diagnostic };
+      }
+      diagnostic.fallback = acceptable.length ? 'ambiguous-carousel-manifest' : (context.expectedPages ? 'no-manifest-with-expected-page-count' : 'no-resolved-carousel-manifest');
     } catch (e) {
       diagnostic.fallback = 'manifest-error:' + (e && e.message ? e.message : 'unknown');
     }
     if (!diagnostic.fallback) diagnostic.fallback = 'manifest-yielded-no-pages';
-    var covers = extractCarouselCoversFromCode(activityId);
-    diagnostic.pageCount = covers.length;
-    return { urls: covers, diagnostic: diagnostic };
+    return { urls: [], diagnostic: diagnostic };
   }
 
   async function extractLinkedIn() {
@@ -1230,9 +1308,9 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
-    var carouselResult = await extractLinkedInCarouselImages(activityId);
+    var carouselResult = await extractLinkedInCarouselImages(card, extractLinkedInActivityId(card) || activityId);
     var carouselImages = carouselResult.urls;
-    if (carouselImages.length === 0) {
+    if (carouselImages.length === 0 && !carouselResult.diagnostic.detectedCarousel) {
       // Not a carousel (or no <code> JSON) — scan for regular images
       carouselImages = scanLinkedInImage(card);
       console.log('[extract] scanLinkedInImage:', carouselImages.length);
@@ -1273,6 +1351,7 @@
       images: carouselImages || [],
       documentUrl: sDocUrl,
       date: date,
+      carouselIncomplete: !!(carouselResult.diagnostic.detectedCarousel && carouselImages.length === 0),
       __debug: diagnostics
     };
   }
@@ -1550,6 +1629,10 @@
             LOG&&console.log('[Swipe.ardy cs] EXTRACT -> LinkedIn result', data);
             var debug = data && data.__debug ? data.__debug : null;
             if (data && data.__debug) delete data.__debug;
+            if (data && data.carouselIncomplete) {
+              sendResponse({ ok: false, error: 'Carousel manifest could not be matched safely. No cover-only result was saved.', debug: debug });
+              return;
+            }
             sendResponse({ ok: true, data: data, debug: debug });
           }).catch(function(e) {
             console.error('[Swipe.ardy cs] EXTRACT -> LinkedIn error', e.message);
@@ -1798,7 +1881,7 @@
         };
         posts.push(post);
         if ((label === 'Carousel' || label === 'Document') && activityId) {
-          carouselCandidates.push({ post: post, activityId: activityId });
+          carouselCandidates.push({ post: post, root: root, activityId: activityId });
         }
       }
     }
@@ -1808,10 +1891,14 @@
     async function worker() {
       while (next < carouselCandidates.length) {
         var candidate = carouselCandidates[next++];
-        var carousel = await extractLinkedInCarouselImages(candidate.activityId);
+        var carousel = await extractLinkedInCarouselImages(candidate.root, candidate.activityId);
         if (carousel.urls.length > 0) {
           candidate.post.images = carousel.urls;
           candidate.post.image = carousel.urls.join(',');
+        } else if (carousel.diagnostic.detectedCarousel) {
+          candidate.post.carouselIncomplete = true;
+          candidate.post.images = [];
+          candidate.post.image = '';
         }
       }
     }
@@ -2063,6 +2150,9 @@
     window.__SWIPEARDY_TEST_HOOK__.decodeLinkedInMediaUrl = decodeLinkedInMediaUrl;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromCode = extractLinkedInManifestUrlsFromCode;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCarouselPageUrls = extractLinkedInCarouselPageUrls;
+    window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselPageCount = linkedInCarouselPageCount;
+    window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselTitle = linkedInCarouselTitle;
+    window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselMatchScore = linkedInCarouselMatchScore;
     window.__SWIPEARDY_TEST_HOOK__.findLinkedInEngagementBoundary = findLinkedInEngagementBoundary;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInStructuralCaption = extractLinkedInStructuralCaption;
     window.__SWIPEARDY_TEST_HOOK__.findLinkedInStructuralEngagementRoot = findLinkedInStructuralEngagementRoot;

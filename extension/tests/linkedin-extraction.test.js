@@ -186,6 +186,28 @@ assert.equal(hooks.extractLinkedInMutualReactionCount('Alice dan 1,2K lainnya'),
 }
 
 {
+  const pages = Array.from({ length: 17 }, (_, index) => 'https://media.licdn.com/dms/image/v2/D4E22AQCAROUSEL_' + index + '.jpg');
+  const context = {
+    ids: ['739218977639215104'],
+    title: 'the $1m practice letter',
+    expectedPages: 17,
+    coverTokens: []
+  };
+  const match = plain(hooks.linkedInCarouselMatchScore(
+    { content: 'Relay data contains The $1M Practice Letter but stores the activity separately.' },
+    context,
+    pages,
+    2
+  ));
+  assert.equal(hooks.linkedInCarouselPageCount('Page 1 of 17 The $1M Practice Letter'), 17);
+  assert.equal(hooks.linkedInCarouselTitle('The $1M Practice Letter · 17 pages'), 'the $1m practice letter');
+  assert.equal(match.activityMatch, false, 'the activity ID may be in a separate Relay block');
+  assert.equal(match.titleMatch, true);
+  assert.equal(match.pageMatch, true);
+  assert.equal(match.score, 90, 'title + exact displayed page count must select the valid 17-page manifest without activity co-location');
+}
+
+{
   const debugRoot = new FakeNode();
   const metric = new FakeNode({ text: '34 comments • 5 reposts', parent: debugRoot });
   const privateComment = new FakeNode({ text: 'Private comment body that must not enter diagnostics.', parent: debugRoot });

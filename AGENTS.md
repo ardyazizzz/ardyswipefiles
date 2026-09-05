@@ -769,13 +769,13 @@ In `loadSwipes()`, items without `type` fall into the default `swipes[]` bucket 
 ### Extraction Order (in `extractLinkedIn()`)
 
 ```
-1. extractLinkedInCarouselImages(activityId) ← FIRST: reads the matched carousel manifest
+1. extractLinkedInCarouselImages(card, activityId) ← FIRST: resolves and validates the carousel manifest
 2. scanLinkedInImage(card)     ← FALLBACK: scans <img> tags with specific selectors
 3. scanLinkedInImage(pageDoc)  ← FALLBACK: scans document container
 4. extractLinkedInImage(card)  ← LAST RESORT: broad img search with URL filters
 ```
 
-Carousel detection runs first so it takes priority over regular image scanning. It only uses a manifest whose Relay JSON contains the current post's activity ID; when the page has exactly one manifest (normal detail-page case), that one is accepted. This prevents a feed post from accidentally receiving another post's carousel. For non-carousel posts, it returns an empty URL list without fetching media.
+Carousel detection runs first so it takes priority over regular image scanning. LinkedIn can put an activity ID and its carousel manifest in separate Relay JSON blocks, so matching uses post-local evidence together: activity/document IDs when available, the carousel title, its visible page count, and the currently visible cover asset. A visible count is a hard rule: a post labelled `17 pages` is accepted only from a manifest with exactly 17 pages. An ambiguous or incomplete carousel fails closed instead of being saved as a cover-only result.
 
 ### Carousel Detection — `<code>` JSON Approach
 
@@ -785,11 +785,10 @@ Carousel detection runs first so it takes priority over regular image scanning. 
 <code> element → JSON → "manifestUrl" → fetch manifest → perResolutions → imageManifestUrl → pages[]
 ```
 
-- `extractLinkedInCarouselImages(activityId)` — supports compact and escaped/whitespace JSON variants, chooses the best available resolution, and normalizes string or object-shaped `pages[]` entries into every valid slide URL
-- `extractCarouselCoversFromCode(activityId)` — conservative fallback for cover URLs when the full manifest cannot be read
+- `extractLinkedInCarouselImages(card, activityId)` — supports compact and escaped/whitespace JSON variants, chooses the best available resolution, normalizes string or object-shaped `pages[]` entries, and verifies they belong to the visible carousel before returning every slide URL
 - `host_permissions` includes `https://media.licdn.com/*` for manifest fetches
 
-The same async manifest path is used by **Re-extract**, the LinkedIn **Save** watcher, and LinkedIn **Scan Page** (at most three carousel manifest chains concurrently). A carousel with 12 pages remains one Swipe record: its `image` field contains 12 comma-separated URLs. `storeItemMedia()` then attempts to archive every URL independently in Supabase Storage before saving the record; a failed individual archive retains its original LinkedIn URL rather than dropping that slide. LinkedIn diagnostics in the panel include manifest candidate count, HTTP status for both manifests, page count, and a conservative fallback reason.
+The same async manifest path is used by **Re-extract**, the LinkedIn **Save** watcher, and LinkedIn **Scan Page** (at most three carousel manifest chains concurrently). A carousel with 12 pages remains one Swipe record: its `image` field contains 12 comma-separated URLs. `storeItemMedia()` then attempts to archive every URL independently in Supabase Storage before saving the record; a failed individual archive retains its original LinkedIn URL rather than dropping that slide. A carousel whose full manifest cannot be matched is not auto-saved or bulk-imported as a cover-only record. LinkedIn diagnostics in the panel include expected pages, manifest candidates, match evidence, resolved page count, and the fallback reason.
 
 ### Image URL Pattern Filters
 

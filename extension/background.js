@@ -680,13 +680,22 @@ function handleBulkImport(posts) {
     return Promise.resolve({ ok: true, saved: 0, duplicates: 0 });
   }
 
+  var incomplete = 0;
+  var importablePosts = [];
+  for (var pi = 0; pi < posts.length; pi++) {
+    if (posts[pi] && posts[pi].carouselIncomplete) incomplete++;
+    else importablePosts.push(posts[pi]);
+  }
+  posts = importablePosts;
+  if (posts.length === 0) return Promise.resolve({ ok: true, saved: 0, duplicates: 0, incomplete: incomplete });
+
   var urlsToCheck = [];
   for (var i = 0; i < posts.length; i++) {
     if (posts[i].postUrl) urlsToCheck.push(posts[i].postUrl);
   }
 
   if (urlsToCheck.length === 0) {
-    return Promise.resolve({ ok: true, saved: 0, duplicates: 0 });
+    return Promise.resolve({ ok: true, saved: 0, duplicates: 0, incomplete: incomplete });
   }
 
   return batchDedupCheck(urlsToCheck).then(function (existingSet) {
@@ -702,7 +711,7 @@ function handleBulkImport(posts) {
 
     function saveChunk(startIdx) {
       if (startIdx >= toSave.length) {
-        return Promise.resolve({ ok: true, saved: saved, duplicates: duplicates });
+        return Promise.resolve({ ok: true, saved: saved, duplicates: duplicates, incomplete: incomplete });
       }
       var end = Math.min(startIdx + CHUNK, toSave.length);
       var batch = [];
