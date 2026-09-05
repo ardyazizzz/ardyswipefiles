@@ -167,6 +167,25 @@ assert.equal(hooks.extractLinkedInMutualReactionCount('Alice and 27 others react
 assert.equal(hooks.extractLinkedInMutualReactionCount('Alice dan 1,2K lainnya'), 1201);
 
 {
+  const master = 'prefix feedshare-document-master-manifest { "manifestUrl" : "https:\\/\\/media.licdn.com\\/dms\\/document\\/master.json?x=1\\u0026y=2" }';
+  assert.deepEqual(
+    plain(hooks.extractLinkedInManifestUrlsFromCode(master)),
+    ['https://media.licdn.com/dms/document/master.json?x=1&y=2'],
+    'carousel master-manifest parsing must accept escaped and whitespace-formatted LinkedIn JSON'
+  );
+  assert.deepEqual(
+    plain(hooks.extractLinkedInCarouselPageUrls({ pages: [
+      'https://media.licdn.com/dms/image/page-1.jpg',
+      { imageUrl: 'https://media.licdn.com/dms/image/page-2.jpg' },
+      { url: 'https://media.licdn.com/dms/image/page-1.jpg' },
+      'https://example.test/not-linkedin.jpg'
+    ] })),
+    ['https://media.licdn.com/dms/image/page-1.jpg', 'https://media.licdn.com/dms/image/page-2.jpg'],
+    'a carousel image manifest must preserve every valid page, including object-shaped page entries, and deduplicate only exact repeats'
+  );
+}
+
+{
   const debugRoot = new FakeNode();
   const metric = new FakeNode({ text: '34 comments • 5 reposts', parent: debugRoot });
   const privateComment = new FakeNode({ text: 'Private comment body that must not enter diagnostics.', parent: debugRoot });

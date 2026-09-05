@@ -12,15 +12,16 @@
     if (!isLinkedInSaveAddAction(btn)) return;
     var card = findLinkedInPostCard(btn);
     if (!card) return;
-    try {
-      var data = extractLinkedInFromCard(card);
+    // LinkedIn document carousels need two manifest requests before all of
+    // their pages are known, so this path must stay asynchronous too.
+    extractLinkedInFromCard(card).then(function (data) {
       if (!data || !data.author || (!data.text && !data.image && !data.documentUrl)) return;
       data.platform = 'LinkedIn';
       data.filters = { Platform: 'LinkedIn' };
       chrome.runtime.sendMessage({ type: 'SAVE_SWIPE', data: data }, function (resp) {
         if (resp && resp.ok) { /* saved silently */ }
       });
-    } catch (e) { /* silent */ }
+    }).catch(function () { /* silent */ });
   }, true);
 
   function findLinkedInSaveButton(target) {
@@ -53,12 +54,15 @@
     return null;
   }
 
-  function extractLinkedInFromCard(card) {
+  async function extractLinkedInFromCard(card) {
     var author = extractLinkedInAuthor(card);
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
-    var btnCarouselImages = scanLinkedInImage(card);
+    var activityId = extractLinkedInActivityId(card);
+    var carouselResult = await extractLinkedInCarouselImages(activityId);
+    var btnCarouselImages = carouselResult.urls;
+    if (btnCarouselImages.length === 0) btnCarouselImages = scanLinkedInImage(card);
     LOG&&console.log('[DEBUG carousel btn]', getLinkedInLabel(card), 'found:', btnCarouselImages.length, btnCarouselImages.slice(0,3));
     var image = btnCarouselImages.length > 0 ? btnCarouselImages.join(',') : extractLinkedInImage(card);
 
@@ -965,7 +969,7 @@
     });
   }
 
-  function buildLinkedInDiagnostics(activityId, card, cardSource, caption, counts) {
+  function buildLinkedInDiagnostics(activityId, card, cardSource, caption, counts, carousel) {
     var activityNode = null;
     if (activityId) {
       activityNode = document.querySelector('[data-urn*="' + activityId + '"], [data-id*="' + activityId + '"]');
@@ -993,6 +997,7 @@
       engagementRootCount: engagementRoots.length,
       reactionCandidateCount: card.querySelectorAll('.social-details-social-counts__reactions-count, [aria-label*="reaction" i], [aria-label*="reaksi" i]').length,
       extractedCounts: counts,
+      carousel: carousel || null,
       metricSignalsInCard: linkedInDebugMetricSignals(card, 12),
       parentScope: linkedInDebugDescribeNode(parentScope),
       metricSignalsInParentScope: linkedInDebugMetricSignals(parentScope, 16),
@@ -1000,55 +1005,117 @@
     };
   }
 
-  function extractCarouselCoversFromCode() {
+  function decodeLinkedInMediaUrl(raw) {
+    return String(raw || '')
+      .replace(/\\u0026/gi, '&')
+      .replace(/\\u002F/gi, '/')
+      .replace(/\\\//g, '/')
+      .replace(/&amp;/gi, '&')
+      .trim();
+  }
+
+  function isLinkedInMediaUrl(url) {
+    return /^https:\/\/(?:media|media-exp\d+)\.licdn\.com\//i.test(url || '');
+  }
+
+  function uniqueLinkedInMediaUrls(values) {
+    var seen = {};
+    var urls = [];
+    for (var i = 0; i < (values || []).length; i++) {
+      var url = decodeLinkedInMediaUrl(values[i]);
+      if (!isLinkedInMediaUrl(url) || seen[url]) continue;
+      seen[url] = true;
+      urls.push(url);
+    }
+    return urls;
+  }
+
+  function extractLinkedInManifestUrlsFromCode(content) {
+    var urls = [];
+    if (!content || content.indexOf('feedshare-document-master-manifest') === -1) return urls;
+    var re = /["']manifestUrl["']\s*:\s*["'](https?:\\?(?:\\\/|\/){2}[^"']+)["']/gi;
+    var match;
+    while ((match = re.exec(content))) {
+      var url = decodeLinkedInMediaUrl(match[1]);
+      if (isLinkedInMediaUrl(url)) urls.push(url);
+    }
+    return uniqueLinkedInMediaUrls(urls);
+  }
+
+  function extractLinkedInCarouselPageUrls(imageManifest) {
+    var values = [];
+    var pages = imageManifest && imageManifest.pages;
+    if (!Array.isArray(pages)) return values;
+    for (var i = 0; i < pages.length; i++) {
+      var page = pages[i];
+      if (typeof page === 'string') values.push(page);
+      else if (page && typeof page === 'object') values.push(page.url, page.imageUrl, page.image_url, page.src);
+    }
+    return uniqueLinkedInMediaUrls(values);
+  }
+
+  function extractCarouselCoversFromCode(activityId) {
     try {
       var codeEls = document.querySelectorAll('code');
       for (var i = 0; i < codeEls.length; i++) {
         var content = codeEls[i].textContent;
         if (!content || content.indexOf('feedshare-document-cover-images') === -1) continue;
+        if (activityId && content.indexOf(String(activityId)) === -1) continue;
         var m2 = content.match(/"imageUrls":\[([^\]]+)\]/);
         if (m2) {
           var urls = m2[1].match(/https:\/\/[^"]+/g);
-          if (urls) return urls.map(function(u) { return u.replace(/\\u0026/g, '&'); });
+          if (urls) return uniqueLinkedInMediaUrls(urls);
         }
       }
     } catch(e) {}
     return [];
   }
 
-  async function extractCarouselImages() {
+  async function extractLinkedInCarouselImages(activityId) {
+    var diagnostic = { attempted: true, activityId: activityId || '', codeManifestCandidates: 0, manifestMatchedToPost: false, masterManifestStatus: '', imageManifestStatus: '', pageCount: 0, fallback: '' };
+    var codeEntries = [];
     try {
       var codeEls = document.querySelectorAll('code');
-      console.log('[carousel] code elements:', codeEls.length);
       for (var i = 0; i < codeEls.length; i++) {
-        var content = codeEls[i].textContent;
-        if (!content || content.indexOf('feedshare-document-master-manifest') === -1) continue;
-        console.log('[carousel] found manifest in code element', i);
-        // Extract manifestUrl from LinkedIn's Relay/GraphQL JSON
-        var m = content.match(/"manifestUrl":"(https:\/\/media\.licdn\.com[^"]+)"/);
-        if (!m) { console.log('[carousel] regex failed to extract manifestUrl'); continue; }
-        var manifestUrl = m[1].replace(/\\u0026/g, '&');
-        console.log('[carousel] manifestUrl found');
-        // Fetch master manifest
-        var resp = await fetch(manifestUrl);
-        if (!resp.ok) { console.log('[carousel] manifest fetch failed:', resp.status); return extractCarouselCoversFromCode(); }
-        var manifest = await resp.json();
-        if (!manifest.perResolutions || manifest.perResolutions.length === 0) { console.log('[carousel] no resolutions'); return extractCarouselCoversFromCode(); }
-        // Pick best resolution
-        var res = manifest.perResolutions.find(function(r) { return r.width === 1280; })
-               || manifest.perResolutions.sort(function(a,b) { return b.width - a.width; })[0];
-        if (!res || !res.imageManifestUrl) { console.log('[carousel] no suitable resolution'); return extractCarouselCoversFromCode(); }
-        // Fetch image manifest
-        var imgResp = await fetch(res.imageManifestUrl);
-        if (!imgResp.ok) { console.log('[carousel] image manifest fetch failed:', imgResp.status); return extractCarouselCoversFromCode(); }
-        var imgData = await imgResp.json();
-        if (!imgData.pages || imgData.pages.length === 0) { console.log('[carousel] no pages in manifest'); return extractCarouselCoversFromCode(); }
-        console.log('[carousel] success:', imgData.pages.length, 'pages');
-        return imgData.pages;
+        var content = codeEls[i].textContent || '';
+        var urls = extractLinkedInManifestUrlsFromCode(content);
+        for (var j = 0; j < urls.length; j++) codeEntries.push({ url: urls[j], content: content });
       }
-      console.log('[carousel] no manifest in any code element');
-      return extractCarouselCoversFromCode();
-    } catch(e) { console.warn('[carousel] extract error:', e); return extractCarouselCoversFromCode(); }
+      diagnostic.codeManifestCandidates = codeEntries.length;
+      // Never use a different feed post's document. An activity match is
+      // required, except on a detail page that has exactly one manifest.
+      var candidates = codeEntries.filter(function(entry) { return activityId && entry.content.indexOf(String(activityId)) !== -1; });
+      if (candidates.length === 0 && codeEntries.length === 1) candidates = codeEntries;
+      if (candidates.length === 0) {
+        diagnostic.fallback = codeEntries.length ? 'manifest-not-linked-to-post' : 'no-master-manifest';
+        return { urls: extractCarouselCoversFromCode(activityId), diagnostic: diagnostic };
+      }
+      diagnostic.manifestMatchedToPost = true;
+      for (var ci = 0; ci < candidates.length; ci++) {
+        var resp = await fetch(candidates[ci].url, { credentials: 'include' });
+        diagnostic.masterManifestStatus = String(resp.status);
+        if (!resp.ok) continue;
+        var manifest = await resp.json();
+        var resolutions = Array.isArray(manifest.perResolutions) ? manifest.perResolutions.slice() : [];
+        var res = resolutions.find(function(r) { return r && r.width === 1280 && r.imageManifestUrl; }) || resolutions.filter(function(r) { return r && r.imageManifestUrl; }).sort(function(a, b) { return (b.width || 0) - (a.width || 0); })[0];
+        if (!res || !res.imageManifestUrl) { diagnostic.masterManifestStatus += ':no-image-manifest'; continue; }
+        var imgResp = await fetch(decodeLinkedInMediaUrl(res.imageManifestUrl), { credentials: 'include' });
+        diagnostic.imageManifestStatus = String(imgResp.status);
+        if (!imgResp.ok) continue;
+        var imageUrls = extractLinkedInCarouselPageUrls(await imgResp.json());
+        if (imageUrls.length > 0) {
+          diagnostic.pageCount = imageUrls.length;
+          return { urls: imageUrls, diagnostic: diagnostic };
+        }
+        diagnostic.imageManifestStatus += ':no-pages';
+      }
+    } catch (e) {
+      diagnostic.fallback = 'manifest-error:' + (e && e.message ? e.message : 'unknown');
+    }
+    if (!diagnostic.fallback) diagnostic.fallback = 'manifest-yielded-no-pages';
+    var covers = extractCarouselCoversFromCode(activityId);
+    diagnostic.pageCount = covers.length;
+    return { urls: covers, diagnostic: diagnostic };
   }
 
   async function extractLinkedIn() {
@@ -1163,9 +1230,8 @@
     var text = extractLinkedInSnippet(card);
     var counts = extractLinkedInCounts(card);
     var postUrl = extractLinkedInPostUrl(card);
-    // Try LinkedIn carousel FIRST — searches <code> JSON (global, not tied to card)
-    var carouselImages = await extractCarouselImages();
-    console.log('[extract] carousel from code:', carouselImages.length);
+    var carouselResult = await extractLinkedInCarouselImages(activityId);
+    var carouselImages = carouselResult.urls;
     if (carouselImages.length === 0) {
       // Not a carousel (or no <code> JSON) — scan for regular images
       carouselImages = scanLinkedInImage(card);
@@ -1190,7 +1256,7 @@
 
     var diagnostics = null;
     try {
-      diagnostics = buildLinkedInDiagnostics(activityId, card, cardSource, text, counts);
+      diagnostics = buildLinkedInDiagnostics(activityId, card, cardSource, text, counts, carouselResult.diagnostic);
     } catch (diagnosticError) {
       diagnostics = { diagnosticVersion: 1, error: diagnosticError.message || String(diagnosticError) };
     }
@@ -1510,9 +1576,13 @@
       }
       try {
         if (platform === 'X') { scanTwitterFromCache(sendResponse); return; }
-        var posts = [];
-        if (platform === 'LinkedIn') { posts = scanLinkedInPage(); }
-        else if (platform === 'Pinterest') { posts = scanPinterestPage(); }
+        if (platform === 'LinkedIn') {
+          scanLinkedInPage().then(function(posts) {
+            sendResponse({ ok: true, posts: posts, count: posts.length });
+          }).catch(function(e) { sendResponse({ ok: false, error: e.message }); });
+          return true;
+        }
+        var posts = platform === 'Pinterest' ? scanPinterestPage() : [];
         sendResponse({ ok: true, posts: posts, count: posts.length });
       } catch (e) {
         sendResponse({ ok: false, error: e.message });
@@ -1667,8 +1737,9 @@
     return 'Text only';
   }
 
-  function scanLinkedInPage() {
+  async function scanLinkedInPage() {
     var posts = [];
+    var carouselCandidates = [];
     var selectors = [
       'div.feed-shared-update-v2',
       'div.occludable-update',
@@ -1706,12 +1777,12 @@
         }
         var timeInfo = scanLinkedInTime(root);
         var date = timeInfo.display || '';
-
-        if (!snippet && images.length === 0) continue;
-
         var label = getLinkedInLabel(root);
+        // A document carousel can have no ordinary <img> until LinkedIn has
+        // rendered a slide. Keep it so the manifest path can fetch all pages.
+        if (!snippet && images.length === 0 && !docContainer && label !== 'Carousel' && label !== 'Document') continue;
 
-        posts.push({
+        var post = {
           author: author,
           date: date,
           platform: 'LinkedIn',
@@ -1724,9 +1795,29 @@
           comments: counts.comments,
           reposts: counts.reposts,
           filters: { Platform: 'LinkedIn', Category: label }
-        });
+        };
+        posts.push(post);
+        if ((label === 'Carousel' || label === 'Document') && activityId) {
+          carouselCandidates.push({ post: post, activityId: activityId });
+        }
       }
     }
+    // Limit concurrent manifest chains so a page with many documents does not
+    // launch dozens of high-resolution downloads at once.
+    var next = 0;
+    async function worker() {
+      while (next < carouselCandidates.length) {
+        var candidate = carouselCandidates[next++];
+        var carousel = await extractLinkedInCarouselImages(candidate.activityId);
+        if (carousel.urls.length > 0) {
+          candidate.post.images = carousel.urls;
+          candidate.post.image = carousel.urls.join(',');
+        }
+      }
+    }
+    var workers = [];
+    for (var wi = 0; wi < Math.min(3, carouselCandidates.length); wi++) workers.push(worker());
+    await Promise.all(workers);
     return posts;
   }
 
@@ -1969,6 +2060,9 @@
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMutualReactionCount = extractLinkedInMutualReactionCount;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
+    window.__SWIPEARDY_TEST_HOOK__.decodeLinkedInMediaUrl = decodeLinkedInMediaUrl;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromCode = extractLinkedInManifestUrlsFromCode;
+    window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCarouselPageUrls = extractLinkedInCarouselPageUrls;
     window.__SWIPEARDY_TEST_HOOK__.findLinkedInEngagementBoundary = findLinkedInEngagementBoundary;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInStructuralCaption = extractLinkedInStructuralCaption;
     window.__SWIPEARDY_TEST_HOOK__.findLinkedInStructuralEngagementRoot = findLinkedInStructuralEngagementRoot;
