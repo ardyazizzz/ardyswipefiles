@@ -7,16 +7,34 @@
     const lanes = Array.from({ length: columns }, () => []);
     const bottoms = Array(columns).fill(0);
     const positions = [];
-    let rowTop = 0;
-    for (let i = 0; i < items.length; i++) {
-      const column = masonry ? bottoms.indexOf(Math.min(...bottoms)) : i % columns;
-      if (!masonry && column === 0) rowTop = Math.max(...bottoms);
-      const height = Math.max(80, heightFor(items[i], cardWidth));
-      const position = { index: i, id: String(items[i].id), left: column * (cardWidth + gap),
-        top: masonry ? bottoms[column] : rowTop, width: cardWidth, height };
-      positions.push(position);
-      lanes[column].push(position);
-      bottoms[column] = position.top + height + gap;
+    if (masonry) {
+      for (let i = 0; i < items.length; i++) {
+        const column = bottoms.indexOf(Math.min(...bottoms));
+        const height = Math.max(80, heightFor(items[i], cardWidth));
+        const position = { index: i, id: String(items[i].id), left: column * (cardWidth + gap),
+          top: bottoms[column], width: cardWidth, height };
+        positions.push(position);
+        lanes[column].push(position);
+        bottoms[column] = position.top + height + gap;
+      }
+    } else {
+      // A grid row is a shared visual unit: its cards get the row's tallest
+      // intrinsic height so every bottom edge aligns before the next row begins.
+      let rowTop = 0;
+      for (let start = 0; start < items.length; start += columns) {
+        const row = items.slice(start, start + columns);
+        const rowHeights = row.map(item => Math.max(80, heightFor(item, cardWidth)));
+        const rowHeight = Math.max(...rowHeights);
+        row.forEach((item, column) => {
+          const index = start + column;
+          const position = { index, id: String(item.id), left: column * (cardWidth + gap),
+            top: rowTop, width: cardWidth, height: rowHeight };
+          positions.push(position);
+          lanes[column].push(position);
+          bottoms[column] = rowTop + rowHeight + gap;
+        });
+        rowTop += rowHeight + gap;
+      }
     }
     return { positions, lanes, height: Math.max(0, ...bottoms) - (items.length ? gap : 0) };
   }
@@ -55,6 +73,7 @@
         let changed = false;
         for (const entry of entries) {
           const id = entry.target.dataset.id;
+          if (!this.options?.masonry) continue;
           const height = entry.borderBoxSize?.[0]?.blockSize || entry.target.offsetHeight;
           if (height && Math.abs((this.heights.get(id) || 0) - height) > 1) {
             this.heights.set(id, height);
@@ -146,6 +165,7 @@
           let entry = this.cache.get(position.id);
           if (!entry || entry.html !== html) {
             if (entry) this.evict(position.id);
+            this.heights.delete(position.id);
             const template = document.createElement('template');
             template.innerHTML = html.trim();
             entry = { node: template.content.firstElementChild, html };
@@ -155,16 +175,20 @@
           node.style.width = position.width + 'px';
           node.style.left = position.left + 'px';
           node.style.top = position.top + 'px';
+          const isNew = !this.mounted.has(position.id);
+          // New grid cards first measure their natural content. On the next
+          // pass they receive the tallest height in their row.
+          node.style.height = this.options.masonry || isNew ? '' : position.height + 'px';
           node.setAttribute('aria-posinset', position.index + 1);
           node.setAttribute('aria-setsize', this.items.length);
           node.setAttribute('role', 'listitem');
           const existing = this.grid.children[index];
           if (existing !== node) this.grid.insertBefore(node, existing || null);
-          if (!this.mounted.has(position.id)) {
+          if (isNew) {
             this.mounted.add(position.id);
             this.restoreState(position.id, node);
             this.callbacks.mount(node);
-            this.resizeObserver.observe(node);
+            if (this.options.masonry) this.resizeObserver.observe(node);
             newNodes.push(node);
           }
           this.cache.delete(position.id);
@@ -186,6 +210,7 @@
             const node = this.cache.get(p.id).node;
             node.style.top = p.top + 'px';
             node.style.left = p.left + 'px';
+            node.style.height = this.options.masonry ? '' : p.height + 'px';
           }
         }
       }

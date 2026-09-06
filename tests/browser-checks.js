@@ -20,6 +20,20 @@
       assert(!(a.left < b.right - 2 && a.right > b.left + 2 && a.top < b.bottom - 2 && a.bottom > b.top + 2), 'Overlapping cards ' + rects[i].id + '/' + rects[j].id);
     }
   }
+  function alignedGridRows() {
+    const rows = new Map();
+    cards().forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const key = Math.round(rect.top);
+      if (!rows.has(key)) rows.set(key, []);
+      rows.get(key).push(rect);
+    });
+    for (const row of rows.values()) {
+      if (row.length < 2) continue;
+      const height = row[0].height;
+      assert(row.every(rect => Math.abs(rect.height - height) < 2), 'Grid cards in one row must have matching heights');
+    }
+  }
   document.getElementById('runChecks').onclick = async () => {
     const passed = [];
     report({ running: true });
@@ -55,11 +69,11 @@
       assert(Math.round(restored.scrollLeft / restored.clientWidth) === 5, 'Carousel position survives eviction');
       passed.push('Deep jumps, no overlaps, bounded cache and carousel restoration');
       const beforeHeight = document.getElementById('cardGrid').offsetHeight;
-      toggleLayout(); await settle(); noOverlap();
+      toggleLayout(); await settle(); noOverlap(); alignedGridRows();
       assert(document.getElementById('cardGrid').offsetHeight > 0, 'Grid height retained');
-      cycleDensity(); await settle(); noOverlap();
+      cycleDensity(); await settle(); noOverlap(); alignedGridRows();
       toggleLayout(); await settle(); noOverlap();
-      passed.push('Grid/Masonry and density switches');
+      passed.push('Aligned Grid rows, Masonry and density switches');
       const input = document.getElementById('searchInput');
       input.value = 'Creator 1999'; applyFilters(); await settle();
       assert(cards().length === 1, 'Search all data including never-mounted items');
