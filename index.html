@@ -73,7 +73,7 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg-canvas);
       background-image: radial-gradient(circle at 50% -20%, var(--bg-secondary) 0%, var(--bg-canvas) 55%);
-      background-attachment: fixed;
+      background-attachment: scroll;
       color: var(--text-primary);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
@@ -169,13 +169,15 @@
     /* Keep the regular grid's offscreen subtrees out of style/layout/paint work.
        Masonry remains opt-out because column balancing depends on card heights. */
     .grid:not(.masonry) > .card { content-visibility: auto; contain-intrinsic-size: auto 360px; }
+    .grid.virtual-grid { position: relative; display: block; column-count: auto !important; overflow-anchor: none; }
+    .grid.virtual-grid > .card { position: absolute; margin: 0; content-visibility: visible; contain-intrinsic-size: none; }
 
     .card { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
     .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow); }
     .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
     .card-body:hover .card-text { color: var(--text-primary); }
-    .card-edit-hint { font-size: 11px; font-weight: 500; color: var(--accent); display: none; align-items: center; gap: 4px; margin-top: 2px; }
-    .card-body:hover .card-edit-hint { display: flex; }
+    .card-edit-hint { font-size: 11px; font-weight: 500; color: var(--accent); display: flex; opacity: 0; align-items: center; gap: 4px; margin-top: 2px; }
+    .card-body:hover .card-edit-hint { opacity: 1; }
     .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .card-author { display: flex; align-items: center; gap: 9px; min-width: 0; }
     .card-author > div:last-child { min-width: 0; }
@@ -201,9 +203,10 @@
     }
     .card-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.62; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 1; transition: color 0.18s var(--ease); }
     .card-text.text-3 { -webkit-line-clamp: 3; max-height: calc(3 * 12.5px * 1.62); }
-    .img-wrap { position: relative; background: var(--bg-secondary); overflow: hidden; }
+    .img-wrap { position: relative; background: var(--bg-secondary); overflow: hidden; height: 200px; }
     .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.15; transform: scale(1.1); pointer-events: none; }
-    .card-img { position: relative; z-index: 1; width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
+    .card-img { position: relative; z-index: 1; width: 100%; height: 100%; max-height: none; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
+    .grid.masonry .img-wrap { height: 300px; }
     .media-deferred { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
     .media-deferred .card-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; background: #000; }
     .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); object-fit: contain; animation: lbIn 0.22s var(--ease); }
@@ -211,10 +214,11 @@
     .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); color: #fff; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.18s var(--ease); }
     .lightbox-close:hover { background: rgba(0,0,0,0.65); }
     .card-hero-wrap { position: relative; }
-    .card-hero-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+    .card-hero-track { display: flex; height: 200px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+    .grid.masonry .card-hero-track { height: 300px; }
     .card-hero-track::-webkit-scrollbar { display: none; }
     .card-hero-track > .slide { flex: 0 0 100%; scroll-snap-align: start; position: relative; overflow: hidden; min-height: 80px; background: var(--bg-secondary); }
-    .card-hero-track > .slide > img { width: 100%; max-height: 200px; object-fit: contain; display: block; background: transparent; cursor: zoom-in; position: relative; z-index: 1; }
+    .card-hero-track > .slide > img { width: 100%; height: 100%; object-fit: contain; display: block; background: transparent; cursor: zoom-in; position: relative; z-index: 1; }
     .card-hero-badge { position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none; }
     .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.45); color: #fff; font-size: 28px; width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
     .lightbox-nav:hover { background: rgba(0,0,0,0.7); }
@@ -558,6 +562,8 @@
 </div>
 
 <script src="supabase.js"></script>
+<script src="swipe-virtual-grid.js"></script>
+<script src="swipe-preview.js"></script>
 <script>
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
@@ -646,6 +652,7 @@
       _authToken = null;
       document.body.setAttribute('data-auth', 'guest');
     }
+    if (typeof swipeVirtualGrid !== 'undefined' && swipeVirtualGrid && swipeVirtualGrid.active) applyFilters();
   }
 
   async function initAuth() {
@@ -1145,7 +1152,7 @@
   function cycleDensity() {
     gridDensity = (gridDensity + 1) % 2;
     currentViewName = null;
-    persistUIState(); applyDensity(); renderFilterBar(); syncHash();
+    persistUIState(); applyDensity(); renderFilterBar(); applyFilters(); syncHash();
   }
 
   function toggleLayout() {
@@ -1333,6 +1340,17 @@
   function getAv(n) { return AVATAR_COLORS[n.charCodeAt(0) % AVATAR_COLORS.length]; }
   function getInitials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
 
+  function mediaAttribute(value) {
+    return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+  }
+
+  function previewImage(url, imagePriority, index, allImages) {
+    const action = allImages
+      ? 'event.stopPropagation();openImageLightboxMulti(' + index + ',' + JSON.stringify(allImages) + ')'
+      : 'event.stopPropagation();openImageLightbox(' + JSON.stringify(url) + ')';
+    return '<img data-preview-src="' + mediaAttribute(url) + '" alt="" class="card-img" decoding="async" fetchpriority="' + imagePriority + '" onclick="' + mediaAttribute(action) + '" onerror="SwipePreview.error(this)" />';
+  }
+
   function getMedia(url, postUrl, imagePriority) {
     imagePriority = imagePriority || 'low';
     if (!url) return '';
@@ -1340,11 +1358,10 @@
       var urls = url.split(',').map(function(u){ return u.trim(); }).filter(function(u){ return u; });
       if (urls.length <= 1) { url = (urls[0] || ''); if (!url) return ''; }
       else {
-        var safe = urls.map(function(u){ return u.replace(/'/g,"\\'"); }).join(',');
         var h = '<div class="card-hero-wrap">';
-        h += '<div class="card-hero-track" onscroll="updateCarouselBadge(this)">';
+        h += '<div class="card-hero-track" tabindex="0" aria-label="Swipe images" data-images="' + mediaAttribute(urls.join(',')) + '" onscroll="scheduleCarouselUpdate(this)">';
         for (var i = 0; i < urls.length; i++) {
-          h += '<div class="slide"><div class="img-bg media-bg-lazy" data-bg-url="' + encodeURIComponent(urls[i]) + '"></div><img src="' + urls[i] + '" alt="" loading="lazy" decoding="async" fetchpriority="' + imagePriority + '" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openImageLightboxMulti(' + i + ',\'' + safe + '\')" /></div>';
+          h += '<div class="slide">' + previewImage(urls[i], imagePriority, i, urls.join(',')) + '</div>';
         }
         h += '</div>';
         h += '<div class="card-hero-badge">1 / ' + urls.length + '</div>';
@@ -1361,26 +1378,57 @@
     const vm = url.match(/vimeo\.com\/(\d+)/);
     if (vm) return `<div class="media-deferred" data-media-type="iframe" data-media-src="${encodeURIComponent('https://player.vimeo.com/video/' + vm[1])}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
     if (/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<div class="media-deferred" data-media-type="video" data-media-src="${encodeURIComponent(url)}"><div class="card-placeholder"><i class="ri-play-circle-line" style="font-size:30px;opacity:.65"></i></div></div>`;
-    return `<div class="img-wrap"><div class="img-bg media-bg-lazy" data-bg-url="${encodeURIComponent(url)}"></div><img src="${url}" alt="" class="card-img" loading="lazy" decoding="async" fetchpriority="${imagePriority}" onclick="event.stopPropagation();openImageLightbox('${url.replace(/'/g,"\\'")}')" onerror="this.style.display='none'" /></div>`;
+    return '<div class="img-wrap">' + previewImage(url, imagePriority) + '</div>';
+  }
+
+  function scheduleCarouselUpdate(track) {
+    if (track._swipeFrame) return;
+    track._swipeFrame = requestAnimationFrame(() => {
+      track._swipeFrame = 0;
+      if (track.isConnected) updateCarouselBadge(track);
+    });
   }
 
   function updateCarouselBadge(track) {
     var wrap = track.parentElement;
     var badge = wrap.querySelector('.card-hero-badge');
-    var total = track.querySelectorAll('img').length;
+    var images = track.querySelectorAll('img');
+    var total = images.length;
     var idx = Math.round(track.scrollLeft / track.clientWidth);
     if (idx < 0) idx = 0;
     if (idx >= total) idx = total - 1;
     badge.textContent = (idx + 1) + ' / ' + total;
+    if (track.dataset.mediaHydrated) {
+      // Only the current slide and its neighbours need image bytes.
+      for (var i = Math.max(0, idx - 1); i <= Math.min(total - 1, idx + 1); i++) SwipePreview.load(images[i]);
+    }
   }
 
   function unobserveDeferredMedia(root) {
-    if (!deferredMediaObserver || !root || !root.querySelectorAll) return;
-    root.querySelectorAll('[data-media-observed]').forEach(target => deferredMediaObserver.unobserve(target));
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('[data-media-observed]').forEach(target => {
+      if (deferredMediaObserver) deferredMediaObserver.unobserve(target);
+      delete target.dataset.mediaObserved;
+    });
+    root.querySelectorAll('video').forEach(video => video.pause());
+  }
+
+  function disposeCardMedia(root) {
+    unobserveDeferredMedia(root);
+    SwipePreview.release(root);
+    root.querySelectorAll('video').forEach(video => { video.removeAttribute('src'); video.load(); });
+    root.querySelectorAll('iframe').forEach(frame => frame.remove());
   }
 
   function hydrateDeferredMedia(target) {
-    if (!target || target.dataset.mediaHydrated === '1') return;
+    if (!target) return;
+    if (target.matches('img[data-preview-src]')) { SwipePreview.load(target); return; }
+    if (target.classList.contains('card-hero-track')) {
+      target.dataset.mediaHydrated = '1';
+      updateCarouselBadge(target);
+      return;
+    }
+    if (target.dataset.mediaHydrated === '1') return;
     let src = '';
     try { src = decodeURIComponent(target.dataset.mediaSrc || target.dataset.bgUrl || ''); } catch (e) { return; }
     if (target.classList.contains('media-bg-lazy')) {
@@ -1413,12 +1461,15 @@
 
   function observeDeferredMedia(root) {
     if (!root || !root.querySelectorAll) return;
-    const targets = root.querySelectorAll('.media-deferred:not([data-media-observed]), .media-bg-lazy:not([data-media-observed])');
+    const targets = root.querySelectorAll('.media-deferred:not([data-media-observed]), .img-wrap > img:not([data-media-observed]), .card-hero-track:not([data-media-observed])');
     if (!targets.length) return;
     if (!deferredMediaObserver && typeof IntersectionObserver === 'function') {
       deferredMediaObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => { if (entry.isIntersecting) hydrateDeferredMedia(entry.target); });
-      }, { rootMargin: '900px 0px' });
+        entries.forEach(entry => {
+          if (entry.isIntersecting) hydrateDeferredMedia(entry.target);
+          else entry.target.querySelectorAll('video').forEach(video => video.pause());
+        });
+      }, { rootMargin: '600px 0px' });
     }
     targets.forEach(target => {
       target.dataset.mediaObserved = '1';
@@ -1843,11 +1894,36 @@
     return node;
   }
 
+  let swipeVirtualGrid = null;
+
   function renderCards(data) {
     const grid = document.getElementById('cardGrid');
     const noun = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
+    if (activeMode === 'posts' && data.length && window.SwipeVirtualGrid && window.ResizeObserver) {
+      if (!swipeVirtualGrid) swipeVirtualGrid = new SwipeVirtualGrid(grid, {
+        html: buildCardHtml, mount: observeDeferredMedia, detach: unobserveDeferredMedia, dispose: disposeCardMedia
+      });
+      if (!swipeVirtualGrid.active) {
+        renderedCardNodes.forEach(node => disposeCardMedia(node));
+        renderedCardNodes.clear();
+        grid.replaceChildren();
+      }
+      renderedCardMode = activeMode;
+      delete grid.dataset.renderState;
+      grid.setAttribute('role', 'list');
+      swipeVirtualGrid.setItems(data, {
+        masonry: layoutMode === 'masonry', auth: !!currentUser,
+        resetKey: JSON.stringify([activeMode, layoutMode, gridDensity, currentSort, getAF(), numericFilters, document.getElementById('searchInput').value]),
+        columns: width => layoutMode === 'masonry'
+          ? (window.innerWidth > 1000 ? (gridDensity === 1 ? 4 : 5) : window.innerWidth > 600 ? 3 : 2)
+          : Math.max(1, Math.floor((width + 16) / ((gridDensity === 1 ? 270 : 220) + 16))),
+        estimate: item => (item.image ? (layoutMode === 'masonry' ? 300 : 200) : (layoutMode === 'masonry' ? 0 : 180)) + 220
+      });
+      return;
+    }
+    if (swipeVirtualGrid && swipeVirtualGrid.active) swipeVirtualGrid.clear();
     if (renderedCardMode !== activeMode) {
-      renderedCardNodes.forEach(node => unobserveDeferredMedia(node));
+      renderedCardNodes.forEach(node => disposeCardMedia(node));
       renderedCardMode = activeMode;
       renderedCardNodes.clear();
       grid.replaceChildren();
@@ -1857,7 +1933,7 @@
     const liveIds = new Set(source.map(item => String(item.id)));
     renderedCardNodes.forEach((node, key) => {
       if (liveIds.has(key)) return;
-      unobserveDeferredMedia(node);
+      disposeCardMedia(node);
       if (node.parentNode === grid) node.remove();
       renderedCardNodes.delete(key);
     });
@@ -1897,7 +1973,7 @@
     const desiredNodes = renderedItems.map(item => {
       let node = renderedCardNodes.get(item.key);
       if (!node || node.__swipeardyHtml !== item.html) {
-        if (node) unobserveDeferredMedia(node);
+        if (node) disposeCardMedia(node);
         node = createCardNode(item.html);
         renderedCardNodes.set(item.key, node);
         observeDeferredMedia(node);

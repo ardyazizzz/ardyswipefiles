@@ -1,0 +1,124 @@
+/* Browser-owned functional checks and repeatable frame timing, with local fixtures only. */
+(function () {
+  const panel = document.createElement('div');
+  panel.id = 'testPanel';
+  panel.style.cssText = 'position:fixed;right:8px;top:8px;z-index:10000;background:white;color:black;padding:8px;border:1px solid #aaa;max-width:420px;font:12px monospace;max-height:45vh;overflow:auto';
+  panel.innerHTML = '<button id="runChecks">Run functional checks</button> <button id="runBenchmark">Run scrolling benchmark</button><pre id="testResults">Ready</pre>';
+  document.body.append(panel);
+  const report = value => document.getElementById('testResults').textContent = JSON.stringify(value, null, 2);
+  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const frame = () => new Promise(requestAnimationFrame);
+  const assert = (condition, label) => { if (!condition) throw new Error(label); };
+  const cards = () => Array.from(document.querySelectorAll('#cardGrid > .card'));
+  const imageReady = img => img?.complete && img.naturalWidth > 0;
+  async function settle() { await frame(); await frame(); await pause(250); }
+  async function go(y) { window.scrollTo(0, y); await settle(); }
+  function noOverlap() {
+    const rects = cards().map(card => ({ id: card.dataset.id, rect: card.getBoundingClientRect() }));
+    for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) {
+      const a = rects[i].rect, b = rects[j].rect;
+      assert(!(a.left < b.right - 2 && a.right > b.left + 2 && a.top < b.bottom - 2 && a.bottom > b.top + 2), 'Overlapping cards ' + rects[i].id + '/' + rects[j].id);
+    }
+  }
+  document.getElementById('runChecks').onclick = async () => {
+    const passed = [];
+    report({ running: true });
+    try {
+      await settle();
+      assert(document.getElementById('totalBadge').textContent.includes(fixtureCount), 'Full dataset remains searchable');
+      assert(cards().length < 120, 'Bounded mounted cards');
+      passed.push('Full result count with bounded DOM');
+      await go(0);
+      await pause(500);
+      const firstImage = document.querySelector('#cardGrid .card img');
+      assert(imageReady(firstImage), 'Preview must actually load');
+      firstImage.click();
+      assert(document.getElementById('imageOverlay').style.display === 'flex', 'Lightbox opens');
+      assert(document.getElementById('lightboxImage').src === firstImage.dataset.previewSrc, 'Lightbox uses original');
+      nextLightboxImage();
+      assert(document.getElementById('lightboxImage').src.includes('slide=2'), 'All carousel slides available');
+      closeImageLightbox();
+      const firstTrack = document.querySelector('.card-hero-track');
+      firstTrack.scrollLeft = firstTrack.clientWidth * 5;
+      await settle();
+      assert(firstTrack.parentElement.querySelector('.card-hero-badge').textContent === '6 / 12', 'Carousel badge');
+      assert(imageReady(firstTrack.querySelectorAll('img')[5]), 'Distant carousel slide preview loads');
+      passed.push('Preview, full-resolution lightbox and 12-slide carousel');
+      for (const y of [15000, 60000, 120000, 250000]) {
+        await go(y);
+        assert(cards().length > 0 && cards().length < 120, 'Bounded DOM at ' + y);
+        noOverlap();
+      }
+      assert(swipeVirtualGrid.cache.size <= 120, 'Card cache bounded');
+      await go(0);
+      const restored = document.querySelector('.card-hero-track');
+      assert(Math.round(restored.scrollLeft / restored.clientWidth) === 5, 'Carousel position survives eviction');
+      passed.push('Deep jumps, no overlaps, bounded cache and carousel restoration');
+      const beforeHeight = document.getElementById('cardGrid').offsetHeight;
+      toggleLayout(); await settle(); noOverlap();
+      assert(document.getElementById('cardGrid').offsetHeight > 0, 'Grid height retained');
+      cycleDensity(); await settle(); noOverlap();
+      toggleLayout(); await settle(); noOverlap();
+      passed.push('Grid/Masonry and density switches');
+      const input = document.getElementById('searchInput');
+      input.value = 'Creator 1999'; applyFilters(); await settle();
+      assert(cards().length === 1, 'Search all data including never-mounted items');
+      input.value = 'no-match-xyz'; applyFilters(); await settle();
+      assert(document.querySelector('.empty-state'), 'Empty state');
+      input.value = ''; applyFilters(); await settle();
+      sortSwipes('oldest'); await settle();
+      assert(cards()[0].dataset.id === String(2000000000000 - fixtureCount + 1), 'Sorting order');
+      sortSwipes('newest'); await settle();
+      toggleFilter('Category', 'Design'); await settle();
+      assert(cards().every(c => c.querySelector('.card-tags').textContent.includes('Design')), 'Filter results');
+      clearAllFilters(); await settle();
+      passed.push('Full-library search, empty state, sorting and filters');
+      for (const mode of ['creators', 'websites', 'snippets', 'posts']) {
+        setMode(mode); await settle(); assert(cards().length > 0, 'Mode ' + mode);
+      }
+      passed.push('All four content modes');
+      updateAuthState({ user: { id: 'local-fixture' }, access_token: 'test-only' }); await settle();
+      toggleSelectMode(); await settle();
+      const selected = Number(cards()[0].dataset.id);
+      toggleCardSelection(selected);
+      await go(200000); await go(0);
+      assert(document.querySelector('.card[data-id="' + selected + '"]').classList.contains('selected'), 'Selection survives eviction');
+      toggleSelectMode(); await settle();
+      openEditModal(selected);
+      document.getElementById('e-text').value = 'Edited locally during virtual scrolling';
+      updateSwipe(); await settle();
+      assert(cards()[0].textContent.includes('Edited locally'), 'In-place update invalidates card');
+      passed.push('Selection and editing after eviction (mock writes only)');
+      _localChange = 0;
+      const changed = { ...swipes[0], text: 'Realtime fixture update' };
+      handleRealtimeChange({ eventType: 'UPDATE', new: changed, old: { id: changed.id, type: 'posts' } });
+      await settle();
+      assert(cards()[0].textContent.includes('Realtime fixture update'), 'Realtime update');
+      passed.push('Realtime refresh');
+      assert(fixtureErrors.length === 0, 'Browser errors: ' + fixtureErrors.join('; '));
+      report({ ok: true, passed, mounted: cards().length, cached: swipeVirtualGrid.cache.size, total: fixtureCount, mockWrites: fixtureWrites.length });
+    } catch (error) { report({ ok: false, passed, error: error.message, browserErrors: fixtureErrors }); }
+  };
+  document.getElementById('runBenchmark').onclick = async () => {
+    report({ running: true });
+    await go(0);
+    const frames = [];
+    let last;
+    const start = performance.now();
+    for (let i = 0; i < 240; i++) {
+      const now = await frame();
+      if (last) frames.push(now - last);
+      last = now;
+      window.scrollTo(0, i * 100);
+    }
+    await settle();
+    const sorted = frames.slice().sort((a, b) => a - b);
+    report({ variant: location.pathname === '/baseline' ? 'baseline' : 'optimized', total: fixtureCount,
+      elapsedMs: Math.round(performance.now() - start), mountedCards: cards().length,
+      gridElements: document.getElementById('cardGrid').querySelectorAll('*').length,
+      frameMedianMs: +sorted[Math.floor(sorted.length * 0.5)].toFixed(1),
+      frameP95Ms: +sorted[Math.floor(sorted.length * 0.95)].toFixed(1), framesOver50Ms: frames.filter(n => n > 50).length,
+      cachedCards: typeof swipeVirtualGrid === 'undefined' ? null : swipeVirtualGrid?.cache.size,
+      errors: fixtureErrors });
+  };
+})();
