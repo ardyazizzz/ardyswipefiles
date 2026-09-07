@@ -160,8 +160,164 @@ function setBookmarkAutoSaveEnabled(enabled) {
   });
 }
 
+function decodeLinkedInHtml(value) {
+  return String(value || '')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#34;/g, '"')
+    .replace(/&#x22;/gi, '"')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#x2f;/gi, '/')
+    .replace(/&#47;/g, '/')
+    .replace(/\\u0026/gi, '&')
+    .replace(/\\u002f/gi, '/')
+    .replace(/\\\//g, '/')
+    .trim();
+}
+
+function isLinkedInDocumentManifestUrl(url) {
+  return /^https:\/\/(?:media|media-exp\d+)\.licdn\.com\/dms\/document(?:\/|$)/i.test(decodeLinkedInHtml(url));
+}
+
+function isLinkedInPageImageUrl(url) {
+  return /^https:\/\/(?:media|media-exp\d+)\.licdn\.com\/dms\/image(?:\/|$)/i.test(decodeLinkedInHtml(url));
+}
+
+function extractLinkedInManifestUrlsFromHtml(html) {
+  var value = decodeLinkedInHtml(html);
+  var urls = [];
+  var seen = {};
+  var re = /["']manifestUrl["']\s*:\s*["']([^"']+)["']/gi;
+  var match;
+  while ((match = re.exec(value))) {
+    var url = decodeLinkedInHtml(match[1]);
+    if (isLinkedInDocumentManifestUrl(url) && !seen[url]) {
+      seen[url] = true;
+      urls.push(url);
+    }
+  }
+  return urls;
+}
+
+function isLinkedInPostUrl(url) {
+  return /^https:\/\/www\.linkedin\.com\/(?:feed\/update\/|posts\/)/i.test(String(url || ''));
+}
+
+function fetchLinkedInJson(url) {
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 20000);
+  return fetch(url, { cache: 'no-store', credentials: 'omit', signal: ctrl.signal }).then(function (res) {
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).catch(function (err) {
+    clearTimeout(timer);
+    throw err;
+  });
+}
+
+function fetchLinkedInPublicHtml(url) {
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 20000);
+  return fetch(url, { cache: 'no-store', credentials: 'omit', signal: ctrl.signal }).then(function (res) {
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.text();
+  }).catch(function (err) {
+    clearTimeout(timer);
+    throw err;
+  });
+}
+
+function uniqueLinkedInManifestUrls(values) {
+  var seen = {};
+  var urls = [];
+  for (var i = 0; i < (values || []).length; i++) {
+    var url = decodeLinkedInHtml(values[i]);
+    if (!isLinkedInDocumentManifestUrl(url) || seen[url]) continue;
+    seen[url] = true;
+    urls.push(url);
+  }
+  return urls.slice(0, 8);
+}
+
+function resolveLinkedInCarousel(message) {
+  var expectedPages = Number(message.expectedPages) || 0;
+  var diagnostic = { source: '', manifestCandidates: 0, resolvedManifestCandidates: 0, expectedPages: expectedPages, pageCount: 0, failures: [] };
+  var supplied = uniqueLinkedInManifestUrls(message.manifestUrls || []);
+
+  function resolveCandidates(candidates, source) {
+    candidates = uniqueLinkedInManifestUrls(candidates);
+    diagnostic.source = source;
+    diagnostic.manifestCandidates = candidates.length;
+    if (!candidates.length) return Promise.resolve(null);
+    var resolved = [];
+
+    function resolveNext(index) {
+      if (index >= candidates.length) return Promise.resolve();
+      var manifestUrl = candidates[index];
+      return fetchLinkedInJson(manifestUrl).then(function (master) {
+        var resolutions = Array.isArray(master && master.perResolutions) ? master.perResolutions.slice() : [];
+        resolutions = resolutions.filter(function (item) { return item && isLinkedInDocumentManifestUrl(item.imageManifestUrl); });
+        resolutions.sort(function (a, b) { return (b.width || 0) - (a.width || 0); });
+        if (!resolutions.length) { diagnostic.failures.push('master-without-image-manifest'); return; }
+        return fetchLinkedInJson(decodeLinkedInHtml(resolutions[0].imageManifestUrl)).then(function (imageManifest) {
+          var pages = Array.isArray(imageManifest && imageManifest.pages) ? imageManifest.pages : [];
+          pages = pages.map(decodeLinkedInHtml).filter(isLinkedInPageImageUrl);
+          if (!pages.length) { diagnostic.failures.push('image-manifest-without-pages'); return; }
+          if (expectedPages && pages.length !== expectedPages) { diagnostic.failures.push('page-count-mismatch:' + pages.length); return; }
+          resolved.push(pages);
+        });
+      }).catch(function (error) {
+        diagnostic.failures.push('manifest-fetch:' + (error && error.message ? error.message : 'failed'));
+      }).then(function () {
+        return resolveNext(index + 1);
+      });
+    }
+
+    return resolveNext(0).then(function () {
+      diagnostic.resolvedManifestCandidates = resolved.length;
+      if (resolved.length === 1) {
+        diagnostic.pageCount = resolved[0].length;
+        return resolved[0];
+      }
+      if (resolved.length > 1) diagnostic.failures.push('ambiguous-matching-manifests');
+      return null;
+    });
+  }
+
+  return resolveCandidates(supplied, supplied.length ? 'native-or-legacy-dom' : '').then(function (pages) {
+    if (pages) return { ok: true, pages: pages, diagnostic: diagnostic };
+    if (!isLinkedInPostUrl(message.postUrl)) return { ok: false, error: 'No safe LinkedIn carousel manifest was found.', diagnostic: diagnostic };
+    return fetchLinkedInPublicHtml(message.postUrl).then(function (html) {
+      var candidates = extractLinkedInManifestUrlsFromHtml(html);
+      return resolveCandidates(candidates, 'public-html');
+    }).then(function (publicPages) {
+      if (publicPages) return { ok: true, pages: publicPages, diagnostic: diagnostic };
+      return { ok: false, error: 'No matching carousel manifest was found.', diagnostic: diagnostic };
+    }).catch(function (error) {
+      diagnostic.failures.push('public-html-fetch:' + (error && error.message ? error.message : 'failed'));
+      return { ok: false, error: 'Could not retrieve the carousel manifest.', diagnostic: diagnostic };
+    });
+  });
+}
+
+if (typeof self !== 'undefined' && self.__SWIPEARDY_TEST_HOOK__) {
+  self.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromHtml = extractLinkedInManifestUrlsFromHtml;
+  self.__SWIPEARDY_TEST_HOOK__.resolveLinkedInCarousel = resolveLinkedInCarousel;
+}
+
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (!message) return;
+  if (message.type === 'SWIPEAR:DY_RESOLVE_LINKEDIN_CAROUSEL') {
+    if (!sender.tab || !sender.tab.url || !/^https:\/\/www\.linkedin\.com\//i.test(sender.tab.url)) {
+      sendResponse({ ok: false, error: 'Carousel requests must originate from LinkedIn.' });
+      return false;
+    }
+    resolveLinkedInCarousel(message).then(sendResponse).catch(function (error) {
+      sendResponse({ ok: false, error: error && error.message ? error.message : 'Carousel resolution failed.' });
+    });
+    return true;
+  }
   if (message.type === 'SWIPEAR:DY_BOOKMARK_AUTO_GET') {
     getBookmarkAutoSaveEnabled().then(function (enabled) {
       sendResponse({ ok: true, enabled: enabled });

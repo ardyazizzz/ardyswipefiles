@@ -220,6 +220,31 @@ assert.equal(hooks.extractLinkedInMutualReactionCount('Alice dan 1,2K lainnya'),
 }
 
 {
+  const iframe = {
+    getAttribute(name) {
+      assert.equal(name, 'data-native-document-config');
+      return '{&quot;doc&quot;:{&quot;title&quot;:&quot;Carousel title&quot;,&quot;subtitle&quot;:&quot;17 pages&quot;,&quot;totalPageCount&quot;:17,&quot;manifestUrl&quot;:&quot;https://media.licdn.com/dms/document/pl/v2/master.json?x=1&amp;y=2&quot;}}';
+    }
+  };
+  const card = {
+    querySelectorAll(selector) {
+      assert.equal(selector, 'iframe[data-id="feed-paginated-document-content"][data-native-document-config]');
+      return [iframe];
+    }
+  };
+  assert.deepEqual(
+    plain(hooks.findLinkedInNativeDocumentConfig(card)),
+    {
+      manifestUrl: 'https://media.licdn.com/dms/document/pl/v2/master.json?x=1&y=2',
+      pageCount: 17,
+      title: 'Carousel title',
+      source: 'native-document-config'
+    },
+    'the iframe document config must provide the explicit carousel manifest and expected page count'
+  );
+}
+
+{
   const pages = Array.from({ length: 17 }, (_, index) => 'https://media.licdn.com/dms/image/v2/D4E22AQCAROUSEL_' + index + '.jpg');
   const context = {
     ids: ['739218977639215104'],

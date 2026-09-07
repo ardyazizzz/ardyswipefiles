@@ -1182,9 +1182,63 @@
     return [];
   }
 
+  function decodeLinkedInDocumentConfig(raw) {
+    var value = String(raw || '')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#34;/g, '"')
+      .replace(/&#x22;/gi, '"')
+      .replace(/&amp;/gi, '&')
+      .trim();
+    try { return JSON.parse(value); } catch (e) { return null; }
+  }
+
+  function findLinkedInNativeDocumentConfig(card) {
+    var scopes = [card, document];
+    var seen = [];
+    for (var si = 0; si < scopes.length; si++) {
+      var scope = scopes[si];
+      if (!scope || !scope.querySelectorAll) continue;
+      var frames = scope.querySelectorAll('iframe[data-id="feed-paginated-document-content"][data-native-document-config]');
+      for (var fi = 0; fi < frames.length; fi++) {
+        if (seen.indexOf(frames[fi]) !== -1) continue;
+        seen.push(frames[fi]);
+        var config = decodeLinkedInDocumentConfig(frames[fi].getAttribute('data-native-document-config'));
+        var doc = config && config.doc;
+        var manifestUrl = decodeLinkedInMediaUrl(doc && doc.manifestUrl);
+        if (!isLinkedInDocumentManifestUrl(manifestUrl)) continue;
+        return {
+          manifestUrl: manifestUrl,
+          pageCount: Number(doc.totalPageCount) || linkedInCarouselPageCount(doc.subtitle || ''),
+          title: String(doc.title || ''),
+          source: 'native-document-config'
+        };
+      }
+    }
+    return null;
+  }
+
+  function resolveLinkedInCarouselInBackground(request) {
+    return new Promise(function (resolve, reject) {
+      chrome.runtime.sendMessage({
+        type: 'SWIPEAR:DY_RESOLVE_LINKEDIN_CAROUSEL',
+        manifestUrls: request.manifestUrls || [],
+        postUrl: request.postUrl || location.href,
+        expectedPages: request.expectedPages || 0
+      }, function (response) {
+        if (chrome.runtime.lastError) { reject(new Error(chrome.runtime.lastError.message)); return; }
+        resolve(response || { ok: false, error: 'No response from carousel resolver.' });
+      });
+    });
+  }
+
   async function extractLinkedInCarouselImages(card, activityId) {
     var context = linkedInCarouselContext(card, activityId);
-    var diagnostic = { attempted: context.detectedCarousel, detectedCarousel: context.detectedCarousel, expectedPages: context.expectedPages, codeManifestCandidates: 0, inlineScriptManifestCandidates: 0, resourceManifestCandidates: 0, resolvedManifestCandidates: 0, pageCount: 0, fallback: '', matches: [] };
+    var nativeConfig = findLinkedInNativeDocumentConfig(card);
+    if (nativeConfig) {
+      context.detectedCarousel = true;
+      if (!context.expectedPages) context.expectedPages = nativeConfig.pageCount;
+    }
+    var diagnostic = { attempted: context.detectedCarousel, detectedCarousel: context.detectedCarousel, expectedPages: context.expectedPages, nativeConfigManifestCandidates: nativeConfig ? 1 : 0, codeManifestCandidates: 0, inlineScriptManifestCandidates: 0, resourceManifestCandidates: 0, resolvedManifestCandidates: 0, pageCount: 0, fallback: '', matches: [] };
     if (!context.detectedCarousel) return { urls: [], diagnostic: diagnostic };
     var manifestEntries = [];
     try {
@@ -1193,6 +1247,20 @@
         if (manifestEntries[i].source === 'code') diagnostic.codeManifestCandidates++;
         else if (manifestEntries[i].source === 'inline-script') diagnostic.inlineScriptManifestCandidates++;
         else if (manifestEntries[i].source === 'resource') diagnostic.resourceManifestCandidates++;
+      }
+      // A page-local native config identifies this exact carousel. Only fall
+      // back to legacy page-wide candidates when that config is unavailable.
+      var manifestUrls = nativeConfig ? [nativeConfig.manifestUrl] : manifestEntries.map(function(entry) { return entry.url; });
+      var backgroundResult = await resolveLinkedInCarouselInBackground({
+        manifestUrls: manifestUrls,
+        postUrl: location.href,
+        expectedPages: context.expectedPages
+      });
+      diagnostic.background = backgroundResult && backgroundResult.diagnostic ? backgroundResult.diagnostic : null;
+      if (backgroundResult && backgroundResult.ok && Array.isArray(backgroundResult.pages)) {
+        diagnostic.resolvedManifestCandidates = 1;
+        diagnostic.pageCount = backgroundResult.pages.length;
+        return { urls: backgroundResult.pages, diagnostic: diagnostic };
       }
       // LinkedIn can place this post's activity ID and its document manifest
       // in different Relay blocks. Resolve each document, then match it using
@@ -2195,6 +2263,8 @@
     window.__SWIPEARDY_TEST_HOOK__.isLinkedInDocumentManifestUrl = isLinkedInDocumentManifestUrl;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromCode = extractLinkedInManifestUrlsFromCode;
     window.__SWIPEARDY_TEST_HOOK__.collectLinkedInManifestEntries = collectLinkedInManifestEntries;
+    window.__SWIPEARDY_TEST_HOOK__.decodeLinkedInDocumentConfig = decodeLinkedInDocumentConfig;
+    window.__SWIPEARDY_TEST_HOOK__.findLinkedInNativeDocumentConfig = findLinkedInNativeDocumentConfig;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCarouselPageUrls = extractLinkedInCarouselPageUrls;
     window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselPageCount = linkedInCarouselPageCount;
     window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselTitle = linkedInCarouselTitle;
