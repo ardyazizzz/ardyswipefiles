@@ -101,7 +101,7 @@ class FakeNode {
   }
 
   querySelector() {
-    return null;
+    return this.documentContainer || null;
   }
 
   getBoundingClientRect() {
@@ -331,6 +331,19 @@ assert.equal(
     plain(hooks.extractLinkedInCounts(fixture.post)),
     { reactions: 132, comments: 156, reposts: 2 },
     'structural fallback must count mutual reactions as total reactions'
+  );
+}
+
+{
+  const post = new FakeNode({
+    kind: 'structural-post',
+    text: 'Feed post\nRohit Virkud\n• Following\nI design and build finance brands.\n2mo •\nI know a financial advisor who went from 180 clients to 40 and built 7 figure business.\nThis carousel shows exactly what he did 👇\nThe $1M Practice Letter\n·\n17 pages'
+  });
+  post.documentContainer = new FakeNode({ text: 'The $1M Practice Letter · 17 pages', parent: post });
+  assert.equal(
+    hooks.extractLinkedInStructuralCaption(post),
+    'I design and build finance brands.\n2mo •\nI know a financial advisor who went from 180 clients to 40 and built 7 figure business.\nThis carousel shows exactly what he did 👇',
+    'structural caption extraction must remove the author header and carousel title while preserving the post copy'
   );
 }
 

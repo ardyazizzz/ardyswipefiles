@@ -408,14 +408,35 @@
     return candidates[0] || null;
   }
 
-  function removeLinkedInCarouselMetadata(text) {
-    var pageMatch = /\bPage\s+\d+\s+of\s+\d+\b/i.exec(text || '');
-    if (!pageMatch) return text || '';
-    var afterPage = String(text).slice(pageMatch.index);
+  function escapeLinkedInRegex(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function removeLinkedInCarouselMetadata(text, carouselTitle) {
+    var value = String(text || '');
+    if (carouselTitle) {
+      var titlePattern = new RegExp('(?:^|\\n)\\s*' + escapeLinkedInRegex(carouselTitle) + '\\s*(?:\\n\\s*[·•|]\\s*\\n?\\s*|\\s*[·•|]\\s*)\\d{1,4}\\s+pages?\\s*$', 'i');
+      value = value.replace(titlePattern, '').trim();
+    }
+    var pageMatch = /\bPage\s+\d+\s+of\s+\d+\b/i.exec(value);
+    if (!pageMatch) return value;
+    var afterPage = value.slice(pageMatch.index);
     var pagesMatch = /\b\d+\s+pages?\b/i.exec(afterPage);
     var metricMatch = /\b\d[\d\s.,'’]*(?:[kKmMbB])?\s+(?:reactions?|comments?|reposts?|shares?)\b/i.exec(afterPage);
-    if (pagesMatch && metricMatch) return String(text).slice(0, pageMatch.index).trim();
-    return text || '';
+    if (pagesMatch && metricMatch) return value.slice(0, pageMatch.index).trim();
+    return value;
+  }
+
+  function removeLinkedInStructuralHeader(text, author) {
+    var value = String(text || '').trim();
+    if (author) {
+      var authorPattern = new RegExp('^' + escapeLinkedInRegex(author) + '(?:\\s*[·•|]\\s*)?(?:(?:Following|Follow|Connect|Connected)\\s*)?', 'i');
+      value = value.replace(authorPattern, '').trim();
+    }
+    // Visibility text belongs to the post header. Keep a bare timestamp such
+    // as "2mo •" because it is useful context in the saved caption.
+    value = value.replace(/^(?:\d+[hmdw]o?|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)(?:\s+ago)?)\s*[·•|]\s*Visible to anyone\s*/i, '');
+    return value.trim();
   }
 
   function extractLinkedInStructuralCaption(card) {
@@ -423,16 +444,19 @@
     var fullText = visibleText(card);
     var postText = getPostAreaText(fullText) || fullText;
     if (!postText) return '';
-    var candidates = [];
+    var author = extractLinkedInAuthor(card);
+    var nativeConfig = findLinkedInNativeDocumentConfig(card);
+    var carouselContext = linkedInCarouselContext(card, '');
+    var carouselTitle = (nativeConfig && nativeConfig.title) || carouselContext.title || '';
+    var candidates = [postText];
     var timestamp = postText.match(/\d+[hmdw]o?\s*·\s*|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)\s*(?:ago)?\s*·\s*/i);
     if (timestamp) candidates.push(postText.slice(timestamp.index + timestamp[0].length).trim());
-    candidates.push(postText);
     for (var i = 0; i < candidates.length; i++) {
-      var candidate = candidates[i]
+      var candidate = removeLinkedInStructuralHeader(candidates[i], author)
         .replace(/^(?:Follow|Connect|Connect with[^\n]*|Visible to anyone[^\n]*|View profile[^\n]*)\s*/i, '')
         .replace(/\bRepost\s+[\s\S]{0,120}?\bto help someone in your network\.?\s*/i, '')
         .trim();
-      candidate = removeLinkedInCarouselMetadata(candidate);
+      candidate = removeLinkedInCarouselMetadata(candidate, carouselTitle);
       var cleaned = cleanSnippet(candidate);
       if (cleaned) return cleaned;
     }
