@@ -728,12 +728,45 @@
     return 0;
   }
 
+  function getLinkedInPostActionMetricControls(card) {
+    if (!card || !card.querySelectorAll) return [];
+    var controls = card.querySelectorAll('button, [role="button"], a');
+    var metrics = [];
+    for (var i = 0; i < controls.length; i++) {
+      var control = controls[i];
+      if (!belongsToLinkedInPost(control, card) || isLinkedInCommentNode(control, card)) continue;
+      var text = linkedInNodeText(control);
+      if (!text || text.length > 100 || !/\b(?:comments?|replies|reposts?|shares?|retweets?)\b/i.test(text)) continue;
+
+      // The current LinkedIn surface exposes counts as controls such as
+      // "Comment 28" and "Repost 1". Require the control's nearby container
+      // to be the complete post action row, so buttons in comment threads do
+      // not become post-level engagement counts.
+      var row = control.parentElement || control.parentNode;
+      for (var depth = 0; row && row !== card && depth < 4; depth++) {
+        if (linkedInHasPostActionRow(row) && visibleText(row).length <= 500) {
+          metrics.push(control);
+          break;
+        }
+        row = row.parentElement || row.parentNode;
+      }
+    }
+    return metrics;
+  }
+
   function extractLinkedInCounts(card) {
     var reactions = 0, comments = 0, reposts = 0;
     var commentTerms = ['comment', 'comments', 'reply', 'replies', 'komentar', 'komentari', 'balasan'];
     var repostTerms = ['repost', 'reposts', 'shared', 'share', 'shares', 'retweet', 'retweets', 'bagikan', 'dibagikan', 'posting ulang'];
     var reactionTerms = ['reaction', 'reactions', 'like', 'likes', 'reaksi', 'suka'];
     var roots = getLinkedInEngagementRoots(card);
+
+    var actionMetricControls = getLinkedInPostActionMetricControls(card);
+    for (var ai = 0; ai < actionMetricControls.length; ai++) {
+      var actionMetricText = linkedInNodeText(actionMetricControls[ai]);
+      if (!comments) comments = extractLinkedInMetric(actionMetricText, commentTerms);
+      if (!reposts) reposts = extractLinkedInMetric(actionMetricText, repostTerms);
+    }
 
     // Dedicated reaction count nodes have the highest confidence.
     var reactionNodes = card.querySelectorAll('.social-details-social-counts__reactions-count, [aria-label*="reaction" i], [aria-label*="reaksi" i]');
@@ -2259,6 +2292,7 @@
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInMutualReactionCount = extractLinkedInMutualReactionCount;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
+    window.__SWIPEARDY_TEST_HOOK__.getLinkedInPostActionMetricControls = getLinkedInPostActionMetricControls;
     window.__SWIPEARDY_TEST_HOOK__.decodeLinkedInMediaUrl = decodeLinkedInMediaUrl;
     window.__SWIPEARDY_TEST_HOOK__.isLinkedInDocumentManifestUrl = isLinkedInDocumentManifestUrl;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromCode = extractLinkedInManifestUrlsFromCode;

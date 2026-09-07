@@ -302,6 +302,24 @@ assert.equal(
 }
 
 {
+  const post = new FakeNode({ kind: 'post', order: 0 });
+  const actionRow = new FakeNode({ kind: 'engagement', order: 2, parent: post });
+  const like = new FakeNode({ text: 'Like', order: 2.1, parent: actionRow });
+  const comment = new FakeNode({ text: 'Comment 28', order: 2.2, parent: actionRow });
+  const repost = new FakeNode({ text: 'Repost 1', order: 2.3, parent: actionRow });
+  const send = new FakeNode({ text: 'Send', order: 2.4, parent: actionRow });
+  actionRow.actionNodes = [like, comment, repost, send];
+  post.actionNodes = actionRow.actionNodes;
+  post.engagementRoots = [actionRow];
+
+  assert.deepEqual(
+    plain(hooks.extractLinkedInCounts(post)),
+    { reactions: 0, comments: 28, reposts: 1 },
+    'post action-row controls must support the current “Comment 28” and “Repost 1” LinkedIn labels'
+  );
+}
+
+{
   const fixture = makeStructuralPostFixture();
   assert.equal(hooks.findLinkedInStructuralEngagementRoot(fixture.post), fixture.summary);
   assert.equal(
