@@ -1033,16 +1033,61 @@
     return urls;
   }
 
+  function isLinkedInDocumentManifestUrl(url) {
+    var value = decodeLinkedInMediaUrl(url);
+    return isLinkedInMediaUrl(value) && /\/dms\/document(?:\/|$)/i.test(value);
+  }
+
   function extractLinkedInManifestUrlsFromCode(content) {
     var urls = [];
-    if (!content || content.indexOf('feedshare-document-master-manifest') === -1) return urls;
-    var re = /["']manifestUrl["']\s*:\s*["'](https?:\\?(?:\\\/|\/){2}[^"']+)["']/gi;
+    // LinkedIn has moved this payload between <code> Relay blocks and inline
+    // scripts. A manifestUrl pointing to /dms/document/ is the stable, narrow
+    // signal; do not accept ordinary image URLs just because they are media.
+    if (!content || !/(?:manifestUrl|feedshare[-_]?document[-_]?master[-_]?manifest|\/dms(?:\\\/|\/)document)/i.test(content)) return urls;
+    var re = /["']?manifestUrl["']?\s*[:=]\s*["'](https?:\\?(?:\\\/|\/){2}[^"']+)["']/gi;
     var match;
     while ((match = re.exec(content))) {
       var url = decodeLinkedInMediaUrl(match[1]);
-      if (isLinkedInMediaUrl(url)) urls.push(url);
+      if (isLinkedInDocumentManifestUrl(url)) urls.push(url);
     }
     return uniqueLinkedInMediaUrls(urls);
+  }
+
+  function collectLinkedInManifestEntries() {
+    var entries = [];
+    var seen = {};
+    var MAX_CANDIDATES = 16;
+
+    function add(url, content, source) {
+      var value = decodeLinkedInMediaUrl(url);
+      if (!isLinkedInDocumentManifestUrl(value) || seen[value] || entries.length >= MAX_CANDIDATES) return;
+      seen[value] = true;
+      entries.push({ url: value, content: content || '', source: source });
+    }
+
+    try {
+      // Recent LinkedIn renders place Relay payloads in inline scripts instead
+      // of <code>. These are local page data only; external script files are
+      // deliberately excluded.
+      var payloadEls = document.querySelectorAll('code, script:not([src])');
+      for (var i = 0; i < payloadEls.length && entries.length < MAX_CANDIDATES; i++) {
+        var content = payloadEls[i].textContent || '';
+        var urls = extractLinkedInManifestUrlsFromCode(content);
+        var source = String(payloadEls[i].tagName || '').toLowerCase() === 'script' ? 'inline-script' : 'code';
+        for (var j = 0; j < urls.length; j++) add(urls[j], content, source);
+      }
+
+      // Some LinkedIn releases load the master manifest before exposing its
+      // Relay payload. Reuse only already-observed document-manifest requests;
+      // the fetched JSON below must still prove it is a master manifest.
+      if (typeof performance !== 'undefined' && performance.getEntriesByType) {
+        var resources = performance.getEntriesByType('resource') || [];
+        for (var ri = 0; ri < resources.length && entries.length < MAX_CANDIDATES; ri++) {
+          add(resources[ri] && resources[ri].name, resources[ri] && resources[ri].name, 'resource');
+        }
+      }
+    } catch (e) {}
+    return entries;
   }
 
   function extractLinkedInCarouselPageUrls(imageManifest) {
@@ -1139,21 +1184,20 @@
 
   async function extractLinkedInCarouselImages(card, activityId) {
     var context = linkedInCarouselContext(card, activityId);
-    var diagnostic = { attempted: context.detectedCarousel, detectedCarousel: context.detectedCarousel, expectedPages: context.expectedPages, codeManifestCandidates: 0, resolvedManifestCandidates: 0, pageCount: 0, fallback: '', matches: [] };
+    var diagnostic = { attempted: context.detectedCarousel, detectedCarousel: context.detectedCarousel, expectedPages: context.expectedPages, codeManifestCandidates: 0, inlineScriptManifestCandidates: 0, resourceManifestCandidates: 0, resolvedManifestCandidates: 0, pageCount: 0, fallback: '', matches: [] };
     if (!context.detectedCarousel) return { urls: [], diagnostic: diagnostic };
-    var codeEntries = [];
+    var manifestEntries = [];
     try {
-      var codeEls = document.querySelectorAll('code');
-      for (var i = 0; i < codeEls.length; i++) {
-        var content = codeEls[i].textContent || '';
-        var urls = extractLinkedInManifestUrlsFromCode(content);
-        for (var j = 0; j < urls.length; j++) codeEntries.push({ url: urls[j], content: content });
+      manifestEntries = collectLinkedInManifestEntries();
+      for (var i = 0; i < manifestEntries.length; i++) {
+        if (manifestEntries[i].source === 'code') diagnostic.codeManifestCandidates++;
+        else if (manifestEntries[i].source === 'inline-script') diagnostic.inlineScriptManifestCandidates++;
+        else if (manifestEntries[i].source === 'resource') diagnostic.resourceManifestCandidates++;
       }
-      diagnostic.codeManifestCandidates = codeEntries.length;
       // LinkedIn can place this post's activity ID and its document manifest
       // in different Relay blocks. Resolve each document, then match it using
       // post-local evidence such as the displayed "17 pages" label.
-      var candidates = codeEntries;
+      var candidates = manifestEntries;
       if (candidates.length === 0) {
         diagnostic.fallback = 'no-master-manifest';
         return { urls: [], diagnostic: diagnostic };
@@ -2148,7 +2192,9 @@
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCaptionFromSelectors = extractLinkedInCaptionFromSelectors;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCounts = extractLinkedInCounts;
     window.__SWIPEARDY_TEST_HOOK__.decodeLinkedInMediaUrl = decodeLinkedInMediaUrl;
+    window.__SWIPEARDY_TEST_HOOK__.isLinkedInDocumentManifestUrl = isLinkedInDocumentManifestUrl;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInManifestUrlsFromCode = extractLinkedInManifestUrlsFromCode;
+    window.__SWIPEARDY_TEST_HOOK__.collectLinkedInManifestEntries = collectLinkedInManifestEntries;
     window.__SWIPEARDY_TEST_HOOK__.extractLinkedInCarouselPageUrls = extractLinkedInCarouselPageUrls;
     window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselPageCount = linkedInCarouselPageCount;
     window.__SWIPEARDY_TEST_HOOK__.linkedInCarouselTitle = linkedInCarouselTitle;

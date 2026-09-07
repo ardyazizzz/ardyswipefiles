@@ -183,6 +183,40 @@ assert.equal(hooks.extractLinkedInMutualReactionCount('Alice dan 1,2K lainnya'),
     ['https://media.licdn.com/dms/image/page-1.jpg', 'https://media.licdn.com/dms/image/page-2.jpg'],
     'a carousel image manifest must preserve every valid page, including object-shaped page entries, and deduplicate only exact repeats'
   );
+
+  const inlineRelay = 'window.__RELAY_PAYLOAD__ = {manifestUrl:"https:\\/\\/media.licdn.com\\/dms\\/document\\/latest-master.json?x=1"};';
+  assert.deepEqual(
+    plain(hooks.extractLinkedInManifestUrlsFromCode(inlineRelay)),
+    ['https://media.licdn.com/dms/document/latest-master.json?x=1'],
+    'the parser must accept the current inline-script payload shape without relying on a legacy code-block marker'
+  );
+  assert.equal(
+    hooks.isLinkedInDocumentManifestUrl('https://media.licdn.com/dms/image/C4D22AQ.jpg'),
+    false,
+    'ordinary LinkedIn images must never become manifest candidates'
+  );
+
+  const originalQuerySelectorAll = sandbox.document.querySelectorAll;
+  sandbox.document.querySelectorAll = (selector) => {
+    assert.equal(selector, 'code, script:not([src])');
+    return [{ tagName: 'SCRIPT', textContent: inlineRelay }];
+  };
+  sandbox.performance = {
+    getEntriesByType(type) {
+      assert.equal(type, 'resource');
+      return [{ name: 'https://media.licdn.com/dms/document/resource-master.json?x=2' }];
+    }
+  };
+  assert.deepEqual(
+    plain(hooks.collectLinkedInManifestEntries()),
+    [
+      { url: 'https://media.licdn.com/dms/document/latest-master.json?x=1', content: inlineRelay, source: 'inline-script' },
+      { url: 'https://media.licdn.com/dms/document/resource-master.json?x=2', content: 'https://media.licdn.com/dms/document/resource-master.json?x=2', source: 'resource' }
+    ],
+    'inline Relay data and already-observed document resources must both be available as bounded manifest candidates'
+  );
+  sandbox.document.querySelectorAll = originalQuerySelectorAll;
+  delete sandbox.performance;
 }
 
 {
