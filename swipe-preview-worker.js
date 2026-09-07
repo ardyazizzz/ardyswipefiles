@@ -132,6 +132,20 @@ onmessage = event => {
     return;
   }
   controllers.set(job.id, new AbortController());
-  jobs.push(job);
-  pump();
+  // Cached previews skip the two-job conversion queue, so a card revisited
+  // after a fast jump does not wait behind unrelated image downloads.
+  cached(job.url).then(hit => {
+    if (!controllers.has(job.id)) return;
+    if (hit) {
+      controllers.delete(job.id);
+      postMessage({ id: job.id, blob: hit });
+      return;
+    }
+    jobs.push(job);
+    pump();
+  }).catch(() => {
+    if (!controllers.has(job.id)) return;
+    jobs.push(job);
+    pump();
+  });
 };
