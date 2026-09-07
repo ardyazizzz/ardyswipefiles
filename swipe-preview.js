@@ -10,6 +10,23 @@
 
   function sourceFor(image) { return image.dataset.previewSrc; }
 
+  function clearExpired(image) {
+    image.closest('.img-wrap, .slide')?.querySelector('.media-expired')?.remove();
+  }
+
+  function showExpired(image) {
+    if (image.dataset.previewExpired) return;
+    image.dataset.previewExpired = '1';
+    image.dataset.previewError = '1';
+    image.removeAttribute('src');
+    const host = image.closest('.img-wrap, .slide');
+    if (!host || host.querySelector('.media-expired')) return;
+    const notice = document.createElement('div');
+    notice.className = 'media-expired';
+    notice.innerHTML = '<i class="ri-image-off-line" aria-hidden="true"></i><span>The original CDN link has expired.</span>';
+    host.append(notice);
+  }
+
   function touch(entry) {
     memory.delete(entry.source);
     memory.set(entry.source, entry);
@@ -36,12 +53,16 @@
 
   function useMemory(image, entry) {
     touch(entry);
+    clearExpired(image);
+    delete image.dataset.previewExpired;
     image.removeAttribute('data-preview-error');
     image.src = entry.objectUrl;
     image.dataset.previewLoaded = '1';
   }
 
   function useOriginal(image) {
+    clearExpired(image);
+    delete image.dataset.previewExpired;
     image.removeAttribute('data-preview-error');
     image.src = image.dataset.previewSrc;
     image.dataset.previewLoaded = '1';
@@ -70,6 +91,7 @@
   }
 
   window.SwipePreview = {
+    loaded(image) { delete image.dataset.previewRetried; },
     load(image) {
       if (image.dataset.previewLoaded || image.dataset.previewJob) return;
       const source = sourceFor(image);
@@ -100,6 +122,7 @@
       worker.postMessage({ id, url: new URL(image.dataset.previewSrc, location.href).href });
     },
     error(image) {
+      if (image.dataset.previewExpired) return;
       const source = sourceFor(image);
       const cached = memory.get(source);
       if (cached) {
@@ -109,9 +132,16 @@
         useOriginal(image);
         return;
       }
-      image.dataset.previewError = '1';
-      image.removeAttribute('src');
-      // Keep the reserved media area stable without the browser's broken-image icon.
+      if (!image.dataset.previewRetried) {
+        image.dataset.previewRetried = '1';
+        delete image.dataset.previewLoaded;
+        image.removeAttribute('src');
+        setTimeout(() => {
+          if (image.isConnected && !image.dataset.previewExpired) useOriginal(image);
+        }, 350);
+        return;
+      }
+      showExpired(image);
     },
     release(root) {
       root.querySelectorAll('img[data-preview-src]').forEach(image => {

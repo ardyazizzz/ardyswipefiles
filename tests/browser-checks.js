@@ -79,6 +79,8 @@
       assert(cards().length === 1, 'Search all data including never-mounted items');
       input.value = 'no-match-xyz'; applyFilters(); await settle();
       assert(document.querySelector('.empty-state'), 'Empty state');
+      input.value = 'Creator 1'; applyFilters(); await settle(); await pause(650);
+      assert(document.querySelector('.media-expired')?.textContent.includes('The original CDN link has expired.'), 'Expired CDN image has a clear placeholder');
       input.value = ''; applyFilters(); await settle();
       sortSwipes('oldest'); await settle();
       assert(cards()[0].dataset.id === String(2000000000000 - fixtureCount + 1), 'Sorting order');

@@ -207,6 +207,8 @@
     .img-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.15; transform: scale(1.1); pointer-events: none; }
     .card-img { position: relative; z-index: 1; width: 100%; height: 100%; max-height: none; object-fit: contain; display: block; background: transparent; cursor: zoom-in; }
     .card-img[data-preview-error="1"] { display: none; }
+    .media-expired { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 20px; text-align: center; color: var(--text-tertiary); background: var(--bg-secondary); font-size: 12px; line-height: 1.45; }
+    .media-expired i { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: 50%; color: var(--text-secondary); font-size: 17px; }
     .grid.masonry .img-wrap { height: 300px; }
     .media-deferred { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
     .media-deferred .card-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; background: #000; }
@@ -1349,7 +1351,7 @@
     const action = allImages
       ? 'event.stopPropagation();openImageLightboxMulti(' + index + ',' + JSON.stringify(allImages) + ')'
       : 'event.stopPropagation();openImageLightbox(' + JSON.stringify(url) + ')';
-    return '<img data-preview-src="' + mediaAttribute(url) + '" alt="" class="card-img" decoding="async" fetchpriority="' + imagePriority + '" onclick="' + mediaAttribute(action) + '" onerror="SwipePreview.error(this)" />';
+    return '<img data-preview-src="' + mediaAttribute(url) + '" alt="" class="card-img" decoding="async" fetchpriority="' + imagePriority + '" onclick="' + mediaAttribute(action) + '" onload="SwipePreview.loaded(this)" onerror="SwipePreview.error(this)" />';
   }
 
   function getMedia(url, postUrl, imagePriority) {
