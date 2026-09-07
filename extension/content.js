@@ -433,9 +433,13 @@
       var authorPattern = new RegExp('^' + escapeLinkedInRegex(author) + '(?:\\s*[·•|]\\s*)?(?:(?:Following|Follow|Connect|Connected)\\s*)?', 'i');
       value = value.replace(authorPattern, '').trim();
     }
-    // Visibility text belongs to the post header. Keep a bare timestamp such
-    // as "2mo •" because it is useful context in the saved caption.
-    value = value.replace(/^(?:\d+[hmdw]o?|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)(?:\s+ago)?)\s*[·•|]\s*Visible to anyone\s*/i, '');
+    // LinkedIn places the headline and timestamp in the post header. Drop
+    // everything through that initial timestamp, including an optional
+    // visibility label, while leaving the actual post copy intact.
+    var headerTimestamp = /(?:^|\n)(?:\d+[hmdw]o?|\d+\s+(?:seconds?|minutes?|hours?|days?|weeks?|months?|years?)(?:\s+ago)?)\s*[·•|]\s*(?:Visible to anyone\s*)?/i.exec(value);
+    if (headerTimestamp && headerTimestamp.index <= 260) {
+      value = value.slice(headerTimestamp.index + headerTimestamp[0].length);
+    }
     return value.trim();
   }
 

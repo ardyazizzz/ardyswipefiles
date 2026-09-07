@@ -342,8 +342,8 @@ assert.equal(
   post.documentContainer = new FakeNode({ text: 'The $1M Practice Letter · 17 pages', parent: post });
   assert.equal(
     hooks.extractLinkedInStructuralCaption(post),
-    'I design and build finance brands.\n2mo •\nI know a financial advisor who went from 180 clients to 40 and built 7 figure business.\nThis carousel shows exactly what he did 👇',
-    'structural caption extraction must remove the author header and carousel title while preserving the post copy'
+    'I know a financial advisor who went from 180 clients to 40 and built 7 figure business.\nThis carousel shows exactly what he did 👇',
+    'structural caption extraction must remove the author header, LinkedIn headline, timestamp, and carousel title'
   );
 }
 
