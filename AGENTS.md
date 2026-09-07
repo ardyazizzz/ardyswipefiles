@@ -351,21 +351,35 @@ Tag rendering is shared across all 4 modes:
 tags.map(([k,v]) => { const c = getFC()[k] && getFC()[k][v]; ... })
 ```
 
-`renderCards(data)` uses a mode-scoped map keyed by item ID. Unchanged card nodes are moved or
+Posts use `SwipeVirtualGrid` from `swipe-virtual-grid.js` when ResizeObserver is available.
+Both grid and masonry mount only nearby cards, with requestAnimationFrame scroll scheduling,
+measured heights, and a bounded LRU node cache (120 or the mounted count, whichever is larger).
+Grid cards share the tallest height within each row; masonry places cards in the shortest lane.
+Offscreen disposal releases media; recent detached nodes remain reusable.
+
+The non-virtual fallback and other modes use a mode-scoped map keyed by item ID. Unchanged card nodes are moved or
 reused instead of recreating the complete grid with `innerHTML`; changed item markup replaces
 only that card. This preserves already-loaded image/video DOM when filters, sort order, or views
 change. Nodes for temporarily filtered-out items remain reusable, while IDs removed from the
 current mode's source array are pruned. Switching modes resets the map; the first render for that
 mode still uses one batched `innerHTML` parse so startup does not pay for one parser call per card.
 
-Regular (non-masonry) post grids also set `content-visibility: auto` with an intrinsic card-size
+Fallback regular (non-masonry) post grids set `content-visibility: auto` with an intrinsic card-size
 estimate, allowing the browser to skip style/layout/paint work for far-off cards. Masonry is
 intentionally excluded because its column balancing depends on measured card heights. Heavy media
 is mounted progressively: video and iframe elements start as lightweight placeholders, and image
 background layers are initially empty. `observeDeferredMedia()` hydrates those elements through an
 `IntersectionObserver` with a 900px look-ahead; browsers without IntersectionObserver hydrate them
 immediately. Native images use lazy loading, async decoding, and low fetch priority except for the
-first few visible-order cards.
+first few visible-order cards. Virtual cards override content-visibility because their DOM is already bounded.
+
+`swipe-preview.js` and `swipe-preview-worker.js` prepare thumbnails for eligible same-origin
+and owned Supabase Storage PNG/JPEG assets. A 16 MiB blob cache keeps recent previews reusable;
+external CDN images use normal browser loading. Carousel hydration loads the selected slide
+and its neighbours. Image errors retry once, then display “The original CDN link has expired.”
+This text is a UI fallback after loading failures, not verified proof of CDN expiry.
+Local browser fixtures and checks live in `tests/performance-server.js`,
+`tests/performance-fixture.js`, and `tests/browser-checks.js`.
 
 ---
 
@@ -373,12 +387,12 @@ first few visible-order cards.
 
 `getMedia()` renders the media preview in posts mode cards, checked in this order:
 1. Empty `url` → returns `''` (no media)
-2. Comma-separated URLs (multi-image) → split by comma, render `<div class="card-thumbs">` with lazy/async `<img class="thumb-img">` thumbnails plus deferred background layers in a horizontal scrollable row. Each thumbnail calls `openImageLightboxMulti(index, urlsStr)` on click.
+2. Comma-separated URLs (multi-image) → a hero carousel with deferred `data-preview-src` images, slide counter, and multi-image lightbox. Only the active slide and neighbours hydrate initially.
 3. `video.twimg.com` → a deferred `<video>` placeholder; hydration uses the Cloudflare Worker proxy (`https://swipe-proxy.ardyazizrw.workers.dev/?url=...`)
 4. YouTube (`youtube.com/watch` or `youtu.be`) → a deferred `<iframe>` placeholder
 5. Vimeo (`vimeo.com`) → a deferred `<iframe>` placeholder
 6. Direct video files (`.mp4`/`.webm`/`.mov`) → a deferred `<video muted playsinline controls preload="none" loop>` placeholder
-7. Fallback → an `<img loading="lazy" decoding="async">` with a deferred background layer, `onclick` lightbox (single-quote escaped), `onerror` hide, and `.card-img` class
+7. Fallback → a deferred `.card-img` with `data-preview-src`, async decoding, escaped lightbox attributes, and `SwipePreview` load/error handling.
 
 `observeDeferredMedia()` is called whenever a card node is first created or replaced. Hydrated media
 is never recreated during keyed filter/sort updates, and removed cards are unobserved before pruning.
@@ -673,7 +687,7 @@ Persistence is split by ownership so UI-only interactions never stringify all it
 
 ## Chrome Extension
 
-Located in `/extension/`. **Manifest V3.**
+Located in `/extension/`. **Manifest V3, version 1.4.12.** Reload the unpacked extension and refresh LinkedIn after updates. Local ZIP packages are user artifacts and are not included in source commits.
 
 Uses the same Supabase `/swipes` table and same item format (with `type` field).
 If you change the item schema in index.html, you MUST update the extension too.
@@ -686,6 +700,7 @@ If you change the item schema in index.html, you MUST update the extension too.
 - `content/x-bookmark-watcher.js` — X bookmark detection + toasts
 - `content/x-graphql-interceptor.js` — X fetch interceptor (runs in MAIN world)
 - `tests/linkedin-extraction.test.js` — Dependency-free LinkedIn caption/count regression tests
+- `tests/linkedin-carousel-background.test.js` — Background manifest resolution and page-count regression tests
 - `tests/bookmark-auto-save.test.js` — Dependency-free regression tests for the X bookmark auto-save toggle
 
 ## Extension Message & Save Flow
@@ -777,16 +792,23 @@ In `loadSwipes()`, items without `type` fall into the default `swipes[]` bucket 
 
 Carousel detection runs first so it takes priority over regular image scanning. LinkedIn can put an activity ID and its carousel manifest in separate Relay JSON blocks, so matching uses post-local evidence together: activity/document IDs when available, the carousel title, its visible page count, and the currently visible cover asset. A visible count is a hard rule: a post labelled `17 pages` is accepted only from a manifest with exactly 17 pages. An ambiguous or incomplete carousel fails closed instead of being saved as a cover-only result.
 
-### Carousel Detection — `<code>` JSON Approach
+### Carousel Detection — Native Config and Background Resolution
 
-**Critical:** For logged-in users, LinkedIn does NOT use `data-native-document-config` iframe attributes (the Hermes workflow document was tested on non-logged-in pages). Instead, carousel data is stored in `<code>` elements as Relay/GraphQL JSON.
+LinkedIn surfaces vary. `findLinkedInNativeDocumentConfig()` checks the selected card and then
+the document for an iframe carrying `data-native-document-config`. Otherwise the content script
+collects candidates from code, inline scripts, and observed document resources. Do not assume
+that either native config or Relay code exists for every logged-in page.
 
 ```
-<code> element → JSON → "manifestUrl" → fetch manifest → perResolutions → imageManifestUrl → pages[]
+content script → SWIPEAR:DY_RESOLVE_LINKEDIN_CAROUSEL → background worker
+  → supplied manifest candidates → largest resolution → imageManifestUrl → pages[]
+  → on failure: fetch public post HTML without cookies → manifestUrl → same chain
 ```
 
-- `extractLinkedInCarouselImages(card, activityId)` — supports compact and escaped/whitespace JSON variants, chooses the best available resolution, normalizes string or object-shaped `pages[]` entries, and verifies they belong to the visible carousel before returning every slide URL
-- `host_permissions` includes `https://media.licdn.com/*` for manifest fetches
+- `resolveLinkedInCarousel()` allows LinkedIn document URLs, processes at most eight candidates sequentially, continues after individual failures, requires the expected page count when known, and rejects multiple matching candidates. Background page entries currently use string URLs.
+- Native config is preferred over legacy candidates. The existing content-script manifest loop remains a final fallback if background resolution fails; it has not been removed.
+- `host_permissions` includes media.licdn.com and media-exp1 through media-exp4. The handler requires a LinkedIn sender tab. Extraction performs no database writes.
+- Verified user diagnostic: 52 reactions, 28 comments, 1 repost, 17 pages; seven resource candidates yielded one valid master and six non-master rejections.
 
 The same async manifest path is used by **Re-extract**, the LinkedIn **Save** watcher, and LinkedIn **Scan Page** (at most three carousel manifest chains concurrently). A carousel with 12 pages remains one Swipe record: its `image` field contains 12 comma-separated URLs. `storeItemMedia()` then attempts to archive every URL independently in Supabase Storage before saving the record; a failed individual archive retains its original LinkedIn URL rather than dropping that slide. A carousel whose full manifest cannot be matched is not auto-saved or bulk-imported as a cover-only record. LinkedIn diagnostics in the panel include expected pages, manifest candidates, match evidence, resolved page count, and the fallback reason.
 
@@ -815,11 +837,20 @@ Single-post extraction, the LinkedIn Save-button watcher, and page scanning all 
 
 `cleanSnippet()` remains a final text cleanup. When several known UI/footer markers are present, it truncates at the marker with the earliest position in the extracted text; the order of the marker array is not significant.
 
+The v1.4.12 structural cleanup removes the leading author/follow state, headline and initial
+timestamp (within 260 characters), and a trailing known carousel title/page-count block.
+This is heuristic; selector-based commentary remains preferred. Caption regression fixtures
+include the Rohit Virkud post and retain only the two actual post-copy sentences.
+
 ### Engagement Count Isolation
 
 `extractLinkedInCounts()` reads dedicated social-count/action-bar regions belonging to the same top-level post, or a bounded structural engagement summary when LinkedIn omits those class markers. Accessible labels are preferred, followed by text segments inside those regions; a bare reaction number is accepted only inside that bounded summary. Caption text, expanded comments, nested posts, and arbitrary page-wide number sequences are never used as engagement data. Lower-confidence fallbacks only fill missing values and never overwrite a count already found from a stronger source.
 
 Compact-number parsing accepts comma or period thousands separators, decimal `K`/`M`/`B` suffixes, and common spacing variants. A mutual summary such as `Alice and 27 others` resolves to 28 total reactions **before** the generic first-number fallback runs. This matters when LinkedIn exposes the same summary through an `aria-label` ending in `reacted`; treating its bare `27` as the total is incorrect.
+
+`getLinkedInPostActionMetricControls()` also reads combined accessible labels/text such as
+`Comment 28` and `Repost 1`. It requires a nearby complete Like/Comment/Repost/Send row,
+excludes recognized comments/nested posts, and seeds comments/reposts before older fallbacks.
 
 ### LinkedIn Extraction Diagnostics
 
@@ -843,7 +874,7 @@ These are NOT bugs today; they are ceilings that bite as the dataset grows.
 |---|---|---|---|
 | **Supabase row cap** | `loadSwipes()` fetches `/swipes` with no pagination | default 1,000 rows | "Max rows" raised to 10,000 via dashboard. Still no code pagination — if the number of cards exceeds the Max-rows setting, older cards silently do not load. Code pagination will be needed around ~8,000+. |
 | **localStorage size** | `persistData()` serializes the entire dataset after data mutations (~1.2 KB/card) | browser ~5 MB (~4,000 cards) | UI-only changes use smaller persistence helpers. `QuotaExceededError` is swallowed silently per-key; Supabase data remains safe. IndexedDB is the future option beyond this ceiling. |
-| **Render-all computation** | `renderCards()` still computes markup for all filtered cards, but reconciles keyed DOM nodes | noticeable at many thousands | Unchanged media DOM is reused; regular grids let the browser skip far-off card work with `content-visibility:auto`, and heavy media is IntersectionObserver-deferred. There is still no pagination or virtual scrolling. |
+| **Large-library computation** | Posts use virtual scrolling; filtering and layout still process the result set | noticeable at many thousands | Bounded card DOM, recent-node reuse, and worker previews reduce rendering costs. Other modes retain keyed rendering; database reads still lack pagination. |
 | **XSS risk** | card content (`s.text`, `s.author`, filter values) inserted via innerHTML without escaping | extension scrapes untrusted web content | Add HTML-escaping before insertion for any data that sourced from untrusted input (e.g., X/Twitter scrape). |
 | **RLS** | Supabase anon key (`SB_KEY`) is public in the source | — | RLS policies now enabled: anon can only SELECT and INSERT; authenticated can full CRUD. Extension still works (INSERT relies on anon policy). **Gotcha:** `authenticated` role also needs explicit `GRANT` on tables — RLS alone returns 403 on writes. |
 
