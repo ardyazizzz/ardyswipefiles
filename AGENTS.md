@@ -492,17 +492,27 @@ and the virtual grid released while it is shown (`body.canvas-active`).
 - **Multi-valued posts appear in every matching section.** Sections themselves never overlap.
 - **Only posts with images.** Video URLs are skipped; a carousel shows its cover with a count badge.
   Clicking a thumbnail opens the existing lightbox. The canvas never writes data.
+  (Carousel covers have no badge; the lightbox shows all slides.)
 - **Per-section cap.** `canvasLimit` (0 = all, or 6/12/24/48; `swipeardy_canvas_limit_v1`). A capped
   section ends with a `+N more` tile that expands only that section until the cap or category changes.
-- **Sections can be moved; thumbnails cannot.** Dragging a section title (or the screen-sized label
-  shown below 60% zoom) moves it on an 8 px snap. A drop that would overlap another section reverts.
+- **Sections can be moved; thumbnails cannot.** Dragging a section title (drawn at a constant
+  12 px; above the frame when zoomed out) moves it on an 8 px snap. A drop that would overlap another section reverts.
   After a move, all section positions for that category are snapshotted; positions and the last
   viewport are per-viewer UI state in localStorage `swipeardy_canvas_v1`
   (`{ [category]: { positions: { [option]: {x,y} }, view: {x,y,s} } }`). "Reset section positions" clears them.
 - **Navigation:** drag to pan, wheel to pan, Ctrl/⌘ + wheel or pinch to zoom (8%–400%),
   toolbar zoom/fit/reset, keyboard `+ - 0 !` and arrows while the canvas is focused.
-- **Performance:** thumbnails sit on a fixed per-section grid, so visible cells are computed
-  arithmetically; at most 900 are mounted (nearest the centre first) and images use `SwipePreview`.
+- **Rendering (performance-critical):** the whole board is painted on ONE `<canvas>`; there is no
+  per-thumbnail DOM. Each image is decoded once and downscaled into cached bitmaps at fixed widths
+  (48/112/240/480 device px, ~192 MB LRU shared across regrouping, trimmed to 48 MB while hidden).
+  A frame blits the level matching the zoom, or any cached level while a sharper one loads. Input
+  only updates the viewport and requests one `requestAnimationFrame` draw. Loads run at most 8 at
+  a time, nearest the viewport centre first. Visible cells and hit-testing are pure arithmetic
+  on the fixed per-section grid. Theme colours are read from CSS variables and refreshed when
+  `data-theme` changes. Benchmark (2,000 posts, pan + zoom): old DOM board p95 33 ms / max 50 ms
+  per frame; canvas board p95 and max 16.7 ms.
+- **Image-only UI:** no captions, hover tooltips, counts or hints are drawn over the board; only
+  section names and the zoom toolbar remain. `#resultsLabel` is hidden in canvas view.
 - **URL / views:** the hash adds `canvas=<category>` and `limit=<n>`. `saveCurrentView()` stores
   `layout`, `group` and `limit` for Posts views; `applyView()` restores them when present.
 
