@@ -402,6 +402,62 @@
     body[data-auth="guest"] #selectToggle { display: none !important; }
     body[data-auth="guest"] .card-body { cursor: default; }
     body[data-auth="user"] #signinBtn { display: none !important; }
+
+    /* ---------- Layout switcher ---------- */
+    .layout-toggle { display: inline-flex; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 2px; gap: 2px; box-shadow: var(--shadow-sm); }
+    .layout-seg { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; font-size: 12px; font-weight: 500; font-family: inherit; border: 0; border-radius: calc(var(--radius-md) - 2px); background: transparent; color: var(--text-tertiary); cursor: pointer; transition: all 0.16s var(--ease); }
+    .layout-seg i { font-size: 13px; }
+    .layout-seg:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+    .layout-seg.active { background: var(--accent-soft); color: var(--accent); }
+    .canvas-group { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--text-tertiary); }
+
+    /* ---------- Canvas view (Posts) ---------- */
+    body.canvas-active .app { max-width: none; padding-bottom: 16px; }
+    body.canvas-active #cardGrid { display: none; }
+    .swipe-canvas { position: relative; height: calc(100vh - var(--canvas-top, 180px) - 16px); height: calc(100dvh - var(--canvas-top, 180px) - 16px); min-height: 360px; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-secondary); outline: none; box-shadow: var(--shadow-sm); }
+    .swipe-canvas[hidden] { display: none; }
+    .swipe-canvas:focus-visible { box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-sm); }
+    .sc-viewport { position: absolute; inset: 0; overflow: hidden; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1.3px); }
+    .sc-viewport.sc-panning { cursor: grabbing; }
+    .sc-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+    .sc-section { position: absolute; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-sm); }
+    .sc-section.sc-dragging { box-shadow: var(--shadow-lg); z-index: 2; border-color: var(--accent); }
+    .sc-section.sc-blocked { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.25); }
+    .sc-section.sc-revert { transition: left 0.24s var(--ease), top 0.24s var(--ease); }
+    .sc-head { position: absolute; left: 0; right: 0; top: 0; height: 46px; display: flex; align-items: center; gap: 8px; padding: 0 14px; cursor: move; border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; }
+    .sc-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .sc-label { font-size: 14px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; }
+    .sc-count { font-size: 11px; font-weight: 600; color: var(--text-tertiary); background: var(--bg-secondary); border-radius: 20px; padding: 1px 8px; flex-shrink: 0; }
+    .sc-labels { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .sc-chip { position: absolute; left: 0; top: 0; display: none; align-items: center; gap: 6px; padding: 4px 9px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-sm); white-space: nowrap; overflow: hidden; pointer-events: auto; cursor: move; }
+    .sc-chip .sc-label { font-size: 12px; }
+    .sc-chip .sc-count { font-size: 10.5px; padding: 0 6px; }
+    .sc-chip .sc-dot { width: 7px; height: 7px; }
+    .sc-small .sc-chip { display: flex; }
+    .sc-small .sc-head { visibility: hidden; }
+    .sc-body { position: absolute; inset: 0; pointer-events: none; }
+    .sc-cell { position: absolute; left: 0; top: 0; width: 132px; height: 165px; border-radius: 8px; overflow: hidden; pointer-events: auto; cursor: zoom-in; background: var(--bg-secondary); box-shadow: 0 0 0 1px var(--border); transition: box-shadow 0.15s var(--ease); }
+    .sc-cell:hover { box-shadow: 0 0 0 2px var(--accent); }
+    .sc-thumb.img-wrap { height: 100%; }
+    .sc-more { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; background: var(--bg-tertiary); color: var(--text-secondary); box-shadow: inset 0 0 0 1.5px var(--border-strong); }
+    .sc-more strong { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .sc-more span { font-size: 11px; font-weight: 500; }
+    .sc-more:hover { color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+    .sc-thumb .card-img { pointer-events: none; }
+    .sc-thumb .media-expired { padding: 8px; gap: 6px; font-size: 10px; }
+    .sc-thumb .media-expired i { width: 24px; height: 24px; font-size: 13px; }
+    .sc-badge { position: absolute; right: 5px; top: 5px; z-index: 2; display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: #fff; background: rgba(17,24,39,0.72); border-radius: 20px; padding: 1px 6px 1px 5px; pointer-events: none; }
+    .sc-empty { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--text-tertiary); pointer-events: none; text-align: center; padding: 24px; }
+    .sc-empty i { font-size: 30px; }
+    .sc-empty p { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+    .sc-empty small { font-size: 12px; }
+    .sc-toolbar { position: absolute; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 2px; padding: 3px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow); z-index: 3; }
+    .sc-tool { min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--text-secondary); border-radius: calc(var(--radius-md) - 3px); cursor: pointer; font-family: inherit; font-size: 15px; }
+    .sc-tool:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .sc-zoom-label { font-size: 11.5px; font-weight: 600; min-width: 48px; font-variant-numeric: tabular-nums; }
+    .sc-tool-sep { width: 1px; height: 18px; background: var(--border); margin: 0 3px; }
+    .sc-hint { position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: var(--text-tertiary); background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; pointer-events: none; z-index: 3; }
+    @media (max-width: 700px) { .sc-hint { display: none; } .layout-seg span { display: none; } }
   </style>
 </head>
 <body data-auth="guest">
@@ -455,6 +511,7 @@
   <div class="filterbar" id="filterBar"></div>
   <div class="results-label" id="resultsLabel"></div>
   <div class="grid" id="cardGrid"></div>
+  <div class="swipe-canvas" id="canvasView" hidden aria-label="Canvas of post images grouped into sections"></div>
 </div>
 
 <div class="batch-bar" id="batchBar">
@@ -567,6 +624,7 @@
 <script src="supabase.js"></script>
 <script src="swipe-virtual-grid.js"></script>
 <script src="swipe-preview.js"></script>
+<script src="swipe-canvas.js"></script>
 <script>
 
   const LS_SWIPES = 'swipeardy_swipes_v1';
@@ -590,6 +648,8 @@
   const LS_VIEWS = 'swipeardy_views_v1';
   const LS_LAYOUT = 'swipeardy_layout_v1';
   const LS_NUMERIC_FILTERS = 'swipeardy_numeric_filters_v1';
+  const LS_CANVAS_GROUP = 'swipeardy_canvas_group_v1';
+  const LS_CANVAS_LIMIT = 'swipeardy_canvas_limit_v1';
 
   const SB_URL = 'https://dmhiitzunsdqyxopqsby.supabase.co/rest/v1';
   const SB_KEY = 'sb_publishable_ia350OuBQjG4Dw5V623eJw_m9Ftgn9F';
@@ -845,6 +905,8 @@
     try { localStorage.setItem(LS_SNIPPET_FILTER_STATE, JSON.stringify(snippetActiveFilters)); } catch(e) {}
     try { localStorage.setItem(LS_GRID_DENSITY, gridDensity); } catch(e) {}
     try { localStorage.setItem(LS_LAYOUT, JSON.stringify(layoutMode)); } catch(e) {}
+    try { localStorage.setItem(LS_CANVAS_GROUP, JSON.stringify(canvasGroup)); } catch(e) {}
+    try { localStorage.setItem(LS_CANVAS_LIMIT, JSON.stringify(canvasLimit)); } catch(e) {}
     try { localStorage.setItem(LS_NUMERIC_FILTERS, JSON.stringify(numericFilters)); } catch(e) {}
   }
 
@@ -1131,6 +1193,16 @@
   let gridDensity = parseInt(load(LS_GRID_DENSITY, 0)) || 0;
   if (gridDensity > 1) gridDensity = 1;
   let layoutMode = load(LS_LAYOUT, 'grid');
+  if (layoutMode !== 'grid' && layoutMode !== 'masonry' && layoutMode !== 'canvas') layoutMode = 'grid';
+  // Canvas view: the one Posts filter category whose options become sections.
+  let canvasGroup = load(LS_CANVAS_GROUP, '');
+  // Optional cap on thumbnails per section (0 = all). Sections expanded with "+N more"
+  // are remembered only until the category or the cap changes.
+  const CANVAS_LIMITS = [0, 6, 12, 24, 48];
+  let canvasLimit = parseInt(load(LS_CANVAS_LIMIT, 0)) || 0;
+  if (!CANVAS_LIMITS.includes(canvasLimit)) canvasLimit = 0;
+  const canvasExpanded = new Set();
+  let swipeCanvas = null;
   let views = load(LS_VIEWS, []);
   let numericFilters = load(LS_NUMERIC_FILTERS, { engMin: '', engMax: '', folMin: '', folMax: '' });
   let currentViewName = null;
@@ -1159,9 +1231,135 @@
   }
 
   function toggleLayout() {
-    layoutMode = layoutMode === 'grid' ? 'masonry' : 'grid';
+    setLayout(layoutMode === 'grid' ? 'masonry' : 'grid');
+  }
+
+  function setLayout(mode) {
+    if (mode !== 'grid' && mode !== 'masonry' && mode !== 'canvas') return;
+    if (mode === 'canvas' && !canvasSupported()) { showToast('Canvas view needs a newer browser'); return; }
+    const enteringCanvas = mode === 'canvas' && layoutMode !== 'canvas';
+    layoutMode = mode;
     currentViewName = null;
+    if (mode === 'canvas' && selectMode) { selectMode = false; selectedIds.clear(); document.getElementById('batchBar').classList.remove('show'); }
     persistUIState(); applyDensity(); renderFilterBar(); applyFilters(); syncHash();
+    if (enteringCanvas) window.scrollTo(0, 0);
+  }
+
+  /* ---------- Canvas view ----------
+     A read-only board for Posts. Exactly one filter category (canvasGroup) defines
+     the sections; every other filter, search and sort still narrows/orders what the
+     sections contain. A post with several values in that category appears in each
+     matching section. Section positions are a per-viewer preference (localStorage). */
+  function canvasSupported() { return !!(window.SwipeCanvas && window.ResizeObserver); }
+  function isCanvasActive() { return activeMode === 'posts' && layoutMode === 'canvas' && canvasSupported(); }
+
+  function canvasGroupKey() {
+    const keys = Object.keys(filters);
+    if (canvasGroup && keys.includes(canvasGroup)) return canvasGroup;
+    return keys.find(k => k.toLowerCase() === 'layout') || keys[0] || null;
+  }
+
+  function setCanvasGroup(key) {
+    if (!Object.prototype.hasOwnProperty.call(filters, key)) return;
+    canvasGroup = key;
+    canvasExpanded.clear();
+    currentViewName = null;
+    persistUIState(); updateViewsControl(); applyFilters(); syncHash();
+  }
+
+  function setCanvasLimit(value) {
+    const limit = parseInt(value) || 0;
+    if (!CANVAS_LIMITS.includes(limit)) return;
+    canvasLimit = limit;
+    canvasExpanded.clear();
+    currentViewName = null;
+    persistUIState(); updateViewsControl(); applyFilters(); syncHash();
+  }
+
+  function expandCanvasSection(name) {
+    canvasExpanded.add(name);
+    applyFilters();
+  }
+
+  const CANVAS_VIDEO_RE = /video\.twimg\.com|youtube\.com\/watch|youtu\.be\/|vimeo\.com\/|\.(mp4|webm|mov)(\?|#|$)/i;
+  function canvasImages(item) {
+    if (!item.image) return [];
+    return String(item.image).split(',').map(u => u.trim()).filter(u => u && !CANVAS_VIDEO_RE.test(u));
+  }
+
+  function buildCanvasSections(data, key) {
+    const options = (key && filters[key]) || [];
+    const colors = (key && filterColors[key]) || {};
+    const groups = new Map(options.map(opt => [opt, []]));
+    const ungrouped = [];
+    let imageCount = 0;
+    data.forEach(item => {
+      const images = canvasImages(item);
+      if (!images.length) return;
+      imageCount++;
+      const caption = String(item.text || '').replace(/\s+/g, ' ').trim();
+      const entry = {
+        key: String(item.id), id: item.id, src: images[0], images,
+        title: (item.author || '') + (caption ? ' — ' + caption.slice(0, 140) + (caption.length > 140 ? '…' : '') : '')
+      };
+      const raw = key && item.filters ? item.filters[key] : undefined;
+      const values = Array.from(new Set((Array.isArray(raw) ? raw : raw ? [raw] : []).filter(Boolean).map(String)));
+      if (!values.length) { ungrouped.push(entry); return; }
+      values.forEach(value => {
+        if (!groups.has(value)) groups.set(value, []);
+        groups.get(value).push(entry);
+      });
+    });
+    const sections = [];
+    const capped = (name, items) => canvasLimit && !canvasExpanded.has(name) ? items.slice(0, canvasLimit) : items;
+    groups.forEach((items, name) => {
+      if (!items.length) return;
+      sections.push({ name, label: name, color: colors[name] || colors[name.replace(/\s+/g, '')] || null, items: capped(name, items), total: items.length });
+    });
+    if (ungrouped.length) sections.push({ name: '\u0000none', label: key ? 'No ' + key : 'All images', color: null, items: capped('\u0000none', ungrouped), total: ungrouped.length });
+    return { sections, imageCount };
+  }
+
+  function updateCanvasTop() {
+    const host = document.getElementById('canvasView');
+    if (!host || host.hidden) return;
+    const top = host.getBoundingClientRect().top + window.scrollY;
+    host.style.setProperty('--canvas-top', Math.round(top) + 'px');
+  }
+
+  function openCanvasItem(entry) {
+    if (entry.images.length > 1) openImageLightboxMulti(0, entry.images.join(','));
+    else openImageLightbox(entry.src);
+  }
+
+  function renderCanvas(data) {
+    const host = document.getElementById('canvasView');
+    if (swipeVirtualGrid && swipeVirtualGrid.active) swipeVirtualGrid.clear();
+    if (renderedCardNodes.size) {
+      renderedCardNodes.forEach(node => disposeCardMedia(node));
+      renderedCardNodes.clear();
+      renderedCardMode = null;
+      document.getElementById('cardGrid').replaceChildren();
+    }
+    host.hidden = false;
+    updateCanvasTop();
+    if (!swipeCanvas) swipeCanvas = new SwipeCanvas(host, {
+      onOpen: openCanvasItem,
+      onExpand: expandCanvasSection,
+      keysEnabled: () => document.getElementById('imageOverlay').style.display !== 'flex'
+    });
+    const key = canvasGroupKey();
+    const { sections, imageCount } = buildCanvasSections(data, key);
+    swipeCanvas.setData(key || '', sections);
+    const hidden = data.length - imageCount;
+    document.getElementById('resultsLabel').textContent = imageCount + ' image' + (imageCount !== 1 ? 's' : '') + ' in ' + sections.length + ' section' + (sections.length !== 1 ? 's' : '') + (key ? ' · grouped by ' + key : '') + (hidden ? ' · ' + hidden + ' without images hidden' : '');
+  }
+
+  function hideCanvas() {
+    const host = document.getElementById('canvasView');
+    if (!host || host.hidden) return;
+    host.hidden = true;
+    if (swipeCanvas) swipeCanvas.suspend();
   }
 
   function densityLabel() {
@@ -1175,6 +1373,10 @@
     if (preset.sort) p.push('sort='+preset.sort);
     if (preset.density) p.push('density='+preset.density);
     if (preset.search) p.push('q='+encodeURIComponent(preset.search));
+    if (preset.layout === 'canvas' && (preset.mode || 'posts') === 'posts') {
+      p.push('canvas='+encodeURIComponent(preset.group || ''));
+      if (preset.limit) p.push('limit='+preset.limit);
+    }
     return location.origin + location.pathname + '#' + p.join('&');
   }
 
@@ -1194,6 +1396,10 @@
     const q = document.getElementById('searchInput').value.trim();
     if (q) p.push('q=' + encodeURIComponent(q));
     if (gridDensity) p.push('density=' + gridDensity);
+    if (isCanvasActive()) {
+      p.push('canvas=' + encodeURIComponent(canvasGroupKey() || ''));
+      if (canvasLimit) p.push('limit=' + canvasLimit);
+    }
     let hash = '#' + p.join('&');
     if (hash === '#mode=posts') hash = '';
     history.replaceState(null, '', location.pathname + hash);
@@ -1218,6 +1424,12 @@
     applySort(currentSort);
     if (v.density !== undefined) { gridDensity = v.density; applyDensity(); }
     if (v.search !== undefined) { document.getElementById('searchInput').value = v.search; }
+    if (activeMode === 'posts' && (v.layout === 'grid' || v.layout === 'masonry' || v.layout === 'canvas')) {
+      layoutMode = v.layout;
+      if (v.group) canvasGroup = v.group;
+      if (v.layout === 'canvas') { canvasLimit = CANVAS_LIMITS.includes(v.limit) ? v.limit : 0; canvasExpanded.clear(); }
+      if (layoutMode === 'canvas' && selectMode) { selectMode = false; selectedIds.clear(); document.getElementById('batchBar').classList.remove('show'); }
+    }
     currentViewName = v.name;
     persistUIState(); renderFilterBar(); applyFilters(); syncHash();
   }
@@ -1247,6 +1459,10 @@
       density: gridDensity,
       search: document.getElementById('searchInput').value
     };
+    if (activeMode === 'posts') {
+      preset.layout = layoutMode;
+      if (layoutMode === 'canvas') { preset.group = canvasGroupKey(); preset.limit = canvasLimit; }
+    }
     views.push(preset);
     currentViewName = name;
     savingView = false;
@@ -1316,6 +1532,9 @@
       if (key === 'sort') { currentSort = val; applySort(val); return; }
       if (key === 'density') { gridDensity = parseInt(val) || 0; if (gridDensity > 1) gridDensity = 1; applyDensity(); return; }
       if (key === 'q') { searchVal = val; return; }
+      // canvas=<category>: open the Posts canvas grouped by that filter category.
+      if (key === 'canvas') { if (activeMode === 'posts') { layoutMode = 'canvas'; if (val) canvasGroup = val; } return; }
+      if (key === 'limit') { const n = parseInt(val) || 0; if (CANVAS_LIMITS.includes(n)) canvasLimit = n; return; }
       for (const fk of filterKeys) {
         const kl = key.toLowerCase();
         if (fk.toLowerCase().startsWith(kl) || fk.slice(0,3).toLowerCase() === kl) {
@@ -1568,9 +1787,26 @@
       <option value="shortest"${currentSort==='shortest'?' selected':''}>Shortest</option>
       `}
     </select>`;
-    html += `${activeMode === 'posts' ? `<button class="btn-ghost" style="padding:6px 10px" onclick="toggleLayout()" title="Switch to ${layoutMode === 'masonry' ? 'Grid' : 'Masonry'}"><i class="${layoutMode === 'masonry' ? 'ri-layout-masonry-fill' : 'ri-layout-grid-fill'}" style="font-size:13px"></i></button>` : ''}`;
-    html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-column-line" style="font-size:13px"></i></button>`;
-    html += `<button class="btn-ghost ${selectMode ? 'active' : ''}" id="selectToggle" style="padding:6px 10px" onclick="toggleSelectMode()" title="Select cards"><i class="ri-checkbox-multiple-line" style="font-size:13px"></i></button>`;
+    const canvasOn = isCanvasActive();
+    if (activeMode === 'posts') {
+      const seg = (mode, icon, label) => `<button class="layout-seg ${layoutMode === mode ? 'active' : ''}" onclick="setLayout('${mode}')" title="${label}" aria-pressed="${layoutMode === mode}"><i class="${icon}"></i>${mode === 'canvas' ? '<span>Canvas</span>' : ''}</button>`;
+      html += `<div class="layout-toggle" role="group" aria-label="Layout">${seg('grid', 'ri-layout-grid-fill', 'Grid')}${seg('masonry', 'ri-layout-masonry-fill', 'Masonry')}${canvasSupported() ? seg('canvas', 'ri-artboard-2-line', 'Canvas: images grouped into sections') : ''}</div>`;
+    }
+    if (canvasOn) {
+      const groupKey = canvasGroupKey();
+      const keys = Object.keys(filters);
+      html += `<label class="canvas-group" title="The filter category whose options become canvas sections">Sections by
+        <select class="sort-select" onchange="setCanvasGroup(this.value)" aria-label="Group canvas sections by">
+          ${keys.length ? keys.map(k => `<option value="${mediaAttribute(k)}"${k === groupKey ? ' selected' : ''}>${mediaAttribute(k)}</option>`).join('') : '<option value="">No filter categories</option>'}
+        </select></label>`;
+      html += `<label class="canvas-group" title="Limit how many images each section shows">Per section
+        <select class="sort-select" onchange="setCanvasLimit(this.value)" aria-label="Images per section">
+          ${CANVAS_LIMITS.map(n => `<option value="${n}"${n === canvasLimit ? ' selected' : ''}>${n ? n + ' images' : 'All'}</option>`).join('')}
+        </select></label>`;
+    } else {
+      html += `<button class="btn-ghost" style="padding:6px 10px" onclick="cycleDensity()" title="${densityLabel()}"><i class="ri-layout-column-line" style="font-size:13px"></i></button>`;
+      html += `<button class="btn-ghost ${selectMode ? 'active' : ''}" id="selectToggle" style="padding:6px 10px" onclick="toggleSelectMode()" title="Select cards"><i class="ri-checkbox-multiple-line" style="font-size:13px"></i></button>`;
+    }
     const totalSelected = Object.values(getAF()).reduce((s, a) => s + a.length, 0);
     html += `<button class="btn-ghost" id="clearAllFiltersBtn" style="padding:6px 10px;font-size:11px;display:${totalSelected ? 'inline-flex' : 'none'}" onclick="clearAllFilters()"><i class="ri-close-line"></i> Clear all</button>`;
     bar.innerHTML = html;
@@ -1767,6 +2003,10 @@
     const totalLabel = activeMode === 'posts' ? 'swipe' : activeMode === 'creators' ? 'creator' : activeMode === 'websites' ? 'website' : 'snippet';
     document.getElementById('totalBadge').textContent = totalCount + ' ' + totalLabel + (totalCount !== 1 ? 's' : '');
     document.getElementById('resultsLabel').textContent = data.length + ' result' + (data.length !== 1 ? 's' : '');
+    const canvasActive = isCanvasActive();
+    document.body.classList.toggle('canvas-active', canvasActive);
+    if (canvasActive) { renderCanvas(data); return; }
+    hideCanvas();
     const grid = document.getElementById('cardGrid');
     grid.classList.toggle('masonry', activeMode === 'posts' && layoutMode === 'masonry');
     if (activeMode === 'posts' && layoutMode === 'masonry') {
@@ -2424,7 +2664,7 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { hideAuthOverlay(); closeAddModal(); closeEditModal(); closeSettings(); closeViewsEditor(); closeImageLightbox(); }
   });
-  window.addEventListener('resize', () => { if (activeMode === 'posts') applyDensity(); });
+  window.addEventListener('resize', () => { if (activeMode === 'posts') applyDensity(); updateCanvasTop(); });
 
   renderFilterBar();
   applyDensity();

@@ -6,7 +6,7 @@ const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const baseline = execFileSync('git', ['show', 'd56e067:index.html'], { cwd: root, encoding: 'utf8' });
 const files = new Map([
-  ['/swipe-virtual-grid.js', 'swipe-virtual-grid.js'], ['/swipe-preview.js', 'swipe-preview.js'],
+  ['/swipe-virtual-grid.js', 'swipe-virtual-grid.js'], ['/swipe-preview.js', 'swipe-preview.js'], ['/swipe-canvas.js', 'swipe-canvas.js'],
   ['/swipe-preview-worker.js', 'swipe-preview-worker.js'], ['/fixture.js', 'tests/performance-fixture.js'],
   ['/checks.js', 'tests/browser-checks.js']
 ]);

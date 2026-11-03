@@ -478,11 +478,41 @@ Masonry uses CSS `column-count` set in BOTH `applyDensity()` and `applyFilters()
 - else → 2 columns
 `grid.style.cssText = ''` restores the default grid layout for non-posts modes.
 
+### Canvas View (Posts only)
+
+`layoutMode` can also be `'canvas'`: a read-only, Figma-like board for scanning images, chosen in
+the Grid | Masonry | Canvas switcher. Grid and Masonry are unchanged. The board lives in
+`swipe-canvas.js` (`window.SwipeCanvas`) and is mounted into `#canvasView`; `#cardGrid` is hidden
+and the virtual grid released while it is shown (`body.canvas-active`).
+
+- **One category defines the sections.** `canvasGroup` (localStorage `swipeardy_canvas_group_v1`,
+  "Sections by" select) names one Posts filter category; each option becomes a section, plus a
+  `No <category>` section for posts without a value. Default: a category named `Layout`, else the
+  first one. Every other filter, search, numeric range and sort still narrows/orders the sections.
+- **Multi-valued posts appear in every matching section.** Sections themselves never overlap.
+- **Only posts with images.** Video URLs are skipped; a carousel shows its cover with a count badge.
+  Clicking a thumbnail opens the existing lightbox. The canvas never writes data.
+- **Per-section cap.** `canvasLimit` (0 = all, or 6/12/24/48; `swipeardy_canvas_limit_v1`). A capped
+  section ends with a `+N more` tile that expands only that section until the cap or category changes.
+- **Sections can be moved; thumbnails cannot.** Dragging a section title (or the screen-sized label
+  shown below 60% zoom) moves it on an 8 px snap. A drop that would overlap another section reverts.
+  After a move, all section positions for that category are snapshotted; positions and the last
+  viewport are per-viewer UI state in localStorage `swipeardy_canvas_v1`
+  (`{ [category]: { positions: { [option]: {x,y} }, view: {x,y,s} } }`). "Reset section positions" clears them.
+- **Navigation:** drag to pan, wheel to pan, Ctrl/⌘ + wheel or pinch to zoom (8%–400%),
+  toolbar zoom/fit/reset, keyboard `+ - 0 !` and arrows while the canvas is focused.
+- **Performance:** thumbnails sit on a fixed per-section grid, so visible cells are computed
+  arithmetically; at most 900 are mounted (nearest the centre first) and images use `SwipePreview`.
+- **URL / views:** the hash adds `canvas=<category>` and `limit=<n>`. `saveCurrentView()` stores
+  `layout`, `group` and `limit` for Posts views; `applyView()` restores them when present.
+
+Run `node tests/performance-server.js` and use **Run canvas checks** in the test panel.
+
 ---
 
 ## Saved Views (Presets)
 
-Each view object: `{ name, mode, filters, sort, density, search }`
+Each view object: `{ name, mode, filters, sort, density, search }`, plus `layout`, `group`, `limit` for Posts views saved after the Canvas view was added
 
 **`applyView(index)`:**
 1. `setMode(v.mode, true)` — switch mode (skipRender to avoid premature hash)
@@ -673,7 +703,7 @@ All keys prefixed with `swipeardy_`:
 | **Filter definitions** | `filters_v2` (posts), `creator_filters_v1`, `website_filters_v1`, `snippet_filters_v1` |
 | **Filter colors** | `filter_colors_v1` (posts), `creator_filter_colors_v1`, `website_filter_colors_v1`, `snippet_filter_colors_v1` |
 | **Filter state** | `filter_state_v1` (posts), `creator_filter_state_v1`, `website_filter_state_v1`, `snippet_filter_state_v1` |
-| **UI state** | `mode_v1`, `grid_density_v1`, `views_v1`, `layout_v1`, `numeric_filters_v1`, `dark_v1` |
+| **UI state** | `mode_v1`, `grid_density_v1`, `views_v1`, `layout_v1`, `numeric_filters_v1`, `dark_v1`, `canvas_group_v1`, `canvas_limit_v1`, `canvas_v1` |
 
 Persistence is split by ownership so UI-only interactions never stringify all item arrays:
 

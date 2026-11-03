@@ -3,7 +3,7 @@
   const panel = document.createElement('div');
   panel.id = 'testPanel';
   panel.style.cssText = 'position:fixed;right:8px;top:8px;z-index:10000;background:white;color:black;padding:8px;border:1px solid #aaa;max-width:420px;font:12px monospace;max-height:45vh;overflow:auto';
-  panel.innerHTML = '<button id="runChecks">Run functional checks</button> <button id="runBenchmark">Run scrolling benchmark</button><pre id="testResults">Ready</pre>';
+  panel.innerHTML = '<button id="runChecks">Run functional checks</button> <button id="runCanvas">Run canvas checks</button> <button id="runBenchmark">Run scrolling benchmark</button><pre id="testResults">Ready</pre>';
   document.body.append(panel);
   const report = value => document.getElementById('testResults').textContent = JSON.stringify(value, null, 2);
   const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -113,6 +113,61 @@
       passed.push('Realtime refresh');
       assert(fixtureErrors.length === 0, 'Browser errors: ' + fixtureErrors.join('; '));
       report({ ok: true, passed, mounted: cards().length, cached: swipeVirtualGrid.cache.size, total: fixtureCount, mockWrites: fixtureWrites.length });
+    } catch (error) { report({ ok: false, passed, error: error.message, browserErrors: fixtureErrors }); }
+  };
+  document.getElementById('runCanvas').onclick = async () => {
+    const passed = [];
+    report({ running: true });
+    const sectionRects = () => Array.from(document.querySelectorAll('.sc-section')).map(s => ({ name: s.dataset.section, rect: s.getBoundingClientRect() }));
+    const sectionsOverlap = () => sectionRects().some((a, i, all) => all.slice(i + 1).some(b =>
+      a.rect.left < b.rect.right && a.rect.right > b.rect.left && a.rect.top < b.rect.bottom && a.rect.bottom > b.rect.top));
+    try {
+      setLayout('canvas'); await settle();
+      assert(!document.getElementById('canvasView').hidden && document.body.classList.contains('canvas-active'), 'Canvas shown');
+      assert(cards().length === 0, 'Card grid released while the canvas is shown');
+      setCanvasGroup('Topic' in filters ? 'Topic' : 'Format'); await settle();
+      filters.Topic = ['Topic 0', 'Topic 1', 'Topic 2', 'Topic 3'];
+      setCanvasGroup('Topic'); await settle();
+      const sections = sectionRects().map(s => s.name);
+      assert(sections.includes('Topic 3') && sections.includes('\u0000none'), 'One section per option plus ungrouped');
+      const multi = swipes.find(s => canvasImages(s).length && Array.isArray(s.filters.Topic) && s.filters.Topic.length > 1);
+      const inSections = swipeCanvas.sections.filter(sec => sec.index.has(String(multi.id))).length;
+      assert(inSections === multi.filters.Topic.length, 'Multi-valued post appears in each matching section');
+      assert(!sectionsOverlap(), 'Sections never overlap');
+      swipeCanvas.fit(); await settle();
+      assert(document.querySelectorAll('.sc-cell').length <= 900, 'Mounted thumbnails bounded');
+      passed.push('Sections by one category, duplicates per value, no overlap, bounded DOM');
+      const first = swipeCanvas.sections[0], second = swipeCanvas.sections[1];
+      const origin = { x: first.x, y: first.y };
+      first.x = second.x; first.y = second.y;
+      const blocked = swipeCanvas.sections.some(o => o !== first && o.x < first.x + first.w && o.x + o.w > first.x);
+      first.x = origin.x; first.y = origin.y;
+      assert(blocked, 'Overlap detection');
+      toggleFilter('Category', 'Design'); await settle();
+      assert(document.getElementById('resultsLabel').textContent.includes('grouped by Topic'), 'Other filters narrow the canvas');
+      assert(location.hash.includes('canvas=Topic'), 'Canvas state in URL');
+      clearAllFilters(); await settle();
+      passed.push('Filters, URL hash');
+      const cell = document.querySelector('.sc-cell');
+      cell.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 7, button: 0, clientX: 1, clientY: 1 }));
+      cell.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 7, button: 0, clientX: 1, clientY: 1 }));
+      assert(document.getElementById('imageOverlay').style.display === 'flex', 'Thumbnail opens the lightbox');
+      closeImageLightbox();
+      passed.push('Read-only lightbox');
+      setCanvasLimit(6); await settle();
+      assert(swipeCanvas.sections.every(sec => sec.shown <= 6), 'Per-section limit applied');
+      const limited = swipeCanvas.sections.find(sec => sec.total > 6);
+      assert(limited && limited.items[limited.items.length - 1].more === limited.total - 6, '+N more tile');
+      expandCanvasSection(limited.name); await settle();
+      assert(swipeCanvas.byName.get(limited.name).shown === limited.total, 'One section expands');
+      assert(location.hash.includes('limit=6'), 'Limit in URL');
+      setCanvasLimit(0); await settle();
+      passed.push('Per-section limit with expandable +N more');
+      setLayout('grid'); await settle();
+      assert(document.getElementById('canvasView').hidden && cards().length > 0 && !document.querySelector('.sc-cell'), 'Grid restored and canvas images released');
+      passed.push('Grid restored');
+      assert(fixtureErrors.length === 0, 'Browser errors: ' + fixtureErrors.join('; '));
+      report({ ok: true, passed, writes: fixtureWrites.length });
     } catch (error) { report({ ok: false, passed, error: error.message, browserErrors: fixtureErrors }); }
   };
   document.getElementById('runBenchmark').onclick = async () => {
